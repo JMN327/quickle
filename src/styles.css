@@ -1,0 +1,49 @@
+svg {
+    width: 100%;
+    height: 100%;
+    background-color: black;
+    border-radius: 7%;
+    
+}
+
+.red {
+    fill: red;
+}
+.orange {
+    fill: orange;
+}
+.yellow {
+    fill: yellow;
+}
+.green {
+    fill: green;
+}
+.blue {
+    fill: blue;
+}
+.purple {
+    fill: purple;
+}
+
+.svg-tile {
+    height: 150px;
+    width: 150px;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+}
+
+.test-pallet {
+    display: flex;
+    gap: 1rem;
+}
+
+.pallet {
+    display: flex;
+    gap: 1rem;
+}
