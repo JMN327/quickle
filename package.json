@@ -1,0 +1,18 @@
+{
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "wp_install": "npm install --save-dev webpack webpack-cli",
+    "wp_server": "npm install --save-dev webpack-dev-server",
+    "wp_html": "npm install --save-dev html-webpack-plugin",
+    "wp_css": "npm install --save-dev style-loader css-loader",
+    "wp_htmlImages": "npm install --save-dev html-loader",
+    "wp_build": "webpack",
+    "wp_dev": "webpack serve",
+    "git_deploy": "git subtree push --prefix dist origin gh-pages",
+    "esl_install": "npm install eslint",
+    "esl_init": "npx eslint --init",
+    "dateFns_install": "npm install date-fns --save",
+    "datePicker_install": "npm install js-datepicker --save",
+    "starBar_install": "npm install rater-js --save"
+  }
+}
