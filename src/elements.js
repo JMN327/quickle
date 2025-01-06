@@ -33,3 +33,9 @@ export function addTileElement(shape, color, parent = null) {
   }
   return svgTile;
 }
+
+export function removeAllChildNodes(parent) {
+  while (parent.firstChild) {
+    parent.removeChild(parent.firstChild);
+  }
+}
