@@ -67,16 +67,16 @@ let outerHeight = 800;
 let outerWidth = 800;
 outer.style.height = outerHeight + "px";
 outer.style.width = outerWidth + "px";
-const innerHeight_Default = 1000;
-const innerWidth_Default = 1500;
+const innerHeight_Default = 1500;
+const innerWidth_Default = 1000;
 const aspectRatio = innerHeight_Default / innerWidth_Default;
 inner.style.height = innerHeight_Default + "px";
 inner.style.width = innerWidth_Default + "px";
 let zoomLevel = 0;
 const zoomLevelMax = 10;
 let zoomFactor = 10;
-const zoomAmountX = innerHeight_Default / zoomFactor;
-const zoomAmountY = innerWidth_Default / zoomFactor;
+const zoomIncreaseX = innerWidth_Default / zoomFactor;
+const zoomIncreaseY = innerHeight_Default / zoomFactor;
 let innerH_current = innerHeight_Default;
 let innerW_current = innerWidth_Default;
 
@@ -116,71 +116,117 @@ inner.addEventListener("wheel", (event) => zoom(event), { passive: false });
 
 function zoom(event) {
   event.preventDefault();
-
+  let zoomParity;
   if (event.deltaY < 0) {
     zoomLevel++;
     if (zoomLevel > zoomLevelMax) {
       console.log(`max zoom level reached`);
-      zoomLevel--
+      zoomLevel--;
       return;
     }
+    zoomParity = -1;
     console.log("zooming in");
   } else {
     console.log("zooming out");
     zoomLevel--;
+    zoomParity = 1;
   }
   console.log(`zoom level: ${zoomLevel}`);
 
-  let innerH_proposed = innerHeight_Default + zoomLevel * zoomAmountX;
-  let innerW_proposed = innerWidth_Default + zoomLevel * zoomAmountY;
+  let innerH_proposed = innerHeight_Default + zoomLevel * zoomIncreaseY;
+  let innerW_proposed = innerWidth_Default + zoomLevel * zoomIncreaseX;
 
-  /* if (innerH_proposed >= outerHeight && innerW_proposed >= outerWidth) {
-    innerH_current = innerH_proposed;
-    innerW_current = innerW_proposed;
-  } */
+  const partIncreaseX =
+    (innerW_proposed + zoomIncreaseX - outerWidth) * aspectRatio;
+  const partIncreaseY =
+    (innerH_proposed + zoomIncreaseY - outerHeight) / aspectRatio;
 
   if (innerH_proposed < outerHeight) {
-    const difY = (innerH_proposed + zoomAmountX - outerHeight) / aspectRatio;
     zoomLevel++;
     innerH_current = outerHeight;
-    innerW_current = innerWidth_Default + zoomLevel * zoomAmountY + difY;
+    innerW_current =
+      innerWidth_Default + zoomLevel * zoomIncreaseX + partIncreaseX;
+    zoomOffset(event, partIncreaseY, partIncreaseX);
   } else if (innerW_proposed < outerWidth) {
-    const difX = (innerW_proposed + zoomAmountY - outerWidth) * aspectRatio;
     zoomLevel++;
-    innerH_current = innerHeight_Default + zoomLevel * zoomAmountX + difX;
+    innerH_current =
+      innerHeight_Default + zoomLevel * zoomIncreaseY + partIncreaseY;
     innerW_current = outerWidth;
+    zoomOffset(event, partIncreaseY, partIncreaseX);
   } else {
     innerH_current = innerH_proposed;
     innerW_current = innerW_proposed;
+    zoomOffset(event, zoomIncreaseY, zoomIncreaseX, zoomParity);
   }
 
-  console.log(innerH_current, innerW_current, innerH_current / innerW_current);
+  console.log(innerH_current, innerW_current, innerW_current / innerH_current );
 
   inner.style.height = innerH_current + "px";
   inner.style.width = innerW_current + "px";
-  //moveInner(event);
 }
 
-function moveInner(event) {
-  let top = event.clientY - outer.getBoundingClientRect().top - clickOffsetY;
-  let bottom = top + innerH_current - outerHeight;
-  let left = event.clientX - outer.getBoundingClientRect().left - clickOffsetX;
-  let right = left + innerW_current - outerWidth;
+function zoomOffset(event, increaseY, increaseX, zoomParity) {
+  const posOffsetY =
+    ((event.clientY - inner.getBoundingClientRect().top) /
+      inner.getBoundingClientRect().height) *
+    increaseY *
+    zoomParity;
+  const posOffsetX =
+    ((event.clientX - inner.getBoundingClientRect().left) /
+      inner.getBoundingClientRect().width) *
+    increaseX *
+    zoomParity;
+  moveInner(event, { posOffsetX, posOffsetY });
+}
+
+function moveInner(event, zoom) {
+  let top;
+  let bottom;
+  let left;
+  let right;
+
+  if (!zoom) {
+    console.log("move Pan");
+    top = event.clientY - outer.getBoundingClientRect().top - clickOffsetY;
+    bottom = top + innerH_current - outerHeight;
+    left = event.clientX - outer.getBoundingClientRect().left - clickOffsetX;
+    right = left + innerW_current - outerWidth;
+  } else {
+    console.log(
+      "move Zoom",
+      "offX " + Math.round(zoom.posOffsetX),
+      "offY " + Math.round(zoom.posOffsetY),
+      Math.round(inner.getBoundingClientRect().top)
+    );
+    top = inner.getBoundingClientRect().top + zoom.posOffsetY;
+    bottom = top + innerH_current - outerHeight;
+    left = inner.getBoundingClientRect().left + zoom.posOffsetX;
+    right = left + innerW_current - outerWidth;
+  }
 
   if (top < 0 && bottom > 0) {
     inner.style.top = top + "px";
   } else if (top >= 0) {
-    inner.style.top = "0px";
+    top = 0;
+    inner.style.top = top + "px";
   } else {
-    inner.style.top = outerHeight - innerH_current + "px";
+    bottom = outerHeight - innerH_current;
+    inner.style.top = bottom + "px";
   }
   if (left < 0 && right > 0) {
     inner.style.left = left + "px";
   } else if (left >= 0) {
-    inner.style.left = "0px";
+    left = 0;
+    inner.style.left = left + "px";
   } else {
-    inner.style.left = outerWidth - innerW_current + "px";
+    right = outerWidth - innerW_current;
+    inner.style.left = right + "px";
   }
 
-  console.log(event.clientY, left, right, top, bottom);
+  console.log(
+    "L " + Math.round(left),
+    "R " + Math.round(right),
+    "T " + Math.round(top),
+    "B " + Math.round(bottom)
+  );
 }
