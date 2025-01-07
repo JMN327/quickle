@@ -73,7 +73,7 @@ const aspectRatio = innerHeight_Default / innerWidth_Default;
 inner.style.height = innerHeight_Default + "px";
 inner.style.width = innerWidth_Default + "px";
 let zoomLevel = 0;
-const zoomLevelMax = 10;
+const zoomLevelMax = 20;
 let zoomFactor = 10;
 const zoomIncreaseX = innerWidth_Default / zoomFactor;
 const zoomIncreaseY = innerHeight_Default / zoomFactor;
@@ -159,7 +159,7 @@ function zoom(event) {
     zoomOffset(event, zoomIncreaseY, zoomIncreaseX, zoomParity);
   }
 
-  console.log(innerH_current, innerW_current, innerW_current / innerH_current );
+  console.log(innerH_current, innerW_current, innerW_current / innerH_current);
 
   inner.style.height = innerH_current + "px";
   inner.style.width = innerW_current + "px";
@@ -198,9 +198,16 @@ function moveInner(event, zoom) {
       "offY " + Math.round(zoom.posOffsetY),
       Math.round(inner.getBoundingClientRect().top)
     );
-    top = inner.getBoundingClientRect().top + zoom.posOffsetY;
+    console.log(inner.style.top, inner.getBoundingClientRect().top);
+    top =
+      inner.getBoundingClientRect().top -
+      outer.getBoundingClientRect().top +
+      zoom.posOffsetY;
     bottom = top + innerH_current - outerHeight;
-    left = inner.getBoundingClientRect().left + zoom.posOffsetX;
+    left =
+      inner.getBoundingClientRect().left -
+      outer.getBoundingClientRect().left +
+      zoom.posOffsetX;
     right = left + innerW_current - outerWidth;
   }
 
