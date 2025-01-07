@@ -58,38 +58,36 @@ function populateGrid() {
 
 let outer = addBasicElement("div", ["outer"], body);
 let inner = addBasicElement("div", ["inner"], outer);
-let mouseY;
-let mouseX;
+
 let clickOffsetY;
 let clickOffsetX;
 
-let outerHeight = 800;
-let outerWidth = 800;
-outer.style.height = outerHeight + "px";
-outer.style.width = outerWidth + "px";
-const innerHeight_Default = 1500;
-const innerWidth_Default = 1000;
-const aspectRatio = innerHeight_Default / innerWidth_Default;
-inner.style.height = innerHeight_Default + "px";
-inner.style.width = innerWidth_Default + "px";
+let outerH_default = 800;
+let outerW_default = 800;
+setOuterSize([outerH_default, outerW_default]);
+
+const innerH_Default = 1011;
+const innerW_Default = 1511;
+setInnerSize([innerH_Default, innerW_Default]);
+const aspectRatio = innerH_Default / innerW_Default;
+
 let zoomLevel = 0;
 const zoomLevelMax = 20;
 let zoomFactor = 10;
-const zoomIncreaseX = innerWidth_Default / zoomFactor;
-const zoomIncreaseY = innerHeight_Default / zoomFactor;
-let innerH_current = innerHeight_Default;
-let innerW_current = innerWidth_Default;
 
-inner.style.height = innerHeight_Default + "px";
-inner.style.width = innerWidth_Default + "px";
+const zoomAddW = innerW_Default / zoomFactor;
+const zoomAddH = innerH_Default / zoomFactor;
+
+let innerH_current = innerH_Default;
+let innerW_current = innerW_Default;
 
 let innerMouseDown = false;
 
-inner.addEventListener("dragstart", (event) => {
+outer.addEventListener("dragstart", (event) => {
   event.preventDefault();
 });
 
-inner.addEventListener("mousedown", (event) => {
+outer.addEventListener("mousedown", (event) => {
   if (event.buttons !== 1) {
     return;
   }
@@ -112,10 +110,11 @@ document.body.addEventListener("mouseup", (event) => {
   innerMouseDown = false;
 });
 
-inner.addEventListener("wheel", (event) => zoom(event), { passive: false });
+outer.addEventListener("wheel", (event) => zoom(event), { passive: false });
 
 function zoom(event) {
   event.preventDefault();
+
   let zoomParity;
   if (event.deltaY < 0) {
     zoomLevel++;
@@ -125,44 +124,88 @@ function zoom(event) {
       return;
     }
     zoomParity = -1;
-    console.log("zooming in");
+    console.log(`zooming in`);
   } else {
-    console.log("zooming out");
     zoomLevel--;
     zoomParity = 1;
+    console.log(`zooming out`);
+  }
+
+  let innerH_initial = innerH_current;
+  let innerW_initial = innerW_current;
+  let partialZoomAddH;
+  let partialZoomAddW;
+
+  let innerH_proposed = innerH_Default + zoomLevel * zoomAddH;
+  let innerW_proposed = innerW_Default + zoomLevel * zoomAddW;
+
+  // zooming out edge cases
+  if (zoomParity === 1) {
+    if (innerH_proposed <= outerH_default) {
+      zoomLevel++;
+      innerH_current = outerH_default;
+      innerW_current = outerH_default / aspectRatio;
+
+      partialZoomAddH = innerH_initial - outerH_default;
+      partialZoomAddW = partialZoomAddH / aspectRatio;
+
+      console.log(
+        "partials",
+        partialZoomAddH,
+        partialZoomAddW,
+        partialZoomAddW / partialZoomAddH
+      );
+      zoomOffset(event, partialZoomAddH, partialZoomAddW, zoomParity);
+    } else if (innerW_proposed <= outerW_default) {
+      zoomLevel++;
+      innerH_current = outerW_default * aspectRatio;
+      innerW_current = outerW_default;
+
+      partialZoomAddW = innerW_initial - outerW_default;
+      partialZoomAddH = partialZoomAddW * aspectRatio;
+
+      console.log("partials", partialZoomAddH, partialZoomAddW);
+      zoomOffset(event, partialZoomAddH, partialZoomAddW, zoomParity);
+    } else {
+      innerH_current = innerH_proposed;
+      innerW_current = innerW_proposed;
+      console.log("no partials");
+      zoomOffset(event, zoomAddH, zoomAddW, zoomParity);
+    }
+  }
+
+  // zooming in edge cases
+  if (zoomParity === -1) {
+    if (innerH_initial == outerH_default) {
+      innerH_current = innerH_proposed;
+      innerW_current = innerW_proposed;
+
+      partialZoomAddH = innerH_proposed - innerH_initial;
+      partialZoomAddW = partialZoomAddH / aspectRatio;
+
+      console.log("partials", partialZoomAddH, partialZoomAddW);
+
+      zoomOffset(event, partialZoomAddH, partialZoomAddW, zoomParity);
+    } else if (innerW_initial == outerW_default) {
+      innerH_current = innerH_proposed;
+      innerW_current = innerW_proposed;
+
+      partialZoomAddW = innerW_proposed - innerW_initial;
+      partialZoomAddH = partialZoomAddW * aspectRatio;
+
+      console.log("partials", partialZoomAddH, partialZoomAddW);
+
+      zoomOffset(event, partialZoomAddH, partialZoomAddW, zoomParity);
+    } else {
+      innerH_current = innerH_proposed;
+      innerW_current = innerW_proposed;
+      console.log("no partials");
+      zoomOffset(event, zoomAddH, zoomAddW, zoomParity);
+    }
   }
   console.log(`zoom level: ${zoomLevel}`);
 
-  let innerH_proposed = innerHeight_Default + zoomLevel * zoomIncreaseY;
-  let innerW_proposed = innerWidth_Default + zoomLevel * zoomIncreaseX;
-
-  const partIncreaseX =
-    (innerW_proposed + zoomIncreaseX - outerWidth) * aspectRatio;
-  const partIncreaseY =
-    (innerH_proposed + zoomIncreaseY - outerHeight) / aspectRatio;
-
-  if (innerH_proposed < outerHeight) {
-    zoomLevel++;
-    innerH_current = outerHeight;
-    innerW_current =
-      innerWidth_Default + zoomLevel * zoomIncreaseX + partIncreaseX;
-    zoomOffset(event, partIncreaseY, partIncreaseX);
-  } else if (innerW_proposed < outerWidth) {
-    zoomLevel++;
-    innerH_current =
-      innerHeight_Default + zoomLevel * zoomIncreaseY + partIncreaseY;
-    innerW_current = outerWidth;
-    zoomOffset(event, partIncreaseY, partIncreaseX);
-  } else {
-    innerH_current = innerH_proposed;
-    innerW_current = innerW_proposed;
-    zoomOffset(event, zoomIncreaseY, zoomIncreaseX, zoomParity);
-  }
-
-  console.log(innerH_current, innerW_current, innerW_current / innerH_current);
-
-  inner.style.height = innerH_current + "px";
-  inner.style.width = innerW_current + "px";
+  setInnerSize([innerH_current, innerW_current]);
 }
 
 function zoomOffset(event, increaseY, increaseX, zoomParity) {
@@ -188,52 +231,71 @@ function moveInner(event, zoom) {
   if (!zoom) {
     console.log("move Pan");
     top = event.clientY - outer.getBoundingClientRect().top - clickOffsetY;
-    bottom = top + innerH_current - outerHeight;
+    bottom = top + innerH_current - outerH_default;
     left = event.clientX - outer.getBoundingClientRect().left - clickOffsetX;
-    right = left + innerW_current - outerWidth;
+    right = left + innerW_current - outerW_default;
   } else {
-    console.log(
-      "move Zoom",
-      "offX " + Math.round(zoom.posOffsetX),
-      "offY " + Math.round(zoom.posOffsetY),
-      Math.round(inner.getBoundingClientRect().top)
-    );
-    console.log(inner.style.top, inner.getBoundingClientRect().top);
+    console.log("move Zoom");
     top =
       inner.getBoundingClientRect().top -
       outer.getBoundingClientRect().top +
       zoom.posOffsetY;
-    bottom = top + innerH_current - outerHeight;
+    bottom = top + innerH_current - outerH_default;
     left =
       inner.getBoundingClientRect().left -
       outer.getBoundingClientRect().left +
       zoom.posOffsetX;
-    right = left + innerW_current - outerWidth;
+    right = left + innerW_current - outerW_default;
   }
 
   if (top < 0 && bottom > 0) {
-    inner.style.top = top + "px";
+    setInnerTop(top);
   } else if (top >= 0) {
     top = 0;
-    inner.style.top = top + "px";
+    setInnerTop(top);
   } else {
-    bottom = outerHeight - innerH_current;
-    inner.style.top = bottom + "px";
+    bottom = outerH_default - innerH_current;
+    setInnerTop(bottom);
   }
   if (left < 0 && right > 0) {
-    inner.style.left = left + "px";
+    setInnerLeft(left);
   } else if (left >= 0) {
     left = 0;
-    inner.style.left = left + "px";
+    setInnerLeft(left);
   } else {
-    right = outerWidth - innerW_current;
-    inner.style.left = right + "px";
+    right = outerW_default - innerW_current;
+    setInnerLeft(right);
   }
 
-  console.log(
-    "L " + Math.round(left),
-    "R " + Math.round(right),
-    "T " + Math.round(top),
-    "B " + Math.round(bottom)
-  );
+  console.log({
+    T: Math.round(top),
+    B: Math.round(bottom),
+    L: Math.round(left),
+    R: Math.round(right),
+  });
+}
+
+function setOuterSize([outerH, outerW]) {
+  if (outerH) {
+    outer.style.height = outerH + "px";
+  }
+  if (outerW) {
+    outer.style.width = outerW + "px";
+  }
+}
+
+function setInnerSize([innerH, innerW]) {
+  if (innerH) {
+    inner.style.height = innerH + "px";
+  }
+  if (innerW) {
+    inner.style.width = innerW + "px";
+  }
+}
+
+function setInnerLeft(left) {
+  inner.style.left = left + "px";
+}
+function setInnerTop(top) {
+  inner.style.top = top + "px";
 }
