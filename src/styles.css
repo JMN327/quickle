@@ -87,9 +87,12 @@ body {
 .inner {
     background-color: green;
     background-image: url(https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Cow_%28Fleckvieh_breed%29_Oeschinensee_Slaunger_2009-07-07.jpg/800px-Cow_%28Fleckvieh_breed%29_Oeschinensee_Slaunger_2009-07-07.jpg);
-    background-size:contain;
+    background-size:cover;
+    background-repeat: no-repeat;
     /* width: 1232px;
     height: 918px; */
+
+    border: 15px solid orange;
 
     position: absolute;
 
