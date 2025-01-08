@@ -45,8 +45,6 @@ let startX;
 let startY;
 let currentX;
 let currentY;
-let dx;
-let dy;
 let lastDx = 0;
 let lastDy = 0;
 
@@ -69,7 +67,8 @@ function setDivSize([div, h, w]) {
 
 function updateInnerTransform({ scale, left, top }) {
   if (scale) {
-    matrix.scaleSelf(scale);
+    matrix.a = scale;
+    matrix.d = scale;
   }
   if (left) {
     matrix.e = left;
@@ -105,6 +104,14 @@ function zoom(event) {
     zoomParity = -1;
     console.log(`zooming out`);
   }
+
+  startX = event.clientX - outerL;
+  startY = event.clientY - outerT;
+  inner.style.transformOrigin = `${startX}px ${startY}px`;
+
+  scale *= scaleFactor ** zoomParity;
+  console.log("scale " + scale);
+  updateInnerTransform({ scale });
 }
 
 ///// panning /////
@@ -133,14 +140,13 @@ document.body.addEventListener("mousemove", (event) => {
   }
   currentX = event.clientX - outerL;
   currentY = event.clientY - outerT;
-  dx = lastDx + currentX - startX;
-  dy = lastDy + currentY - startY;
-  console.log({ dx, dy });
-  updateInnerTransform({ left: dx, top: dy });
+  left = lastDx + currentX - startX;
+  top = lastDy + currentY - startY;
+  updateInnerTransform({ left, top });
 });
 
 document.body.addEventListener("mouseup", (event) => {
   innerMouseDown = false;
-  lastDx = dx;
-  lastDy = dy;
+  lastDx = left;
+  lastDy = top;
 });
