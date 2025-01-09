@@ -22,7 +22,7 @@ addTileElement("star", "purple", pallet) */
 ///// outer /////
 let outer = addBasicElement("div", ["outer"], body);
 let outerH = 800;
-let outerW = 800;
+let outerW = 1000;
 setDivSize([outer, outerH, outerW]);
 
 const outerL = outer.getBoundingClientRect().left;
@@ -30,7 +30,7 @@ const outerT = outer.getBoundingClientRect().top;
 
 let inner = addBasicElement("div", ["inner"], outer);
 const innerH = 800;
-const innerW = 800;
+const innerW = 1600;
 setDivSize([inner, innerH, innerW]);
 
 //initiate transform matrix
@@ -39,10 +39,10 @@ let matrix = new DOMMatrix([1, 0, 0, 1, 0, 0]);
 
 setTransformOrigin({ x: 0, y: 0 });
 
-let mousedownPoint = { x: 0, y: 0 };
-let mousemovePoint = { x: 0, y: 0 };
-let divMovingPoint = { x: 0, y: 0 };
-let divPoint = { x: 0, y: 0 };
+let mousedownPos = { x: 0, y: 0 };
+let mousemovePos = { x: 0, y: 0 };
+let divMovingPos = { x: 0, y: 0 };
+let divPos = { x: 0, y: 0 };
 
 const zoomLevelMax = 10;
 const zoomLevelMin = -10;
@@ -61,7 +61,7 @@ function setDivSize([div, h, w]) {
   }
 }
 
-function getMousePoint(event) {
+function getMousePos(event) {
   if (!event) {
     return { x: 0, y: 0 };
   }
@@ -114,14 +114,14 @@ function zoom(event) {
 
   scale *= scaleFactor ** zoomParity;
 
-  mousemovePoint = getMousePoint(event);
-  let d = { x: mousemovePoint.x - divPoint.x, y: mousemovePoint.y - divPoint.y };
-  divPoint.y += d.y - d.y * scaleFactor ** zoomParity;
-  divPoint.x += d.x - d.x * scaleFactor ** zoomParity;
+  mousemovePos = getMousePos(event);
+  let d = { x: mousemovePos.x - divPos.x, y: mousemovePos.y - divPos.y };
+  divPos.y += d.y - d.y * scaleFactor ** zoomParity;
+  divPos.x += d.x - d.x * scaleFactor ** zoomParity;
 
-  console.log(zoomParity, zoomLevel, divPoint)
+  console.log(zoomParity, zoomLevel, divPos)
 
-  setTransform({ scale: scale, x: divPoint.x, y: divPoint.y });
+  setTransform({ scale: scale, x: divPos.x, y: divPos.y });
 }
 
 ///// panning /////
@@ -137,7 +137,7 @@ outer.addEventListener("mousedown", (event) => {
     return;
   }
   innerMouseDown = true;
-  mousedownPoint = getMousePoint(event);
+  mousedownPos = getMousePos(event);
 });
 
 document.body.addEventListener("mousemove", (event) => {
@@ -148,17 +148,17 @@ document.body.addEventListener("mousemove", (event) => {
     return;
   }
 
-  mousemovePoint = getMousePoint(event);
+  mousemovePos = getMousePos(event);
 
-  divMovingPoint = {
-    x: divPoint.x + mousemovePoint.x - mousedownPoint.x,
-    y: divPoint.y + mousemovePoint.y - mousedownPoint.y,
+  divMovingPos = {
+    x: divPos.x + mousemovePos.x - mousedownPos.x,
+    y: divPos.y + mousemovePos.y - mousedownPos.y,
   };
 
-  setTransform(divMovingPoint);
+  setTransform(divMovingPos);
 });
 
 document.body.addEventListener("mouseup", (event) => {
   innerMouseDown = false;
-  divPoint = divMovingPoint;
+  divPos = divMovingPos;
 });
