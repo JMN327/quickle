@@ -35,24 +35,20 @@ setDivSize([inner, innerH, innerW]);
 
 //initiate transform matrix
 let scale = 1;
-let top = 0;
-let left = 0;
-let matrix = new DOMMatrix([scale, 0, 0, scale, left, top]);
+let matrix = new DOMMatrix([1, 0, 0, 1, 0, 0]);
 
-inner.style.transformOrigin = "00px 00px";
+setTransformOrigin({ x: 0, y: 0 });
 
-let startX;
-let startY;
-let currentX;
-let currentY;
-let lastDx = 0;
-let lastDy = 0;
+let startMousePos = { x: 0, y: 0 };
+let currentMousePos = { x: 0, y: 0 };
+let newDivPos = { x: 0, y: 0 };
+let divPos = { x: 0, y: 0 };
 
 const zoomLevelMax = 10;
 const zoomLevelMin = -10;
 let zoomLevel = 0;
 
-let scaleFactor = 1.1;
+let scaleFactor = 1.5;
 
 ///// utilities /////
 
@@ -65,16 +61,27 @@ function setDivSize([div, h, w]) {
   }
 }
 
-function updateInnerTransform({ scale, left, top }) {
-  if (scale) {
+function getMousePos(event) {
+  if (!event) {
+    return { x: 0, y: 0 };
+  }
+  return { x: event.clientX - outerL, y: event.clientY - outerT };
+}
+
+function setTransformOrigin(pos = { x: 0, y: 0 }) {
+  inner.style.transformOrigin = `${pos.x}px ${pos.y}px`;
+}
+
+function setTransform({ scale, x, y }) {
+  if (scale != null) {
     matrix.a = scale;
     matrix.d = scale;
   }
-  if (left) {
-    matrix.e = left;
+  if (x != null) {
+    matrix.e = x;
   }
-  if (top) {
-    matrix.f = top;
+  if (y !=null) {
+    matrix.f = y;
   }
   inner.style.transform = matrix;
 }
@@ -105,13 +112,16 @@ function zoom(event) {
     console.log(`zooming out`);
   }
 
-  startX = event.clientX - outerL;
-  startY = event.clientY - outerT;
-  inner.style.transformOrigin = `${startX}px ${startY}px`;
-
   scale *= scaleFactor ** zoomParity;
-  console.log("scale " + scale);
-  updateInnerTransform({ scale });
+
+  currentMousePos = getMousePos(event);
+  let d = { x: currentMousePos.x - divPos.x, y: currentMousePos.y - divPos.y };
+  divPos.y += d.y - d.y * scaleFactor ** zoomParity;
+  divPos.x += d.x - d.x * scaleFactor ** zoomParity;
+
+  console.log(zoomParity, zoomLevel, divPos)
+
+  setTransform({ scale: scale, x: divPos.x, y: divPos.y });
 }
 
 ///// panning /////
@@ -127,8 +137,7 @@ outer.addEventListener("mousedown", (event) => {
     return;
   }
   innerMouseDown = true;
-  startX = event.clientX - outerL;
-  startY = event.clientY - outerT;
+  startMousePos = getMousePos(event);
 });
 
 document.body.addEventListener("mousemove", (event) => {
@@ -138,15 +147,19 @@ document.body.addEventListener("mousemove", (event) => {
   if (event.buttons !== 1) {
     return;
   }
-  currentX = event.clientX - outerL;
-  currentY = event.clientY - outerT;
-  left = lastDx + currentX - startX;
-  top = lastDy + currentY - startY;
-  updateInnerTransform({ left, top });
+
+  currentMousePos = getMousePos(event);
+
+  newDivPos = {
+    //no vector addition/subtraction :(
+    x: divPos.x + currentMousePos.x - startMousePos.x,
+    y: divPos.y + currentMousePos.y - startMousePos.y,
+  };
+
+  setTransform(newDivPos);
 });
 
 document.body.addEventListener("mouseup", (event) => {
   innerMouseDown = false;
-  lastDx = left;
-  lastDy = top;
+  divPos = newDivPos;
 });
