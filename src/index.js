@@ -39,16 +39,16 @@ let matrix = new DOMMatrix([1, 0, 0, 1, 0, 0]);
 
 setTransformOrigin({ x: 0, y: 0 });
 
-let startMousePos = { x: 0, y: 0 };
-let currentMousePos = { x: 0, y: 0 };
-let newDivPos = { x: 0, y: 0 };
-let divPos = { x: 0, y: 0 };
+let mousedownPoint = { x: 0, y: 0 };
+let mousemovePoint = { x: 0, y: 0 };
+let divMovingPoint = { x: 0, y: 0 };
+let divPoint = { x: 0, y: 0 };
 
 const zoomLevelMax = 10;
 const zoomLevelMin = -10;
 let zoomLevel = 0;
 
-let scaleFactor = 1.5;
+let scaleFactor = 1.1;
 
 ///// utilities /////
 
@@ -61,7 +61,7 @@ function setDivSize([div, h, w]) {
   }
 }
 
-function getMousePos(event) {
+function getMousePoint(event) {
   if (!event) {
     return { x: 0, y: 0 };
   }
@@ -114,14 +114,14 @@ function zoom(event) {
 
   scale *= scaleFactor ** zoomParity;
 
-  currentMousePos = getMousePos(event);
-  let d = { x: currentMousePos.x - divPos.x, y: currentMousePos.y - divPos.y };
-  divPos.y += d.y - d.y * scaleFactor ** zoomParity;
-  divPos.x += d.x - d.x * scaleFactor ** zoomParity;
+  mousemovePoint = getMousePoint(event);
+  let d = { x: mousemovePoint.x - divPoint.x, y: mousemovePoint.y - divPoint.y };
+  divPoint.y += d.y - d.y * scaleFactor ** zoomParity;
+  divPoint.x += d.x - d.x * scaleFactor ** zoomParity;
 
-  console.log(zoomParity, zoomLevel, divPos)
+  console.log(zoomParity, zoomLevel, divPoint)
 
-  setTransform({ scale: scale, x: divPos.x, y: divPos.y });
+  setTransform({ scale: scale, x: divPoint.x, y: divPoint.y });
 }
 
 ///// panning /////
@@ -137,7 +137,7 @@ outer.addEventListener("mousedown", (event) => {
     return;
   }
   innerMouseDown = true;
-  startMousePos = getMousePos(event);
+  mousedownPoint = getMousePoint(event);
 });
 
 document.body.addEventListener("mousemove", (event) => {
@@ -148,18 +148,17 @@ document.body.addEventListener("mousemove", (event) => {
     return;
   }
 
-  currentMousePos = getMousePos(event);
+  mousemovePoint = getMousePoint(event);
 
-  newDivPos = {
-    //no vector addition/subtraction :(
-    x: divPos.x + currentMousePos.x - startMousePos.x,
-    y: divPos.y + currentMousePos.y - startMousePos.y,
+  divMovingPoint = {
+    x: divPoint.x + mousemovePoint.x - mousedownPoint.x,
+    y: divPoint.y + mousemovePoint.y - mousedownPoint.y,
   };
 
-  setTransform(newDivPos);
+  setTransform(divMovingPoint);
 });
 
 document.body.addEventListener("mouseup", (event) => {
   innerMouseDown = false;
-  divPos = newDivPos;
+  divPoint = divMovingPoint;
 });
