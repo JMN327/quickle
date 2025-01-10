@@ -80,7 +80,7 @@ function setTransform({ scale, x, y }) {
   if (x != null) {
     matrix.e = x;
   }
-  if (y !=null) {
+  if (y != null) {
     matrix.f = y;
   }
   inner.style.transform = matrix;
@@ -118,8 +118,6 @@ function zoom(event) {
   let d = { x: mousemovePos.x - divPos.x, y: mousemovePos.y - divPos.y };
   divPos.y += d.y - d.y * scaleFactor ** zoomParity;
   divPos.x += d.x - d.x * scaleFactor ** zoomParity;
-
-  console.log(zoomParity, zoomLevel, divPos)
 
   setTransform({ scale: scale, x: divPos.x, y: divPos.y });
 }
@@ -162,3 +160,23 @@ document.body.addEventListener("mouseup", (event) => {
   innerMouseDown = false;
   divPos = divMovingPos;
 });
+
+/* let gridSize = 10;
+let grid = addBasicElement("div", ["grid"], inner);
+populateGrid();
+
+function populateGrid() {
+  removeAllChildNodes(grid);
+  const gridPx = innerH / gridSize;
+  console.log(gridPx);
+  for (let i = 0; i < gridSize; i++) {
+    for (let j = 0; j < gridSize; j++) {
+      let cell = addBasicElement("div", ["cell"], grid);
+      cell.style.left = `${gridPx * j}px`;
+      cell.style.top = `${gridPx * i}px`;
+      cell.style.width = `${gridPx}px`;
+      cell.style.height = `${gridPx}px`;
+      let tile = addTileElement("circle", "purple", cell);
+    }
+  }
+} */

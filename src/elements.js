@@ -21,9 +21,10 @@ export function addBasicElement(
 export function addTileElement(shape, color, parent = null) {
   const svgTile = document.createElement("div");
   svgTile.classList.add("svg-tile");
+  svgTile.classList.add(shape);
+  svgTile.classList.add(color);
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg.classList.add(shape);
-  svg.classList.add(color);
+  svg.classList.add("svgTile__svg")
   const use = document.createElementNS("http://www.w3.org/2000/svg", "use");
   use.setAttribute("href", `#${shape}`);
   svg.appendChild(use);
