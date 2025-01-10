@@ -5,6 +5,7 @@ import {
   addTileElement,
   removeAllChildNodes,
 } from "./elements.js";
+import zoomPanWindow from "./zoom-pan-window.js";
 
 console.log("Hello World!)");
 console.log(`Storage available: ${storageAvailable("localStorage")}`);
@@ -21,36 +22,14 @@ addTileElement("star", "purple", pallet) */
 
 ///// outer /////
 let outer = addBasicElement("div", ["outer"], body);
-let outerH = 800;
-let outerW = 1000;
+let outerH = 400;
+let outerW = 600;
 setDivSize([outer, outerH, outerW]);
 
-const outerL = outer.getBoundingClientRect().left;
-const outerT = outer.getBoundingClientRect().top;
-
-let inner = addBasicElement("div", ["inner"], outer);
-const innerH = 800;
-const innerW = 1600;
-setDivSize([inner, innerH, innerW]);
-
-//initiate transform matrix
-let scale = 1;
-let matrix = new DOMMatrix([1, 0, 0, 1, 0, 0]);
-
-setTransformOrigin({ x: 0, y: 0 });
-
-let mousedownPos = { x: 0, y: 0 };
-let mousemovePos = { x: 0, y: 0 };
-let divMovingPos = { x: 0, y: 0 };
-let divPos = { x: 0, y: 0 };
-
-const zoomLevelMax = 10;
-const zoomLevelMin = -10;
-let zoomLevel = 0;
-
-let scaleFactor = 1.1;
-
-///// utilities /////
+let outer2 = addBasicElement("div", ["outer"], body);
+let outer2H = 400;
+let outer2W = 600;
+setDivSize([outer2, outer2H, outer2W]);
 
 function setDivSize([div, h, w]) {
   if (h) {
@@ -61,122 +40,6 @@ function setDivSize([div, h, w]) {
   }
 }
 
-function getMousePos(event) {
-  if (!event) {
-    return { x: 0, y: 0 };
-  }
-  return { x: event.clientX - outerL, y: event.clientY - outerT };
-}
 
-function setTransformOrigin(pos = { x: 0, y: 0 }) {
-  inner.style.transformOrigin = `${pos.x}px ${pos.y}px`;
-}
-
-function setTransform({ scale, x, y }) {
-  if (scale != null) {
-    matrix.a = scale;
-    matrix.d = scale;
-  }
-  if (x != null) {
-    matrix.e = x;
-  }
-  if (y != null) {
-    matrix.f = y;
-  }
-  inner.style.transform = matrix;
-}
-
-///// zooming /////
-
-outer.addEventListener("wheel", (event) => zoom(event), { passive: false });
-
-function zoom(event) {
-  event.preventDefault();
-
-  let zoomParity;
-  if (event.deltaY < 0) {
-    if (zoomLevel == zoomLevelMax) {
-      console.log(`max zoom in level reached`);
-      return;
-    }
-    zoomLevel++;
-    zoomParity = 1;
-    console.log(`zooming in`);
-  } else {
-    if (zoomLevel == zoomLevelMin) {
-      console.log(`max zoom out level reached`);
-      return;
-    }
-    zoomLevel--;
-    zoomParity = -1;
-    console.log(`zooming out`);
-  }
-
-  scale *= scaleFactor ** zoomParity;
-
-  mousemovePos = getMousePos(event);
-  let d = { x: mousemovePos.x - divPos.x, y: mousemovePos.y - divPos.y };
-  divPos.y += d.y - d.y * scaleFactor ** zoomParity;
-  divPos.x += d.x - d.x * scaleFactor ** zoomParity;
-
-  setTransform({ scale: scale, x: divPos.x, y: divPos.y });
-}
-
-///// panning /////
-
-let innerMouseDown = false;
-
-outer.addEventListener("dragstart", (event) => {
-  event.preventDefault();
-});
-
-outer.addEventListener("mousedown", (event) => {
-  if (event.buttons !== 1) {
-    return;
-  }
-  innerMouseDown = true;
-  mousedownPos = getMousePos(event);
-});
-
-document.body.addEventListener("mousemove", (event) => {
-  if (!innerMouseDown) {
-    return;
-  }
-  if (event.buttons !== 1) {
-    return;
-  }
-
-  mousemovePos = getMousePos(event);
-
-  divMovingPos = {
-    x: divPos.x + mousemovePos.x - mousedownPos.x,
-    y: divPos.y + mousemovePos.y - mousedownPos.y,
-  };
-
-  setTransform(divMovingPos);
-});
-
-document.body.addEventListener("mouseup", (event) => {
-  innerMouseDown = false;
-  divPos = divMovingPos;
-});
-
-/* let gridSize = 10;
-let grid = addBasicElement("div", ["grid"], inner);
-populateGrid();
-
-function populateGrid() {
-  removeAllChildNodes(grid);
-  const gridPx = innerH / gridSize;
-  console.log(gridPx);
-  for (let i = 0; i < gridSize; i++) {
-    for (let j = 0; j < gridSize; j++) {
-      let cell = addBasicElement("div", ["cell"], grid);
-      cell.style.left = `${gridPx * j}px`;
-      cell.style.top = `${gridPx * i}px`;
-      cell.style.width = `${gridPx}px`;
-      cell.style.height = `${gridPx}px`;
-      let tile = addTileElement("circle", "purple", cell);
-    }
-  }
-} */
+let zpw = zoomPanWindow(outer)
+let zpw2 = zoomPanWindow(outer2)
