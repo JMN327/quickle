@@ -1,153 +1,220 @@
 import { addBasicElement } from "./elements.js";
 
 export default function zoomPanWindow(outer) {
-
-if (!outer) {
-    return null
-}
-
-///// outer /////
-outer.classList.add("outer")
-
-//let outerH = 800;
-//let outerW = 1000;
-//setDivSize([outer, outerH, outerW]);
-
-const outerL = outer.getBoundingClientRect().left;
-const outerT = outer.getBoundingClientRect().top;
-
-let inner = addBasicElement("div", ["inner"], outer);
-const innerH = 800;
-const innerW = 1600;
-setDivSize([inner, innerH, innerW]);
-
-//initiate transform matrix
-let scale = 1;
-let matrix = new DOMMatrix([1, 0, 0, 1, 0, 0]);
-
-setTransformOrigin({ x: 0, y: 0 });
-
-let mousedownPos = { x: 0, y: 0 };
-let mousemovePos = { x: 0, y: 0 };
-let divMovingPos = { x: 0, y: 0 };
-let divPos = { x: 0, y: 0 };
-
-const zoomLevelMax = 10;
-const zoomLevelMin = -10;
-let zoomLevel = 0;
-
-let scaleFactor = 1.1;
-
-///// utilities /////
-
-function setDivSize([div, h, w]) {
-  if (h) {
-    div.style.height = h + "px";
+  if (!outer) {
+    return null;
   }
-  if (w) {
-    div.style.width = w + "px";
-  }
-}
 
-function getMousePos(event) {
-  if (!event) {
-    return { x: 0, y: 0 };
-  }
-  return { x: event.clientX - outerL, y: event.clientY - outerT };
-}
+  ///// outer /////
+  outer.classList.add("outer");
+  let outerLimits = outer.getBoundingClientRect();
+  const outerL = outerLimits.left;
+  const outerT = outerLimits.top;
+  const outerW = outerLimits.width;
+  const outerH = outerLimits.height;
 
-function setTransformOrigin(pos = { x: 0, y: 0 }) {
-  inner.style.transformOrigin = `${pos.x}px ${pos.y}px`;
-}
+  ///// inner /////
+  let inner = addBasicElement("div", ["inner"], outer);
+  let innerH = 800;
+  let innerW = 1600;
+  let innerR;
+  let innerB;
+  setDivSize([inner, innerH, innerW]);
 
-function setTransform({ scale, x, y }) {
-  if (scale != null) {
-    matrix.a = scale;
-    matrix.d = scale;
-  }
-  if (x != null) {
-    matrix.e = x;
-  }
-  if (y != null) {
-    matrix.f = y;
-  }
-  inner.style.transform = matrix;
-}
+  ///// transform matrix /////
+  let scale = 1;
+  let matrix = new DOMMatrix([scale, 0, 0, scale, 0, 0]);
 
-///// zooming /////
+  setTransformOrigin({ x: 0, y: 0 });
 
-outer.addEventListener("wheel", (event) => zoom(event), { passive: false });
+  ///// positions /////
+  let mousedownPos = { x: 0, y: 0 };
+  let mousemovePos = { x: 0, y: 0 };
+  let innerMovingPos = { x: 0, y: 0 };
+  let innerPos = { x: 0, y: 0 };
+  let innerMouseDown = false;
+  let bounded = true;
 
-function zoom(event) {
-  event.preventDefault();
-
+  ///// zoom /////
+  const zoomLevelMax = 10;
+  const zoomLevelMin = -10;
+  let zoomLevel = 0;
   let zoomParity;
-  if (event.deltaY < 0) {
-    if (zoomLevel == zoomLevelMax) {
-      console.log(`max zoom in level reached`);
+  let scaleFactor = 1.1;
+
+  ///// utilities /////
+  function setDivSize([div, h, w]) {
+    if (h) {
+      div.style.height = h + "px";
+    }
+    if (w) {
+      div.style.width = w + "px";
+    }
+  }
+
+  function getMousePos(event) {
+    if (!event) {
+      return { x: 0, y: 0 };
+    }
+    return { x: event.clientX - outerL, y: event.clientY - outerT };
+  }
+
+  function setTransformOrigin(pos = { x: 0, y: 0 }) {
+    inner.style.transformOrigin = `${pos.x}px ${pos.y}px`;
+  }
+
+  function setTransform({ scale, x, y }) {
+    if (scale != null) {
+      matrix.a = scale;
+      matrix.d = scale;
+    }
+    if (x != null) {
+      matrix.e = x;
+    }
+    if (y != null) {
+      matrix.f = y;
+    }
+    inner.style.transform = matrix;
+  }
+
+  ///// options /////
+  function setBounded(bool) {
+    if (typeof bool == "boolean") {
+      bounded = bool;
+    }
+  }
+
+  function setInnerWidth(width) {
+    if (typeof width != "number") {
+      throw new Error("Parameter is not a number!");
+    }
+    if (width < outerW && bounded === true) {
+      throw new Error(
+        "You cannot set the inner width as less than the outer width for a bounded window"
+      );
+    }
+    innerW = width;
+    setDivSize([inner, innerH, innerW]);
+  }
+
+  function setInnerHeight(height) {
+    if (typeof height != "number") {
+      throw new Error("Parameter is not a number!");
+    }
+    if (height < outerH && bounded === true) {
+      throw new Error(
+        "You cannot set the inner height as less than the outer height for a bounded window"
+      );
+    }
+    innerH = height;
+    setDivSize([inner, innerH, innerW]);
+  }
+
+  ///// zooming /////
+  outer.addEventListener("wheel", (event) => zoom(event), { passive: false });
+
+  function zoom(event) {
+    event.preventDefault();
+
+    if (event.deltaY < 0) {
+      if (zoomLevel == zoomLevelMax) {
+        console.log(`max zoom in level reached`);
+        return;
+      }
+      zoomLevel++;
+      zoomParity = 1;
+      console.log(`zooming in`);
+    } else {
+      if (zoomLevel == zoomLevelMin) {
+        console.log(`max zoom out level reached`);
+        return;
+      }
+      zoomLevel--;
+      zoomParity = -1;
+      console.log(`zooming out`);
+    }
+
+    scale *= scaleFactor ** zoomParity;
+
+    if (innerW * scale < outerW || innerH * scale < outerH) {
+      scale *= (scaleFactor ** zoomParity) ** -1;
       return;
     }
-    zoomLevel++;
-    zoomParity = 1;
-    console.log(`zooming in`);
-  } else {
-    if (zoomLevel == zoomLevelMin) {
-      console.log(`max zoom out level reached`);
+
+    mousemovePos = getMousePos(event);
+    let d = { x: mousemovePos.x - innerPos.x, y: mousemovePos.y - innerPos.y };
+    innerPos.x += d.x - d.x * scaleFactor ** zoomParity;
+    innerPos.y += d.y - d.y * scaleFactor ** zoomParity;
+
+    if (bounded) {
+      innerPos = checkBounds({ x: innerPos.x, y: innerPos.y });
+    }
+
+    setTransform({ scale: scale, x: innerPos.x, y: innerPos.y });
+  }
+
+  ///// panning /////
+  outer.addEventListener("dragstart", (event) => {
+    event.preventDefault();
+  });
+
+  outer.addEventListener("mousedown", (event) => {
+    if (event.buttons !== 1) {
       return;
     }
-    zoomLevel--;
-    zoomParity = -1;
-    console.log(`zooming out`);
+    innerMouseDown = true;
+    mousedownPos = getMousePos(event);
+  });
+
+  document.body.addEventListener("mousemove", (event) => {
+    if (!innerMouseDown) {
+      return;
+    }
+    if (event.buttons !== 1) {
+      return;
+    }
+
+    mousemovePos = getMousePos(event);
+
+    innerMovingPos = {
+      x: innerPos.x + mousemovePos.x - mousedownPos.x,
+      y: innerPos.y + mousemovePos.y - mousedownPos.y,
+    };
+
+    if (bounded) {
+      innerMovingPos = checkBounds({
+        x: innerMovingPos.x,
+        y: innerMovingPos.y,
+      });
+    }
+
+    setTransform(innerMovingPos);
+  });
+
+  document.body.addEventListener("mouseup", (event) => {
+    innerMouseDown = false;
+    innerPos = innerMovingPos;
+  });
+
+  ///// bounds /////
+  function checkBounds({ x, y }) {
+    x = x > 0 ? 0 : x;
+    y = y > 0 ? 0 : y;
+
+    innerR = x + innerW * scale;
+    innerB = y + innerH * scale;
+
+    console.log("check Bounds:", innerR, outerW - innerW, outerH - innerH);
+
+    x = innerR < outerW ? outerW - innerW * scale : x;
+    y = innerB < outerH ? outerH - innerH * scale : y;
+
+    return { x, y };
   }
 
-  scale *= scaleFactor ** zoomParity;
-
-  mousemovePos = getMousePos(event);
-  let d = { x: mousemovePos.x - divPos.x, y: mousemovePos.y - divPos.y };
-  divPos.y += d.y - d.y * scaleFactor ** zoomParity;
-  divPos.x += d.x - d.x * scaleFactor ** zoomParity;
-
-  setTransform({ scale: scale, x: divPos.x, y: divPos.y });
-}
-
-///// panning /////
-
-let innerMouseDown = false;
-
-outer.addEventListener("dragstart", (event) => {
-  event.preventDefault();
-});
-
-outer.addEventListener("mousedown", (event) => {
-  if (event.buttons !== 1) {
-    return;
-  }
-  innerMouseDown = true;
-  mousedownPos = getMousePos(event);
-});
-
-document.body.addEventListener("mousemove", (event) => {
-  if (!innerMouseDown) {
-    return;
-  }
-  if (event.buttons !== 1) {
-    return;
-  }
-
-  mousemovePos = getMousePos(event);
-
-  divMovingPos = {
-    x: divPos.x + mousemovePos.x - mousedownPos.x,
-    y: divPos.y + mousemovePos.y - mousedownPos.y,
+  return {
+    setInnerWidth,
+    setInnerHeight,
+    setBounded,
   };
-
-  setTransform(divMovingPos);
-});
-
-document.body.addEventListener("mouseup", (event) => {
-  innerMouseDown = false;
-  divPos = divMovingPos;
-});
-
-
 }

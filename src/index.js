@@ -43,3 +43,5 @@ function setDivSize([div, h, w]) {
 
 let zpw = zoomPanWindow(outer)
 let zpw2 = zoomPanWindow(outer2)
+zpw2.setBounded(false)
+zpw2.setInnerHeight(1200)

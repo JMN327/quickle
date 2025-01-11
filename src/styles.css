@@ -107,8 +107,5 @@ body {
     var(--holes) 9px,
     rgba(0, 0, 0, 0) 10px)
   ;
-  ;
 
-  /* border: 15px solid orange; */
-  border-radius: 4px;
 }
