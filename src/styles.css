@@ -68,7 +68,7 @@ body {
   position: absolute;
 }
 
-.outer {
+.frame {
   outline: solid 3px black;
 
   overflow: hidden;
@@ -76,6 +76,13 @@ body {
   position: relative;
 
   border-radius: 6px;
+}
+
+.outer {
+  width: 100%;
+  height: 100%;
+  /* display: flex;
+  justify-content: right; */
 }
 
 .inner {

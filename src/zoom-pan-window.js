@@ -1,12 +1,12 @@
 import { addBasicElement } from "./elements.js";
 
-export default function zoomPanWindow(outer) {
-  if (!outer) {
+export default function zoomPanWindow(div) {
+  if (!div) {
     return null;
   }
 
   ///// outer /////
-  outer.classList.add("outer");
+  const outer = addBasicElement("div", ["outer"], div);
   let outerLimits = outer.getBoundingClientRect();
   const outerL = outerLimits.left;
   const outerT = outerLimits.top;
@@ -15,7 +15,7 @@ export default function zoomPanWindow(outer) {
 
   ///// inner /////
   let inner = addBasicElement("div", ["inner"], outer);
-  let innerH = 800;
+  let innerH = 1600;
   let innerW = 1600;
   let innerR;
   let innerB;
@@ -36,8 +36,8 @@ export default function zoomPanWindow(outer) {
   let bounded = true;
 
   ///// zoom /////
-  const zoomLevelMax = 10;
-  const zoomLevelMin = -10;
+  let zoomLevelMax = 10;
+  let zoomLevelMin = -10;
   let zoomLevel = 0;
   let zoomParity;
   let scaleFactor = 1.1;
@@ -77,13 +77,20 @@ export default function zoomPanWindow(outer) {
     inner.style.transform = matrix;
   }
 
-  ///// options /////
+  ///// exposed functions /////
+  function getBounded() {
+    let isBounded = bounded ? true : false;
+    return isBounded;
+  }
   function setBounded(bool) {
     if (typeof bool == "boolean") {
       bounded = bool;
     }
   }
 
+  function getInnerWidth() {
+    return innerW;
+  }
   function setInnerWidth(width) {
     if (typeof width != "number") {
       throw new Error("Parameter is not a number!");
@@ -97,6 +104,9 @@ export default function zoomPanWindow(outer) {
     setDivSize([inner, innerH, innerW]);
   }
 
+  function getInnerHeight() {
+    return innerH;
+  }
   function setInnerHeight(height) {
     if (typeof height != "number") {
       throw new Error("Parameter is not a number!");
@@ -110,6 +120,28 @@ export default function zoomPanWindow(outer) {
     setDivSize([inner, innerH, innerW]);
   }
 
+  function appendChild(div) {
+    if (!(div instanceof HTMLElement)) {
+      throw new Error("Parameter is not an HTML Element");
+    }
+    inner.appendChild(div);
+  }
+
+  function getZoomLevelMax() {
+    return zoomLevelMax;
+  }
+  function setZoomLevelMax(max) {
+    max = max < 0 ? 0 : max;
+    zoomLevelMax = max;
+  }
+  function getZoomLevelMin() {
+    return zoomLevelMin;
+  }
+  function setZoomLevelMin(min) {
+    min = min > 0 ? 0 : min;
+    zoomLevelMin = min;
+  }
+
   ///// zooming /////
   outer.addEventListener("wheel", (event) => zoom(event), { passive: false });
 
@@ -118,7 +150,7 @@ export default function zoomPanWindow(outer) {
 
     if (event.deltaY < 0) {
       if (zoomLevel == zoomLevelMax) {
-        console.log(`max zoom in level reached`);
+        console.log(`max zoom in level reached: ${zoomLevel}`);
         return;
       }
       zoomLevel++;
@@ -126,7 +158,7 @@ export default function zoomPanWindow(outer) {
       console.log(`zooming in`);
     } else {
       if (zoomLevel == zoomLevelMin) {
-        console.log(`max zoom out level reached`);
+        console.log(`max zoom out level reached: ${zoomLevel}`);
         return;
       }
       zoomLevel--;
@@ -204,17 +236,37 @@ export default function zoomPanWindow(outer) {
     innerR = x + innerW * scale;
     innerB = y + innerH * scale;
 
-    console.log("check Bounds:", innerR, outerW - innerW, outerH - innerH);
-
     x = innerR < outerW ? outerW - innerW * scale : x;
     y = innerB < outerH ? outerH - innerH * scale : y;
 
     return { x, y };
   }
 
+  ///// control panel /////
+
+  let controls = addBasicElement("div", ["control-panel"], outer);
+  let styles = controls.style;
+  styles.position = "absolute";
+  styles.margin = "30px";
+  styles.padding = "1rem";
+  styles.right = outer.style.left + outer.style.width;
+  console.log(outer.style.left + outer.style.width);
+  styles.width = "minmax(50px, min-content)";
+  styles.top = outer.style.top;
+  styles.height = "minmax(50px, min-content)";
+  styles.backgroundColor = "white";
+
   return {
+    getZoomLevelMax,
+    setZoomLevelMax,
+    getZoomLevelMin,
+    setZoomLevelMin,
+    getInnerWidth,
     setInnerWidth,
+    getInnerHeight,
     setInnerHeight,
+    getBounded,
     setBounded,
+    appendChild,
   };
 }

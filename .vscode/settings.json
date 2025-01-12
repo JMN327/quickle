@@ -1,5 +1,8 @@
 {
   "eslint.options": {
     "ignorePattern": "webpack.config.js"
-  }
+  },
+  "cSpell.words": [
+    "greenyellow"
+  ]
 }
