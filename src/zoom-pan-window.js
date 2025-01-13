@@ -5,21 +5,24 @@ export default function zoomPanWindow(div) {
     return null;
   }
 
-  ///// outer /////
-  const outer = addBasicElement("div", ["outer"], div);
-  let outerLimits = outer.getBoundingClientRect();
-  const outerL = outerLimits.left;
-  const outerT = outerLimits.top;
-  const outerW = outerLimits.width;
-  const outerH = outerLimits.height;
+  ///// frame /////
+  const frame = addBasicElement("div", ["frame"], div);
+  let frameLimits = frame.getBoundingClientRect();
+  const frameL = frameLimits.left;
+  const frameT = frameLimits.top;
+  const frameW = frameLimits.width;
+  const frameH = frameLimits.height;
 
-  ///// inner /////
-  let inner = addBasicElement("div", ["inner"], outer);
-  let innerH = 1600;
-  let innerW = 1600;
-  let innerR;
-  let innerB;
-  setDivSize([inner, innerH, innerW]);
+  ///// view /////
+  let view = addBasicElement("div", ["view"], frame);
+  /* view.style.left = 0
+  view.style.top = 0 */
+  let viewH = 1600;
+  let viewW = 1600;
+  
+  let viewR;
+  let viewB;
+  setDivSize([view, viewH, viewW]);
 
   ///// transform matrix /////
   let scale = 1;
@@ -30,9 +33,9 @@ export default function zoomPanWindow(div) {
   ///// positions /////
   let mousedownPos = { x: 0, y: 0 };
   let mousemovePos = { x: 0, y: 0 };
-  let innerMovingPos = { x: 0, y: 0 };
-  let innerPos = { x: 0, y: 0 };
-  let innerMouseDown = false;
+  let viewMovingPos = { x: 0, y: 0 };
+  let viewPos = { x: 0, y: 0 };
+  let viewMouseDown = false;
   let bounded = true;
 
   ///// zoom /////
@@ -56,11 +59,11 @@ export default function zoomPanWindow(div) {
     if (!event) {
       return { x: 0, y: 0 };
     }
-    return { x: event.clientX - outerL, y: event.clientY - outerT };
+    return { x: event.clientX - frameL, y: event.clientY - frameT };
   }
 
   function setTransformOrigin(pos = { x: 0, y: 0 }) {
-    inner.style.transformOrigin = `${pos.x}px ${pos.y}px`;
+    view.style.transformOrigin = `${pos.x}px ${pos.y}px`;
   }
 
   function setTransform({ scale, x, y }) {
@@ -74,7 +77,7 @@ export default function zoomPanWindow(div) {
     if (y != null) {
       matrix.f = y;
     }
-    inner.style.transform = matrix;
+    view.style.transform = matrix;
   }
 
   ///// exposed functions /////
@@ -88,43 +91,43 @@ export default function zoomPanWindow(div) {
     }
   }
 
-  function getInnerWidth() {
-    return innerW;
+  function getViewWidth() {
+    return viewW;
   }
-  function setInnerWidth(width) {
+  function setViewWidth(width) {
     if (typeof width != "number") {
       throw new Error("Parameter is not a number!");
     }
-    if (width < outerW && bounded === true) {
+    if (width < frameW && bounded === true) {
       throw new Error(
-        "You cannot set the inner width as less than the outer width for a bounded window"
+        "You cannot set the view width as less than the frame width for a bounded window"
       );
     }
-    innerW = width;
-    setDivSize([inner, innerH, innerW]);
+    viewW = width;
+    setDivSize([view, viewH, viewW]);
   }
 
-  function getInnerHeight() {
-    return innerH;
+  function getViewHeight() {
+    return viewH;
   }
-  function setInnerHeight(height) {
+  function setViewHeight(height) {
     if (typeof height != "number") {
       throw new Error("Parameter is not a number!");
     }
-    if (height < outerH && bounded === true) {
+    if (height < frameH && bounded === true) {
       throw new Error(
-        "You cannot set the inner height as less than the outer height for a bounded window"
+        "You cannot set the view height as less than the frame height for a bounded window"
       );
     }
-    innerH = height;
-    setDivSize([inner, innerH, innerW]);
+    viewH = height;
+    setDivSize([view, viewH, viewW]);
   }
 
   function appendChild(div) {
     if (!(div instanceof HTMLElement)) {
       throw new Error("Parameter is not an HTML Element");
     }
-    inner.appendChild(div);
+    view.appendChild(div);
   }
 
   function getZoomLevelMax() {
@@ -143,7 +146,7 @@ export default function zoomPanWindow(div) {
   }
 
   ///// zooming /////
-  outer.addEventListener("wheel", (event) => zoom(event), { passive: false });
+  frame.addEventListener("wheel", (event) => zoom(event), { passive: false });
 
   function zoom(event) {
     event.preventDefault();
@@ -168,38 +171,38 @@ export default function zoomPanWindow(div) {
 
     scale *= scaleFactor ** zoomParity;
 
-    if (innerW * scale < outerW || innerH * scale < outerH) {
+    if (viewW * scale < frameW || viewH * scale < frameH) {
       scale *= (scaleFactor ** zoomParity) ** -1;
       return;
     }
 
     mousemovePos = getMousePos(event);
-    let d = { x: mousemovePos.x - innerPos.x, y: mousemovePos.y - innerPos.y };
-    innerPos.x += d.x - d.x * scaleFactor ** zoomParity;
-    innerPos.y += d.y - d.y * scaleFactor ** zoomParity;
+    let d = { x: mousemovePos.x - viewPos.x, y: mousemovePos.y - viewPos.y };
+    viewPos.x += d.x - d.x * scaleFactor ** zoomParity;
+    viewPos.y += d.y - d.y * scaleFactor ** zoomParity;
 
     if (bounded) {
-      innerPos = checkBounds({ x: innerPos.x, y: innerPos.y });
+      viewPos = checkBounds({ x: viewPos.x, y: viewPos.y });
     }
 
-    setTransform({ scale: scale, x: innerPos.x, y: innerPos.y });
+    setTransform({ scale: scale, x: viewPos.x, y: viewPos.y });
   }
 
   ///// panning /////
-  outer.addEventListener("dragstart", (event) => {
+  frame.addEventListener("dragstart", (event) => {
     event.preventDefault();
   });
 
-  outer.addEventListener("mousedown", (event) => {
+  frame.addEventListener("mousedown", (event) => {
     if (event.buttons !== 1) {
       return;
     }
-    innerMouseDown = true;
+    viewMouseDown = true;
     mousedownPos = getMousePos(event);
   });
 
   document.body.addEventListener("mousemove", (event) => {
-    if (!innerMouseDown) {
+    if (!viewMouseDown) {
       return;
     }
     if (event.buttons !== 1) {
@@ -208,24 +211,24 @@ export default function zoomPanWindow(div) {
 
     mousemovePos = getMousePos(event);
 
-    innerMovingPos = {
-      x: innerPos.x + mousemovePos.x - mousedownPos.x,
-      y: innerPos.y + mousemovePos.y - mousedownPos.y,
+    viewMovingPos = {
+      x: viewPos.x + mousemovePos.x - mousedownPos.x,
+      y: viewPos.y + mousemovePos.y - mousedownPos.y,
     };
 
     if (bounded) {
-      innerMovingPos = checkBounds({
-        x: innerMovingPos.x,
-        y: innerMovingPos.y,
+      viewMovingPos = checkBounds({
+        x: viewMovingPos.x,
+        y: viewMovingPos.y,
       });
     }
 
-    setTransform(innerMovingPos);
+    setTransform(viewMovingPos);
   });
 
   document.body.addEventListener("mouseup", (event) => {
-    innerMouseDown = false;
-    innerPos = innerMovingPos;
+    viewMouseDown = false;
+    viewPos = viewMovingPos;
   });
 
   ///// bounds /////
@@ -233,38 +236,30 @@ export default function zoomPanWindow(div) {
     x = x > 0 ? 0 : x;
     y = y > 0 ? 0 : y;
 
-    innerR = x + innerW * scale;
-    innerB = y + innerH * scale;
+    viewR = x + viewW * scale;
+    viewB = y + viewH * scale;
 
-    x = innerR < outerW ? outerW - innerW * scale : x;
-    y = innerB < outerH ? outerH - innerH * scale : y;
+    x = viewR < frameW ? frameW - viewW * scale : x;
+    y = viewB < frameH ? frameH - viewH * scale : y;
 
     return { x, y };
   }
 
   ///// control panel /////
 
-  let controls = addBasicElement("div", ["control-panel"], outer);
-  let styles = controls.style;
-  styles.position = "absolute";
-  styles.margin = "30px";
-  styles.padding = "1rem";
-  styles.right = outer.style.left + outer.style.width;
-  console.log(outer.style.left + outer.style.width);
-  styles.width = "minmax(50px, min-content)";
-  styles.top = outer.style.top;
-  styles.height = "minmax(50px, min-content)";
-  styles.backgroundColor = "white";
+  let panel = addBasicElement("div", ["panel"], frame);
+  let controls = addBasicElement("div", ["panel__controls"], panel);
+
 
   return {
     getZoomLevelMax,
     setZoomLevelMax,
     getZoomLevelMin,
     setZoomLevelMin,
-    getInnerWidth,
-    setInnerWidth,
-    getInnerHeight,
-    setInnerHeight,
+    getViewWidth,
+    setViewWidth,
+    getViewHeight,
+    setViewHeight,
     getBounded,
     setBounded,
     appendChild,

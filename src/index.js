@@ -22,12 +22,12 @@ addTileElement("square", "blue", pallet)
 addTileElement("star", "purple", pallet) */
 
 ///// outer /////
-let frame = addBasicElement("div", ["frame"], body);
+let frame = addBasicElement("div", ["zpw"], body);
 let frameH = 400;
 let frameW = 600;
 setDivSize([frame, frameH, frameW]);
 
-let frame2 = addBasicElement("div", ["frame"], body);
+let frame2 = addBasicElement("div", ["zpw"], body);
 let frame2H = 400;
 let frame2W = 600;
 setDivSize([frame2, frame2H, frame2W]);
