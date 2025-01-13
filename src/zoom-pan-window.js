@@ -59,7 +59,15 @@ export default function zoomPanWindow(div) {
     if (!event) {
       return { x: 0, y: 0 };
     }
-    return { x: event.clientX - frameL, y: event.clientY - frameT };
+    switch (event.type) {
+      case "click":
+        return { x: (frameW/2), y:(frameH/2)};
+        break;
+      default:
+        return { x: event.clientX - frameL, y: event.clientY - frameT };
+    }
+    
+    
   }
 
   function setTransformOrigin(pos = { x: 0, y: 0 }) {
@@ -149,15 +157,18 @@ export default function zoomPanWindow(div) {
   frame.addEventListener("wheel", (event) => zoom(event), { passive: false });
 
   function zoom(event) {
-    console.log(event.type)
-    let condition
+    let condition;
     switch (event.type) {
       case "wheel":
         event.preventDefault();
-         condition = event.deltaY < 0
+        console.log(event.type);
+        condition = event.deltaY < 0;
         break;
       case "click":
-         condition = event.target.classlist.includes("zoom-in")
+        console.log(event.type);
+        condition = event.target.closest(".controls__icon").classList.contains("zoom-in");
+        console.log(condition);
+        break;
       default:
         return;
     }
@@ -260,11 +271,11 @@ export default function zoomPanWindow(div) {
 
   let panel = addBasicElement("div", ["panel"], frame);
   let controls = addBasicElement("div", ["panel__controls"], panel);
-  let zoomIn = addSvgElement("zoom-in",["controls__icon"], controls);
-  zoomIn.addEventListener("click", (event) => zoom(event))
-  let zoomOut = addSvgElement("zoom-out",["controls__icon"], controls);
-  zoomOut.addEventListener("click", (event) => zoom(event))
-  let resetView = addSvgElement("reset-view",["controls__icon"], controls);
+  let zoomIn = addSvgElement("zoom-in", ["zoom-in", "controls__icon"], controls);
+  zoomIn.addEventListener("click", (event) => zoom(event));
+  let zoomOut = addSvgElement("zoom-out", ["zoom-out", "controls__icon"], controls);
+  zoomOut.addEventListener("click", (event) => zoom(event));
+  let resetView = addSvgElement("reset-view", ["controls__icon"], controls);
 
   return {
     getZoomLevelMax,

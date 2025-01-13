@@ -143,6 +143,11 @@ body {
   justify-content: center;
   align-items: center;
   fill: white;
+
+  svg {
+    width: 100%;
+  height: 100%;
+  }
 }
 
 .svg_element__svg {
