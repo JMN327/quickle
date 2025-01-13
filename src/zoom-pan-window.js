@@ -1,4 +1,4 @@
-import { addBasicElement } from "./elements.js";
+import { addBasicElement, addSvgElement } from "./elements.js";
 
 export default function zoomPanWindow(div) {
   if (!div) {
@@ -19,7 +19,7 @@ export default function zoomPanWindow(div) {
   view.style.top = 0 */
   let viewH = 1600;
   let viewW = 1600;
-  
+
   let viewR;
   let viewB;
   setDivSize([view, viewH, viewW]);
@@ -149,9 +149,20 @@ export default function zoomPanWindow(div) {
   frame.addEventListener("wheel", (event) => zoom(event), { passive: false });
 
   function zoom(event) {
-    event.preventDefault();
+    console.log(event.type)
+    let condition
+    switch (event.type) {
+      case "wheel":
+        event.preventDefault();
+         condition = event.deltaY < 0
+        break;
+      case "click":
+         condition = event.target.classlist.includes("zoom-in")
+      default:
+        return;
+    }
 
-    if (event.deltaY < 0) {
+    if (condition) {
       if (zoomLevel == zoomLevelMax) {
         console.log(`max zoom in level reached: ${zoomLevel}`);
         return;
@@ -249,7 +260,11 @@ export default function zoomPanWindow(div) {
 
   let panel = addBasicElement("div", ["panel"], frame);
   let controls = addBasicElement("div", ["panel__controls"], panel);
-
+  let zoomIn = addSvgElement("zoom-in",["controls__icon"], controls);
+  zoomIn.addEventListener("click", (event) => zoom(event))
+  let zoomOut = addSvgElement("zoom-out",["controls__icon"], controls);
+  zoomOut.addEventListener("click", (event) => zoom(event))
+  let resetView = addSvgElement("reset-view",["controls__icon"], controls);
 
   return {
     getZoomLevelMax,
