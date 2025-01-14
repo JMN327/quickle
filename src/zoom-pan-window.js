@@ -5,7 +5,7 @@ export default function zoomPanWindow(div) {
     return null;
   }
 
-  ///// frame /////
+  ///// Setup frame viv /////
   const frame = addBasicElement("div", ["frame"], div);
   let frameLimits = frame.getBoundingClientRect();
   const frameL = frameLimits.left;
@@ -13,7 +13,7 @@ export default function zoomPanWindow(div) {
   const frameW = frameLimits.width;
   const frameH = frameLimits.height;
 
-  ///// view /////
+  ///// Setup view div /////
   let view = addBasicElement("div", ["view"], frame);
   /* view.style.left = 0
   view.style.top = 0 */
@@ -43,7 +43,7 @@ export default function zoomPanWindow(div) {
   let zoomLevelMin = -10;
   let zoomLevel = 0;
   let zoomParity;
-  let scaleFactor = 1.1;
+  let zoomScaleFactor = 1.1;
 
   ///// utilities /////
   function setDivSize([div, h, w]) {
@@ -66,8 +66,6 @@ export default function zoomPanWindow(div) {
       default:
         return { x: event.clientX - frameL, y: event.clientY - frameT };
     }
-    
-    
   }
 
   function setTransformOrigin(pos = { x: 0, y: 0 }) {
@@ -89,6 +87,8 @@ export default function zoomPanWindow(div) {
   }
 
   ///// exposed functions /////
+  
+
   function getBounded() {
     let isBounded = bounded ? true : false;
     return isBounded;
@@ -191,17 +191,17 @@ export default function zoomPanWindow(div) {
       console.log(`zooming out`);
     }
 
-    scale *= scaleFactor ** zoomParity;
+    scale *= zoomScaleFactor ** zoomParity;
 
     if (viewW * scale < frameW || viewH * scale < frameH) {
-      scale *= (scaleFactor ** zoomParity) ** -1;
+      scale *= (zoomScaleFactor ** zoomParity) ** -1;
       return;
     }
 
     mousemovePos = getMousePos(event);
     let d = { x: mousemovePos.x - viewPos.x, y: mousemovePos.y - viewPos.y };
-    viewPos.x += d.x - d.x * scaleFactor ** zoomParity;
-    viewPos.y += d.y - d.y * scaleFactor ** zoomParity;
+    viewPos.x += d.x - d.x * zoomScaleFactor ** zoomParity;
+    viewPos.y += d.y - d.y * zoomScaleFactor ** zoomParity;
 
     if (bounded) {
       viewPos = checkBounds({ x: viewPos.x, y: viewPos.y });
@@ -282,6 +282,9 @@ export default function zoomPanWindow(div) {
     setZoomLevelMax,
     getZoomLevelMin,
     setZoomLevelMin,
+    get zoomScaleFactor() {
+      return zoomScaleFactor;
+    },
     getViewWidth,
     setViewWidth,
     getViewHeight,

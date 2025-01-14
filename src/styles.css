@@ -71,13 +71,13 @@ body {
 }
 
 .zpw {
-  outline: solid 3px black;
+  outline: solid 0px hsl(120, 55%, 45%);
 
   overflow: hidden;
 
   position: relative;
 
-  border-radius: 6px;
+  border-radius: 12px;
 }
 
 .frame {
@@ -126,15 +126,15 @@ body {
 
 .panel__controls {
   position: absolute;
-  margin: 12.5px;
-  padding: 8px;
-  width: minmax(50px, min-content);
+  margin: 6px;
+  padding: 6px 4px;
+  width: minmax(40px, min-content);
   height: minmax(100px, min-content);
   background-color: rgba(172, 255, 47, 0.2);
   border-radius: 6px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
 
 }
 

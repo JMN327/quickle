@@ -23,14 +23,14 @@ addTileElement("star", "purple", pallet) */
 
 ///// outer /////
 let frame = addBasicElement("div", ["zpw"], body);
-let frameH = 400;
-let frameW = 600;
+let frameH = 800;
+let frameW = 800;
 setDivSize([frame, frameH, frameW]);
 
-let frame2 = addBasicElement("div", ["zpw"], body);
+/* let frame2 = addBasicElement("div", ["zpw"], body);
 let frame2H = 400;
 let frame2W = 600;
-setDivSize([frame2, frame2H, frame2W]);
+setDivSize([frame2, frame2H, frame2W]); */
 
 function setDivSize([div, h, w]) {
   if (h) {
@@ -41,7 +41,10 @@ function setDivSize([div, h, w]) {
   }
 }
 
-let rect = document.createElement("div")
+let zpw = zoomPanWindow(frame)
+console.log(zpw.zoomScaleFactor)
+
+/* let rect = document.createElement("div")
 rect.style.backgroundColor = "greenyellow"
 rect.style.width = "100px"
 rect.style.height = "100px"
@@ -54,4 +57,4 @@ zpw2.setBounded(false)
 zpw2.setZoomLevelMax(20)
 zpw2.setZoomLevelMin(0)
 zpw2.setViewHeight(1200)
-zpw2.appendChild(rect)
+zpw2.appendChild(rect) */
