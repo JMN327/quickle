@@ -15,8 +15,8 @@ export default function zoomPanWindow(div) {
 
   ///// Setup view div /////
   let view = addBasicElement("div", ["view"], frame);
-  let viewH = 1600;
-  let viewW = 1600;
+  let viewH = 6400;
+  let viewW = 6400;
   let viewR;
   let viewB;
   setDivSize([view, viewH, viewW]);
@@ -29,42 +29,45 @@ export default function zoomPanWindow(div) {
   setTransformOrigin({ x: 0, y: 0 });
 
   ///// initialize positions /////
-  let centred = {
-    x: frameW / 2 - (viewW / 2) * scale,
-    y: frameH / 2 - (viewH / 2) * scale,
-  };
-  let mousedownPos = centred;
-  let mousemovePos = centred;
-  let viewMovingPos = centred;
-  let viewPos = centred;
+  function center() {
+    return {
+      x: frameW / 2 - (viewW / 2) * scale,
+      y: frameH / 2 - (viewH / 2) * scale,
+    };
+  }
+  let centered = center();
+  let mousedownPos = center();
+  let mousemovePos = center();
+  let viewMovingPos = center();
+  let viewPos = center();
   setTransform({ scale: scale, x: viewPos.x, y: viewPos.y });
 
-  function centreView() {
-    console.log("centred:", viewPos == centred);
+  function centerView() {
+    console.log("centered:", viewPos == centered);
 
-    if (viewPos != centred) {
+    if (viewPos != centered) {
+      let thisCenter = center();
       let animation = view.animate(
         [
           {
-            transform: `matrix(${scale}, 0, 0, ${scale}, ${viewPos.x}, ${viewPos.y})`,
+            transform: `matrix(${scale}, 0, 0, ${scale}, ${matrix.e}, ${matrix.f})`,
           },
           {
-            transform: `matrix(${scale}, 0, 0, ${scale}, ${centred.x}, ${centred.y})`,
+            transform: `matrix(${scale}, 0, 0, ${scale}, ${thisCenter.x}, ${thisCenter.y})`,
           },
         ],
-        150
+        300
       );
       animation.onfinish = () => {
-        mousedownPos = centred;
-        mousemovePos = centred;
-        viewMovingPos = centred;
-        viewPos.x = centred.x;
-        viewPos.y = centred.y;
+        mousedownPos = center();
+        mousemovePos = center();
+        viewMovingPos = center();
+        viewPos = center();
         setTransform({ scale: scale, x: viewPos.x, y: viewPos.y });
       };
     }
   }
-  centreView();
+  centerView();
 
   ///// zoom /////
   let zoomLevelMax = 10;
@@ -326,15 +329,15 @@ export default function zoomPanWindow(div) {
     event.stopPropagation();
   });
   zoomOutButton.addEventListener("click", (event) => zoom(event));
-  let centreViewButton = addSvgElement(
+  let centerViewButton = addSvgElement(
     "reset-view",
     ["controls__icon"],
     controls
   );
-  centreViewButton.addEventListener("mousedown", (event) => {
+  centerViewButton.addEventListener("mousedown", (event) => {
     event.stopPropagation();
   });
-  centreViewButton.addEventListener("click", centreView);
+  centerViewButton.addEventListener("click", centerView);
 
   return {
     getZoomLevelMax,
