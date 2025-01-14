@@ -131,7 +131,7 @@ body {
   width: minmax(40px, min-content);
   height: minmax(100px, min-content);
   background-color: rgba(172, 255, 47, 0.2);
-  border-radius: 6px;
+  border-radius: 8px;
   display: flex;
   flex-direction: column;
   gap: 4px;

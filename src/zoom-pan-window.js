@@ -15,28 +15,56 @@ export default function zoomPanWindow(div) {
 
   ///// Setup view div /////
   let view = addBasicElement("div", ["view"], frame);
-  /* view.style.left = 0
-  view.style.top = 0 */
   let viewH = 1600;
   let viewW = 1600;
-
   let viewR;
   let viewB;
   setDivSize([view, viewH, viewW]);
+  let viewMouseDown = false;
+  let bounded = true;
 
   ///// transform matrix /////
   let scale = 1;
   let matrix = new DOMMatrix([scale, 0, 0, scale, 0, 0]);
-
   setTransformOrigin({ x: 0, y: 0 });
 
-  ///// positions /////
-  let mousedownPos = { x: 0, y: 0 };
-  let mousemovePos = { x: 0, y: 0 };
-  let viewMovingPos = { x: 0, y: 0 };
-  let viewPos = { x: 0, y: 0 };
-  let viewMouseDown = false;
-  let bounded = true;
+  ///// initialize positions /////
+  let centred = {
+    x: frameW / 2 - (viewW / 2) * scale,
+    y: frameH / 2 - (viewH / 2) * scale,
+  };
+  let mousedownPos = centred;
+  let mousemovePos = centred;
+  let viewMovingPos = centred;
+  let viewPos = centred;
+  setTransform({ scale: scale, x: viewPos.x, y: viewPos.y });
+
+  function centreView() {
+    console.log("centred:", viewPos == centred);
+
+    if (viewPos != centred) {
+      let animation = view.animate(
+        [
+          {
+            transform: `matrix(${scale}, 0, 0, ${scale}, ${viewPos.x}, ${viewPos.y})`,
+          },
+          {
+            transform: `matrix(${scale}, 0, 0, ${scale}, ${centred.x}, ${centred.y})`,
+          },
+        ],
+        150
+      );
+      animation.onfinish = () => {
+        mousedownPos = centred;
+        mousemovePos = centred;
+        viewMovingPos = centred;
+        viewPos.x = centred.x;
+        viewPos.y = centred.y;
+        setTransform({ scale: scale, x: viewPos.x, y: viewPos.y });
+      };
+    }
+  }
+  centreView();
 
   ///// zoom /////
   let zoomLevelMax = 10;
@@ -56,14 +84,17 @@ export default function zoomPanWindow(div) {
   }
 
   function getMousePos(event) {
+    console.log("getting mouse position");
     if (!event) {
       return { x: 0, y: 0 };
     }
     switch (event.type) {
       case "click":
-        return { x: (frameW/2), y:(frameH/2)};
+        console.log("getMousePos by control panel ");
+        return { x: frameW / 2, y: frameH / 2 };
         break;
       default:
+        console.log("getMousePos by pan or mouse zoom ");
         return { x: event.clientX - frameL, y: event.clientY - frameT };
     }
   }
@@ -87,7 +118,6 @@ export default function zoomPanWindow(div) {
   }
 
   ///// exposed functions /////
-  
 
   function getBounded() {
     let isBounded = bounded ? true : false;
@@ -157,6 +187,7 @@ export default function zoomPanWindow(div) {
   frame.addEventListener("wheel", (event) => zoom(event), { passive: false });
 
   function zoom(event) {
+    //set condition for if zooming in/out based on event type
     let condition;
     switch (event.type) {
       case "wheel":
@@ -166,13 +197,15 @@ export default function zoomPanWindow(div) {
         break;
       case "click":
         console.log(event.type);
-        condition = event.target.closest(".controls__icon").classList.contains("zoom-in");
-        console.log(condition);
+        condition = event.target
+          .closest(".controls__icon")
+          .classList.contains("zoom-in");
         break;
       default:
         return;
     }
 
+    //set zooming in/out params
     if (condition) {
       if (zoomLevel == zoomLevelMax) {
         console.log(`max zoom in level reached: ${zoomLevel}`);
@@ -191,13 +224,14 @@ export default function zoomPanWindow(div) {
       console.log(`zooming out`);
     }
 
+    //update scale
     scale *= zoomScaleFactor ** zoomParity;
 
-    if (viewW * scale < frameW || viewH * scale < frameH) {
+    //undo scale updates if bounded and width or height too small
+    if (bounded && (viewW * scale < frameW || viewH * scale < frameH)) {
       scale *= (zoomScaleFactor ** zoomParity) ** -1;
       return;
     }
-
     mousemovePos = getMousePos(event);
     let d = { x: mousemovePos.x - viewPos.x, y: mousemovePos.y - viewPos.y };
     viewPos.x += d.x - d.x * zoomScaleFactor ** zoomParity;
@@ -216,6 +250,7 @@ export default function zoomPanWindow(div) {
   });
 
   frame.addEventListener("mousedown", (event) => {
+    console.log(event.target);
     if (event.buttons !== 1) {
       return;
     }
@@ -271,11 +306,35 @@ export default function zoomPanWindow(div) {
 
   let panel = addBasicElement("div", ["panel"], frame);
   let controls = addBasicElement("div", ["panel__controls"], panel);
-  let zoomIn = addSvgElement("zoom-in", ["zoom-in", "controls__icon"], controls);
-  zoomIn.addEventListener("click", (event) => zoom(event));
-  let zoomOut = addSvgElement("zoom-out", ["zoom-out", "controls__icon"], controls);
-  zoomOut.addEventListener("click", (event) => zoom(event));
-  let resetView = addSvgElement("reset-view", ["controls__icon"], controls);
+  let zoomInButton = addSvgElement(
+    "zoom-in",
+    ["zoom-in", "controls__icon"],
+    controls
+  );
+  zoomInButton.addEventListener("mousedown", (event) => {
+    event.stopPropagation();
+  });
+  zoomInButton.addEventListener("click", (event) => {
+    zoom(event);
+  });
+  let zoomOutButton = addSvgElement(
+    "zoom-out",
+    ["zoom-out", "controls__icon"],
+    controls
+  );
+  zoomOutButton.addEventListener("mousedown", (event) => {
+    event.stopPropagation();
+  });
+  zoomOutButton.addEventListener("click", (event) => zoom(event));
+  let centreViewButton = addSvgElement(
+    "reset-view",
+    ["controls__icon"],
+    controls
+  );
+  centreViewButton.addEventListener("mousedown", (event) => {
+    event.stopPropagation();
+  });
+  centreViewButton.addEventListener("click", centreView);
 
   return {
     getZoomLevelMax,

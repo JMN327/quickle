@@ -42,6 +42,7 @@ function setDivSize([div, h, w]) {
 }
 
 let zpw = zoomPanWindow(frame)
+zpw.setBounded(true)
 console.log(zpw.zoomScaleFactor)
 
 /* let rect = document.createElement("div")
