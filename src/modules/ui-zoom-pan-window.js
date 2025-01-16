@@ -5,7 +5,7 @@ export default function ZoomPanWindow(div) {
     return null;
   }
 
-  ///// Setup frame viv /////
+  ///// Setup frame div /////
   const frame = addBasicElement("div", ["frame"], div);
   let frameLimits = frame.getBoundingClientRect();
   const frameL = frameLimits.left;
@@ -120,76 +120,12 @@ export default function ZoomPanWindow(div) {
     view.style.transform = matrix;
   }
 
-  ///// exposed functions /////
-
-  function getBounded() {
-    let isBounded = bounded ? true : false;
-    return isBounded;
-  }
-  function setBounded(bool) {
-    if (typeof bool == "boolean") {
-      bounded = bool;
-    }
-  }
-
-  function getViewWidth() {
-    return viewW;
-  }
-  function setViewWidth(width) {
-    if (typeof width != "number") {
-      throw new Error("Parameter is not a number!");
-    }
-    if (width < frameW && bounded === true) {
-      throw new Error(
-        "You cannot set the view width as less than the frame width for a bounded window"
-      );
-    }
-    viewW = width;
-    setDivSize([view, viewH, viewW]);
-  }
-
-  function getViewHeight() {
-    return viewH;
-  }
-  function setViewHeight(height) {
-    if (typeof height != "number") {
-      throw new Error("Parameter is not a number!");
-    }
-    if (height < frameH && bounded === true) {
-      throw new Error(
-        "You cannot set the view height as less than the frame height for a bounded window"
-      );
-    }
-    viewH = height;
-    setDivSize([view, viewH, viewW]);
-  }
-
-  function appendChild(div) {
-    if (!(div instanceof HTMLElement)) {
-      throw new Error("Parameter is not an HTML Element");
-    }
-    view.appendChild(div);
-  }
-
-  function getZoomLevelMax() {
-    return zoomLevelMax;
-  }
-  function setZoomLevelMax(max) {
-    max = max < 0 ? 0 : max;
-    zoomLevelMax = max;
-  }
-  function getZoomLevelMin() {
-    return zoomLevelMin;
-  }
-  function setZoomLevelMin(min) {
-    min = min > 0 ? 0 : min;
-    zoomLevelMin = min;
-  }
-
   ///// zooming /////
-  frame.addEventListener("wheel", (event) => zoom(event), { passive: false });
+  frame.addEventListener("wheel", (event) => zooming(event), {
+    passive: false,
+  });
 
-  function zoom(event) {
+  function zooming(event) {
     //set condition for if zooming in/out based on event type
     let condition;
     switch (event.type) {
@@ -318,7 +254,7 @@ export default function ZoomPanWindow(div) {
     event.stopPropagation();
   });
   zoomInButton.addEventListener("click", (event) => {
-    zoom(event);
+    zooming(event);
   });
   let zoomOutButton = addSvgElement(
     "zoom-out",
@@ -328,7 +264,7 @@ export default function ZoomPanWindow(div) {
   zoomOutButton.addEventListener("mousedown", (event) => {
     event.stopPropagation();
   });
-  zoomOutButton.addEventListener("click", (event) => zoom(event));
+  zoomOutButton.addEventListener("click", (event) => zooming(event));
   let centerViewButton = addSvgElement(
     "reset-view",
     ["controls__icon"],
@@ -339,20 +275,86 @@ export default function ZoomPanWindow(div) {
   });
   centerViewButton.addEventListener("click", centerView);
 
+  ///// exposed functions /////
+
+  function appendChild(div) {
+    if (!(div instanceof HTMLElement)) {
+      throw new Error("Parameter is not an HTML Element");
+    }
+    view.appendChild(div);
+  }
+
   return {
-    getZoomLevelMax,
-    setZoomLevelMax,
-    getZoomLevelMin,
-    setZoomLevelMin,
+    get zoomLevelMax() {
+      return zoomLevelMax;
+    },
+    set zoomLevelMax(max) {
+      if (typeof max != "number") {
+        throw new Error("Parameter is not a number!");
+      }
+      max = max < 0 ? 0 : max;
+      zoomLevelMax = max;
+    },
+    get zoomLevelMin() {
+      return zoomLevelMin;
+    },
+    set zoomLevelMin(min) {
+      if (typeof max != "number") {
+        throw new Error("Parameter is not a number!");
+      }
+      min = min > 0 ? 0 : min;
+      zoomLevelMin = min;
+    },
     get zoomScaleFactor() {
       return zoomScaleFactor;
     },
-    getViewWidth,
-    setViewWidth,
-    getViewHeight,
-    setViewHeight,
-    getBounded,
-    setBounded,
+    set zoomScaleFactor(factor) {
+      if (typeof factor != "number") {
+        throw new Error("Parameter is not a number!");
+      }
+      factor = factor > 2 ? 2 : factor;
+      factor = factor < 1 ? 1 : factor;
+      zoomScaleFactor = factor
+    },
+    get viewWidth() {
+      return viewW;
+    },
+    set viewWidth(width) {
+      if (typeof width != "number") {
+        throw new Error("Parameter is not a number!");
+      }
+      if (width < frameW && bounded === true) {
+        throw new Error(
+          "You cannot set the view width as less than the frame width for a bounded window"
+        );
+      }
+      viewW = width;
+      setDivSize([view, viewH, viewW]);
+    },
+    get viewHeight() {
+      return viewH;
+    },
+    set viewHeight(height) {
+      if (typeof height != "number") {
+        throw new Error("Parameter is not a number!");
+      }
+      if (height < frameH && bounded === true) {
+        throw new Error(
+          "You cannot set the view height as less than the frame height for a bounded window"
+        );
+      }
+      viewH = height;
+      setDivSize([view, viewH, viewW]);
+    },
+    get bounded() {
+      let isBounded = bounded ? true : false;
+      return isBounded;
+    },
+    set bounded(bool) {
+      if (typeof bool == "boolean") {
+        bounded = bool;
+      }
+    },
     appendChild,
   };
 }

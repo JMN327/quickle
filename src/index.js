@@ -5,7 +5,7 @@ import {
   addTileElement,
   removeAllChildNodes,
 } from "./modules/elements.js";
-import ZoomPanWindow from "./modules/zoom-pan-window.js";
+import ZoomPanWindow from "./modules/ui-zoom-pan-window.js";
 
 console.log("Hello World!)");
 console.log(`Local Storage available: ${storageAvailable("localStorage")}`);
@@ -36,8 +36,8 @@ function setDivSize([div, h, w]) {
 }
 
 let zpw = ZoomPanWindow(frame)
-zpw.setBounded(true)
-console.log(zpw.zoomScaleFactor)
+zpw.bounded = true
+console.log(zpw.zoomLevelMax)
 
 /* let pallet = addBasicElement("div", ["pallet"], body)
 addTileElement("cross", "red", pallet)
@@ -48,3 +48,5 @@ addTileElement("square", "blue", pallet)
 addTileElement("star", "purple", pallet)
 
 zpw.appendChild(pallet) */
+zpw.zoomScaleFactor = 1.25
+console.log(zpw.zoomScaleFactor)
