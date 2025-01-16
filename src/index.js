@@ -1,11 +1,11 @@
 import "./styles.css";
-import storageAvailable from "./browser-storage.js";
+import storageAvailable from "./modules/browser-storage.js";
 import {
   addBasicElement,
   addTileElement,
   removeAllChildNodes,
-} from "./elements.js";
-import zoomPanWindow from "./zoom-pan-window.js";
+} from "./modules/elements.js";
+import ZoomPanWindow from "./modules/zoom-pan-window.js";
 
 console.log("Hello World!)");
 console.log(`Local Storage available: ${storageAvailable("localStorage")}`);
@@ -35,11 +35,11 @@ function setDivSize([div, h, w]) {
   }
 }
 
-let zpw = zoomPanWindow(frame)
+let zpw = ZoomPanWindow(frame)
 zpw.setBounded(true)
 console.log(zpw.zoomScaleFactor)
 
-let pallet = addBasicElement("div", ["pallet"], body)
+/* let pallet = addBasicElement("div", ["pallet"], body)
 addTileElement("cross", "red", pallet)
 addTileElement("clover", "orange", pallet)
 addTileElement("diamond", "yellow", pallet)
@@ -47,4 +47,4 @@ addTileElement("circle", "green", pallet)
 addTileElement("square", "blue", pallet)
 addTileElement("star", "purple", pallet)
 
-zpw.appendChild(pallet)
+zpw.appendChild(pallet) */

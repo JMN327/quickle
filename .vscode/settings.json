@@ -3,6 +3,7 @@
     "ignorePattern": "webpack.config.js"
   },
   "cSpell.words": [
+    "Gameboard",
     "greenyellow"
   ]
 }

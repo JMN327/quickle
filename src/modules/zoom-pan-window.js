@@ -1,6 +1,6 @@
 import { addBasicElement, addSvgElement } from "./elements.js";
 
-export default function zoomPanWindow(div) {
+export default function ZoomPanWindow(div) {
   if (!div) {
     return null;
   }
