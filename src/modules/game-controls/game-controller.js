@@ -1,5 +1,5 @@
 function GameController() {
-    let players = Players();
+    let players = Player();
     let winLine = {};
     const board = Gameboard();
     const turnCounter = TurnCounter();

@@ -1,10 +1,9 @@
-import color from "./ENUMS-color";
-import shape from "./ENUMS-shape";
-
-export default function Tile(color,shape){
+export default function Tile(color,shape, number,state){
 
     return {
         color,
-        shape
+        shape,
+        number,
+        state,
     }
 }

@@ -1,5 +1,6 @@
 import { color } from "./ENUMS-color";
 import { shape } from "./ENUMS-shape";
+import { tileState } from "./ENUMS-tile-state";
 import Tile from "./tile";
 
 export default function Bag() {
@@ -8,26 +9,27 @@ export default function Bag() {
   let tiles = [];
 
   function fill() {
+    let n = 0;
     for (let i = 0; i < 6; i++) {
       for (let j = 0; j < 6; j++) {
         for (let k = 0; k < 3; k++) {
-          tiles.push(Tile(colorArr[i], shapeArr[j]));
+          tiles.push(Tile(n,colorArr[i], shapeArr[j],  tileState.BAG));
+          n++;
         }
       }
     }
   }
 
   function shuffle() {
-    let m = tiles.length 
-    let t
+    let m = tiles.length;
+    let t;
     let i;
 
     // While there remain elements to shuffle…
     while (m) {
-  
       // Pick a remaining element…
       i = Math.floor(Math.random() * m--);
-  
+
       // And swap it with the current element.
       t = tiles[m];
       tiles[m] = tiles[i];
@@ -35,23 +37,21 @@ export default function Bag() {
     }
   }
 
-  // drawTiles(int count) method to return array of tiles equal to count removed from bag array
-  function draw(count){
-    count = count > tiles.length ? tiles.length :count
-    return tiles.splice(-count,count)
+  function draw(count) {
+    count = count > tiles.length ? tiles.length : count;
+    return tiles.splice(-count, count);
   }
 
-  function swap(arr){
+  function swap(arr) {
     if (!arr) {
-      return
+      return;
     }
-    let count = arr.length
-    if (count>tiles.length) {
+    let count = arr.length;
+    if (count > tiles.length) {
       throw new Error("Not enough tiles left in the bag to complete the swap");
-      
     }
-    shuffle()
-    return tiles.splice(-count,count, ...arr)
+    shuffle();
+    return tiles.splice(-count, count, ...arr);
   }
 
   return {
@@ -60,5 +60,5 @@ export default function Bag() {
     shuffle,
     draw,
     swap,
-  }
+  };
 }

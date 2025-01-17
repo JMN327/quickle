@@ -11,6 +11,7 @@ import { color } from "./modules/game-objects/ENUMS-color.js";
 import { shape } from "./modules/game-objects/ENUMS-shape.js";
 import Tile from "./modules/game-objects/tile.js";
 import Bag from "./modules/game-objects/bag.js";
+import Rack from "./modules/game-objects/rack.js";
 
 console.log("Hello World!)");
 console.log(`Local Storage available: ${storageAvailable("localStorage")}`);
@@ -59,13 +60,18 @@ let t2 = Tile(color[0], shape[3])
 
 console.log(t2.color, t2.shape) */
 
-let b = Bag()
-console.log(b.tiles)
-b.fill()
-console.log(b.tiles)
-/* b.shuffle()
-console.log(b.tiles) */
-let hand = b.draw(6)
-console.log(b.tiles, hand)
-hand = b.swap(hand)
-console.log(b.tiles, hand)
+let bag = Bag()
+//console.log(bag.tiles)
+bag.fill()
+bag.shuffle()
+//console.log(bag.tiles)
+let rack = Rack()
+rack.fill(bag)
+console.table(rack.tiles)
+rack.rearrange(0,1)
+console.table(rack.tiles)
+rack.select(3)
+console.log(rack.selection)
+let playedTile = rack.playSelected() // cell.tile = rack.playSelected()
+console.table(playedTile)
+console.table(rack.tiles)
