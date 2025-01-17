@@ -1,12 +1,10 @@
-export default function Tile(){
-/*     const color = "color"
-    const shape = "shape"
+import color from "./ENUMS-color";
+import shape from "./ENUMS-shape";
+
+export default function Tile(color,shape){
+
     return {
-        get color() {
-            return color
-        }
-        set color(c) {
-            color = c
-        }
-    } */
+        color,
+        shape
+    }
 }
