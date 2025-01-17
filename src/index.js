@@ -10,6 +10,7 @@ import ZoomPanWindow from "./modules/UI/ui-zoom-pan-window.js";
 import { color } from "./modules/game-objects/ENUMS-color.js";
 import { shape } from "./modules/game-objects/ENUMS-shape.js";
 import Tile from "./modules/game-objects/tile.js";
+import Bag from "./modules/game-objects/bag.js";
 
 console.log("Hello World!)");
 console.log(`Local Storage available: ${storageAvailable("localStorage")}`);
@@ -58,4 +59,13 @@ let t2 = Tile(color[0], shape[3])
 
 console.log(t2.color, t2.shape) */
 
-console.log(color[1])
+let b = Bag()
+console.log(b.tiles)
+b.fill()
+console.log(b.tiles)
+/* b.shuffle()
+console.log(b.tiles) */
+let hand = b.draw(6)
+console.log(b.tiles, hand)
+hand = b.swap(hand)
+console.log(b.tiles, hand)
