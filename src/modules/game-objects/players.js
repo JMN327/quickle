@@ -2,13 +2,13 @@ export default function Players() {
     let players = [
       {
         name: "Player One",
-        mark: "O",
+        rack: [],
         score: 0,
         index: 0,
       },
       {
         name: "Player Two",
-        mark: "X",
+        rack: [],
         score: 0,
         index: 1,
       },
@@ -46,13 +46,6 @@ export default function Players() {
     const getPlayers = () => players;
 
     return {
-      switchStartPlayer,
-      getActivePlayer,
-      switchPlayerTurn,
-      setPlayerNames,
-      setPlayerMarks,
-      incrementScores,
-      resetScores,
-      getPlayers,
+
     };
   }

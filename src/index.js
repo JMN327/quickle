@@ -4,8 +4,8 @@ import {
   addBasicElement,
   addTileElement,
   removeAllChildNodes,
-} from "./modules/elements.js";
-import ZoomPanWindow from "./modules/ui-zoom-pan-window.js";
+} from "./modules/UI/DOM-elements.js";
+import ZoomPanWindow from "./modules/UI/ui-zoom-pan-window.js";
 
 console.log("Hello World!)");
 console.log(`Local Storage available: ${storageAvailable("localStorage")}`);

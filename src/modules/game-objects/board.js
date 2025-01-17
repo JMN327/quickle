@@ -1,4 +1,4 @@
-export default function Gameboard() {
+export default function Board() {
   const rows = 3;
   const columns = 3;
   const board = [];

@@ -1,4 +1,4 @@
-import { addBasicElement, addSvgElement } from "./elements.js";
+import { addBasicElement, addSvgElement } from "./DOM-elements.js";
 
 export default function ZoomPanWindow(div) {
   if (!div) {
