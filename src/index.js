@@ -7,8 +7,8 @@ import {
 } from "./modules/UI/DOM-elements.js";
 import ZoomPanWindow from "./modules/UI/ui-zoom-pan-window.js";
 
-import { color } from "./modules/game-objects/ENUMS-color.js";
-import { shape } from "./modules/game-objects/ENUMS-shape.js";
+import { color } from "./modules/game-objects/enums/color.js";
+import { shape } from "./modules/game-objects/enums/shape.js";
 import Tile from "./modules/game-objects/tile.js";
 import Bag from "./modules/game-objects/bag.js";
 import Rack from "./modules/game-objects/rack.js";
@@ -66,11 +66,14 @@ bag.fill()
 bag.shuffle()
 //console.log(bag.tiles)
 let rack = Rack()
+console.table(rack.tiles)
 rack.fill(bag)
 console.table(rack.tiles)
 rack.rearrange(0,1)
 console.table(rack.tiles)
 rack.select(3)
+rack.deselect(3)
+rack.select(4)
 console.log(rack.selection)
 let playedTile = rack.playSelected() // cell.tile = rack.playSelected()
 console.table(playedTile)

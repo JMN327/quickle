@@ -1,5 +1,5 @@
 import Bag from "./bag";
-import { tileState } from "./ENUMS-tile-state";
+import { tileState } from "./enums/tile-state";
 
 export default function Rack() {
   let tiles = [
@@ -10,7 +10,7 @@ export default function Rack() {
     undefined,
     undefined,
   ];
-  let emptySpaces = getEmptySpaces();
+  let swapMode = false;
 
   function getEmptySpaces() {
     let emptySpaces = [];
@@ -19,21 +19,23 @@ export default function Rack() {
         emptySpaces.push(index);
       }
     });
-    console.table(emptySpaces)
+    console.table(emptySpaces);
     return emptySpaces;
   }
 
-  let selectedTile;
+  let selection;
+  let swapSelection = [];
 
   function fill(bag) {
     if (!bag) {
       throw new Error("The bag has not been created");
     }
+    let emptySpaces = getEmptySpaces()
     if (emptySpaces.length == 0) {
       return;
     }
     emptySpaces.forEach((space) => {
-      tiles.splice(space,1,...bag.draw(1))
+      tiles.splice(space, 1, ...bag.draw(1));
       //tiles[space] = ...bag.draw(1);
       tiles[space].state = tileState.RACK;
     });
@@ -50,23 +52,22 @@ export default function Rack() {
       throw new Error("Invalid index for selection");
     }
     tiles[i].state = tileState.SELECTED;
-    selectedTile = i;
+    selection = i;
   }
-  function deselect() {
+  function deselect(i) {
     if (i > 5 || i < 0) {
       throw new Error("Invalid index for deselection");
     }
-    tiles.forEach((tile) => {
-      tile.state = tileState.RACK;
-    });
-    selectedTile = undefined;
+    tiles[i].state = tileState.RACK;
+    selection = undefined;
   }
 
   function playSelected() {
-    if (!selectedTile) {
+    if (!selection) {
       throw new Error("there is no selected tile on the rack");
     }
-    let playedTile = tiles.splice(selectedTile, 1)[0];
+    let playedTile = tiles.splice(selection, 1)[0];
+    tiles.splice(selection,0,undefined)
     playedTile.state = tileState.LOOSE;
     return playedTile;
   }
@@ -78,7 +79,26 @@ export default function Rack() {
     tiles.splice(to, 0, tiles.splice(from, 1)[0]);
   }
 
-  // .selection = tile number of interface selected tile
+  function swapSelect(i) {
+    if (!swapMode) {
+      return
+    }
+    if (i > 5 || i < 0) {
+      throw new Error("Invalid index for selection");
+    }
+    tiles[i].state = tileState.SWAPSELECTED;
+    swapSelection.push(tiles[i])
+  }
+
+  function deselectAll() {
+    tiles.forEach((tile) => {
+      tile.state = tileState.RACK;
+    });
+    selection = undefined;
+  }
+
+
+
   // .swapMode = bool activated if player wants to swap tiles
   // .swapSelect = push tile onto swapSelection
   // .swapSelection = [] of tile numbers for swapping
@@ -92,9 +112,10 @@ export default function Rack() {
     fill,
     select,
     deselect,
+    deselectAll,
     rearrange,
     get selection() {
-      return tiles[selectedTile];
+      return tiles[selection];
     },
     playSelected,
   };
