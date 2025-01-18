@@ -42,6 +42,7 @@ export default function Bag() {
     return tiles.splice(-count, count);
   }
 
+  // change to remove and fill
   function swap(arr) {
     if (!arr) {
       return;

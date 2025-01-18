@@ -78,3 +78,5 @@ console.log(rack.selection)
 let playedTile = rack.playSelected() // cell.tile = rack.playSelected()
 console.table(playedTile)
 console.table(rack.tiles)
+rack.swapMode = false
+console.log(rack.swapMode)
