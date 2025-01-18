@@ -1,9 +1,8 @@
-export default function Tile(color,shape, number,state){
-
-    return {
-        color,
-        shape,
-        number,
-        state,
-    }
+export default function Tile(number, color, shape, state) {
+  return {
+    number,
+    color,
+    shape,
+    state,
+  };
 }
