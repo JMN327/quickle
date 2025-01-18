@@ -13,7 +13,7 @@ export default function Bag() {
     for (let i = 0; i < 6; i++) {
       for (let j = 0; j < 6; j++) {
         for (let k = 0; k < 3; k++) {
-          tiles.push(Tile(n,colorArr[i], shapeArr[j],  tileState.BAG));
+          tiles.push(Tile(n, colorArr[i], shapeArr[j], tileState.BAG));
           n++;
         }
       }
@@ -49,7 +49,6 @@ export default function Bag() {
     }
     let count = arr.length;
     if (count > tiles.length) {
-      // NEED SOME FUNCTIONALITY HERE FOR DEALING WITH GAME SITUATIONS WHERE IT COULD HAPPEN
       throw new Error("Not enough tiles left in the bag to complete the swap");
     }
     return tiles.splice(tiles.length, 0, ...arr);
@@ -61,5 +60,8 @@ export default function Bag() {
     shuffle,
     draw,
     putBack,
+    get count() {
+      return tiles.length;
+    },
   };
 }

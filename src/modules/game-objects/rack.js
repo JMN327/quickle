@@ -1,4 +1,3 @@
-import Bag from "./bag";
 import { tileState } from "./enums/tile-state";
 
 export default function Rack() {
@@ -41,7 +40,6 @@ export default function Rack() {
     let gap = tiles[from]
     tiles[from] = tiles[to]
     tiles[to] = gap
-    //tiles.splice(to, 0, tiles.splice(from, 1)[0]);
   }
 
   function getSelection() {
@@ -64,7 +62,6 @@ export default function Rack() {
         emptySpaces.push(index);
       }
     });
-    console.table(emptySpaces);
     return emptySpaces;
   }
 
@@ -100,61 +97,16 @@ export default function Rack() {
   return {
     tiles,
     addTiles,
-    removeSelection,
     rearrange,
     select,
     xSelect,
     deselectSingle,
     deselectAll,
-
     get spaces() {
-      return getSpaces();
+      return {indexArr:getSpaces(), count:getSpaces().length};
     },
-    get spaceCount() {
-      return getSpaces().length;
-    },
-
     get selection() {
-      return getSelection();
-    },
-  };
-}
-
-export function TileManager() {
-  function fillRack(bag) {
-    if (!bag) {
-      throw new Error("The bag has not been created");
-    }
-    let emptySpaces = getEmptySpaces();
-    if (emptySpaces.length == 0) {
-      return;
-    }
-    emptySpaces.forEach((space) => {
-      slots.splice(space, 1, ...bag.draw(1));
-      //tiles[space] = ...bag.draw(1);
-      slots[space].state = tileState.RACK;
-    });
-  }
-
-  return {
-    tiles: slots,
-    fillRack,
-    select,
-    deselect,
-    deselectAll,
-    rearrange,
-    get selection() {
-      /////**************update
-      return slots[selectedTilesIndexArr];
-    },
-    playSelected,
-    get swapMode() {
-      return swapMode;
-    },
-    set swapMode(bool) {
-      if (typeof bool == "boolean") {
-        swapMode = bool;
-      }
+      return {indexArr:getSelection(), count:getSelection().length, remove:removeSelection};
     },
   };
 }

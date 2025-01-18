@@ -3,6 +3,6 @@ export const tileState = Object.freeze({
   RACK: "rack",
   SELECTED: "selected",
   MOVING: "moving",
-  LOOSE: "loose",
+  PLACED: "placed",
   FIXED: "fixed",
 });

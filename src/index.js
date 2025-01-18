@@ -7,11 +7,12 @@ import {
 } from "./modules/UI/DOM-elements.js";
 import ZoomPanWindow from "./modules/UI/ui-zoom-pan-window.js";
 
-import { color } from "./modules/game-objects/enums/color.js";
-import { shape } from "./modules/game-objects/enums/shape.js";
-import Tile from "./modules/game-objects/tile.js";
+
 import Bag from "./modules/game-objects/bag.js";
 import Rack from "./modules/game-objects/rack.js";
+import Cell from "./modules/game-objects/cell.js";
+import { color } from "./modules/game-objects/enums/color.js";
+import { shape } from "./modules/game-objects/enums/shape.js";
 
 console.log("Hello World!)");
 console.log(`Local Storage available: ${storageAvailable("localStorage")}`);
@@ -24,11 +25,6 @@ let frame = addBasicElement("div", ["zpw"], body);
 let frameH = 800;
 let frameW = 800;
 setDivSize([frame, frameH, frameW]);
-
-/* let frame2 = addBasicElement("div", ["zpw"], body);
-let frame2H = 400;
-let frame2W = 600;
-setDivSize([frame2, frame2H, frame2W]); */
 
 function setDivSize([div, h, w]) {
   if (h) {
@@ -52,26 +48,26 @@ addTileElement("square", "blue", pallet)
 addTileElement("star", "purple", pallet)
 
 zpw.appendChild(pallet) */
-zpw.zoomScaleFactor = 1.25;
-console.log(zpw.zoomScaleFactor);
 
-/* let t1 = Tile(color.RED, shape.CIRCLE)
-let t2 = Tile(color[0], shape[3])
-
-console.log(t2.color, t2.shape) */
-
-let bag = Bag()
+/* let bag = Bag()
 bag.fill()
 bag.shuffle()
 let rack = Rack()
-rack.addTiles(bag.draw(rack.spaceCount))
+rack.addTiles(bag.draw(rack.spaces.count))
 console.table(rack.tiles)
 rack.rearrange(0,1)
 console.table(rack.tiles)
-rack.select(3)
-rack.select(4)
-rack.xSelect(5)
-console.table(rack.selection)
-let playedTile = rack.removeSelection() // cell.tile = rack.playSelected()
+rack.xSelect(2)
+console.table(rack.tiles)
+let playedTile = rack.selection.remove() // cell.tile = rack.playSelected()
 console.table(playedTile)
 console.table(rack.tiles)
+rack.addTiles(bag.draw(rack.spaces.count))
+console.table(rack.tiles) */
+
+let cell = Cell()
+//cell.addCriterion(color.RED,shape.CIRCLE)
+cell.addColCriterion({color:color.ORANGE,shape:shape.STAR})
+cell.addRowCriterion({color:color.PURPLE,shape:shape.STAR})
+cell.addRowCriterion({color:color.RED,shape:shape.CIRCLE})
+console.log(cell.meetsCriteria(color.RED, shape.STAR))
