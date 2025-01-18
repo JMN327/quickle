@@ -1,4 +1,7 @@
 export default function Player() {
+
+  // MOST OF THIS TO ME MOVED TO PLAYER MANAGER CONTROLLER
+
     let players = [
       {
         name: "Player One",
