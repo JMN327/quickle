@@ -43,16 +43,16 @@ export default function Bag() {
   }
 
   // change to remove and fill
-  function swap(arr) {
+  function putBack(arr) {
     if (!arr) {
       return;
     }
     let count = arr.length;
     if (count > tiles.length) {
+      // NEED SOME FUNCTIONALITY HERE FOR DEALING WITH GAME SITUATIONS WHERE IT COULD HAPPEN
       throw new Error("Not enough tiles left in the bag to complete the swap");
     }
-    shuffle();
-    return tiles.splice(-count, count, ...arr);
+    return tiles.splice(tiles.length, 0, ...arr);
   }
 
   return {
@@ -60,6 +60,6 @@ export default function Bag() {
     fill,
     shuffle,
     draw,
-    swap,
+    putBack,
   };
 }
