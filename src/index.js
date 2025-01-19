@@ -13,6 +13,8 @@ import Rack from "./modules/game-objects/rack.js";
 import Cell from "./modules/game-objects/cell.js";
 import { color } from "./modules/game-objects/enums/color.js";
 import { shape } from "./modules/game-objects/enums/shape.js";
+import { direction } from "./modules/game-objects/enums/direction.js";
+import CheckList from "./modules/abstract/CheckList.js";
 
 console.log("Hello World!)");
 console.log(`Local Storage available: ${storageAvailable("localStorage")}`);
@@ -66,3 +68,10 @@ rack.addTiles(bag.draw(rack.spaces.count))
 console.table(rack.tiles) */
 
 let cell = Cell()
+
+
+//let checkList = CheckList()
+cell.checkList.add(direction.HORIZONTAL,color.RED,shape.CIRCLE)
+cell.checkList.add(direction.HORIZONTAL,color.RED,shape.SQUARE)
+console.table(cell.checkList.matrix)
+console.table(cell.checkList.horizontalIds)
