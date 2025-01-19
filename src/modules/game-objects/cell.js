@@ -2,10 +2,6 @@ import { tileState } from "./enums/tile-state";
 
 export default function Cell() {
   let tile = undefined;
-  let criteria = [];
-
-
-
 
   function placeTile(movingTile) {
     if (tile) {
@@ -21,6 +17,8 @@ export default function Cell() {
     }
     tile.state = tileState.FIXED;
   }
+
+  
 
 
   return {
