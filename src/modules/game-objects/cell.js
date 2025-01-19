@@ -2,8 +2,22 @@ import { tileState } from "./enums/tile-state";
 
 export default function Cell() {
   let tile = undefined;
-  let rowCriteria = [];
-  let colCriteria = [];
+  let criteria = [];
+
+  let words = {
+    own: {
+      h: undefined,
+      v: undefined,
+    },
+    adjacent: {
+      left: { color:undefined, shape:undefined },
+      right: { color:undefined, shape:undefined  },
+      up: { color:undefined, shape:undefined },
+      down: { color:undefined, shape:undefined  },
+
+    },
+  };
+
 
   function placeTile(movingTile) {
     if (tile) {
@@ -20,25 +34,24 @@ export default function Cell() {
     tile.state = tileState.FIXED;
   }
 
-  function addRowCriterion({ color, shape }) {
-    if (tile) {
-      return;
-    }
-    rowCriteria.push({ color, shape });
+  function removeTile() {
+    let removedTile = tile;
+    tile = undefined;
+    return removedTile;
   }
 
-  function addColCriterion({ color, shape }) {
+  function addCriterion({ color, shape }) {
     if (tile) {
       return;
     }
-    colCriteria.push({ color, shape });
+    criteria.push({ color, shape });
   }
 
   function meetsCriteria(checkColor, checkShape) {
     if (tile) {
       throw new Error("There is already a tile in this cell");
     }
-    if (!(rowCriteria && colCriteria)) {
+    if (!(criteria && criteria)) {
       return false;
     }
     let check = (criterion) => {
@@ -47,25 +60,22 @@ export default function Cell() {
       console.log(a ^ b);
       return a ^ b;
     };
-    console.log(rowCriteria.every(check), colCriteria.every(check))
-    return rowCriteria.every(check) && colCriteria.every(check);
-  }
-
-  function removeTile() {
-    let removedTile = tile;
-    tile = undefined;
-    return removedTile;
+    console.log(criteria.every(check));
+    return criteria.every(check);
   }
 
   return {
     get tile() {
       return tile;
     },
+    get empty() {
+      return tile == undefined;
+    },
     placeTile,
     fixTile,
     removeTile,
-    addRowCriterion,
-    addColCriterion,
+    addCriterion,
     meetsCriteria,
+    words,
   };
 }
