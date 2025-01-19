@@ -66,10 +66,3 @@ rack.addTiles(bag.draw(rack.spaces.count))
 console.table(rack.tiles) */
 
 let cell = Cell()
-//cell.addCriterion(color.RED,shape.CIRCLE)
-/* cell.addColCriterion({color:color.ORANGE,shape:shape.STAR})
-cell.addRowCriterion({color:color.PURPLE,shape:shape.STAR})
-cell.addRowCriterion({color:color.RED,shape:shape.CIRCLE})
-console.log(cell.meetsCriteria(color.RED, shape.STAR)) */
-cell.words.adjacent.left = {color:color.RED, shape:shape.CIRCLE}
-console.log(cell.words)

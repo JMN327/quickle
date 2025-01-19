@@ -1,8 +1,8 @@
 export const shape = Object.freeze({
-  CIRCLE: "circle",
-  CLOVER: "clover",
-  CROSS: "cross",
-  DIAMOND: "diamond",
-  SQUARE: "square",
-  STAR: "star",
+  CIRCLE: 0,
+  CLOVER: 1,
+  CROSS: 2,
+  DIAMOND: 3,
+  SQUARE: 4,
+  STAR: 5,
 });

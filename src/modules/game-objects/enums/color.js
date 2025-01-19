@@ -1,8 +1,8 @@
 export const color = Object.freeze({
-  RED: "red",
-  ORANGE: "orange",
-  YELLOW: "yellow",
-  GREEN: "green",
-  BLUE: "blue",
-  PURPLE: "purple",
+  RED: 0,
+  ORANGE: 1,
+  YELLOW: 2,
+  GREEN: 3,
+  BLUE: 4,
+  PURPLE: 5,
 });
