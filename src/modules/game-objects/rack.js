@@ -3,7 +3,7 @@ import { tileState } from "./enums/tile-state";
 export default function Rack() {
 
   let tiles = new Array(6)
-  tiles.fill(undefined)
+  tiles.fill(null)
   Object.seal(tiles)
 
   function select(i) {
@@ -20,7 +20,7 @@ export default function Rack() {
   }
   function deselectAll() {
     tiles.forEach((tile) => {
-      if (tile != undefined) {
+      if (tile != null) {
         tile.state = tileState.RACK;
       }
     });
@@ -45,7 +45,7 @@ export default function Rack() {
   function getSelection() {
     let selected = [];
     tiles.forEach((tile, index) => {
-      if (tile == undefined) {
+      if (tile == null) {
         return;
       }
       if ((tile.state == tileState.SELECTED)) {
@@ -58,7 +58,7 @@ export default function Rack() {
   function getSpaces() {
     let emptySpaces = [];
     tiles.forEach((tile, index) => {
-      if (tile == undefined) {
+      if (tile == null) {
         emptySpaces.push(index);
       }
     });
@@ -89,7 +89,7 @@ export default function Rack() {
     }
     selectionArr.forEach((tileIndex) => {
       tiles[tileIndex].state = tileState.MOVING;
-      removedTileArr.push(tiles.splice(tileIndex, 1, undefined)[0]);
+      removedTileArr.push(tiles.splice(tileIndex, 1, null)[0]);
     });
     return removedTileArr;
   }

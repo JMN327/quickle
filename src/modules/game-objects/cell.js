@@ -1,9 +1,11 @@
 import { tileState } from "./enums/tile-state";
 import { color } from "./enums/color";
 import { shape } from "./enums/shape";
+import { cellState } from "./enums/cell-state";
 
 export default function Cell() {
   let tile = undefined;
+  let state = cellState.EMPTY;
   let checkList = CheckList();
 
   function placeTile(movingTile) {
@@ -12,16 +14,18 @@ export default function Cell() {
     }
     tile = movingTile;
     tile.state = tileState.PLACED;
+    state = cellState.PLACED;
   }
 
-  function pickTileUp() {
+  function pickTile() {
     if (!tile) {
       throw new Error("There is no tile in this cell");
     }
     let pickedUpTile = tile;
     pickedUpTile.state = tileState.MOVING;
+    state = cellState.EMPTY;
     tile = undefined;
-    return pickTileUp;
+    return pickedUpTile;
   }
 
   function fixTile() {
@@ -29,6 +33,7 @@ export default function Cell() {
       throw new Error("The is not a tile in this cell to fix yet");
     }
     tile.state = tileState.FIXED;
+    state = cellState.FIXED;
   }
 
   function CheckList() {
@@ -118,6 +123,11 @@ export default function Cell() {
             }
           }
         }
+        if (validTiles.length == 0) {
+          state = cellState.DEAD;
+        }
+      } else {
+        state = cellState.DEAD;
       }
     }
 
@@ -146,14 +156,17 @@ export default function Cell() {
     get tile() {
       return tile;
     },
+    get state() {
+      return state;
+    },
     get empty() {
       return tile == undefined;
     },
     get checkList() {
       return checkList;
     },
-    placeTile,
-    pickTileUp,
+    placeTile: placeTile,
+    pickTileUp: pickTile,
     fixTile,
   };
 }

@@ -50,7 +50,7 @@ addTileElement("star", "purple", pallet)
 
 zpw.appendChild(pallet) */
 
-/* let bag = Bag()
+let bag = Bag()
 bag.fill()
 bag.shuffle()
 let rack = Rack()
@@ -64,11 +64,9 @@ let playedTile = rack.selection.remove() // cell.tile = rack.playSelected()
 console.table(playedTile)
 console.table(rack.tiles)
 rack.addTiles(bag.draw(rack.spaces.count))
-console.table(rack.tiles) */
+console.table(rack.tiles)
 
-let cell = Cell();
-
-//let checkList = CheckList()
+/* let cell = Cell();
 cell.checkList.addTile(direction.HORIZONTAL, color.RED, shape.CIRCLE);
 cell.checkList.addTile(direction.HORIZONTAL, color.RED, shape.SQUARE);
 cell.checkList.addTile(direction.VERTICAL, color.GREEN, shape.CLOVER);
@@ -77,4 +75,4 @@ console.table(cell.checkList.validTileNames);
 cell.checkList.removeTile(direction.HORIZONTAL, color.RED, shape.SQUARE);
 console.table(cell.checkList.validTileNames);
 cell.checkList.removeTile(direction.VERTICAL, color.GREEN, shape.CLOVER);
-console.table(cell.checkList.validTileNames);
+console.table(cell.checkList.validTileNames); */
