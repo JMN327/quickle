@@ -7,7 +7,6 @@ import {
 } from "./modules/UI/DOM-elements.js";
 import ZoomPanWindow from "./modules/UI/ui-zoom-pan-window.js";
 
-
 import Bag from "./modules/game-objects/bag.js";
 import Rack from "./modules/game-objects/rack.js";
 import Cell from "./modules/game-objects/cell.js";
@@ -67,11 +66,15 @@ console.table(rack.tiles)
 rack.addTiles(bag.draw(rack.spaces.count))
 console.table(rack.tiles) */
 
-let cell = Cell()
-
+let cell = Cell();
 
 //let checkList = CheckList()
-cell.checkList.add(direction.HORIZONTAL,color.RED,shape.CIRCLE)
-cell.checkList.add(direction.HORIZONTAL,color.RED,shape.SQUARE)
-console.table(cell.checkList.matrix)
-console.table(cell.checkList.horizontalIds)
+cell.checkList.addTile(direction.HORIZONTAL, color.RED, shape.CIRCLE);
+cell.checkList.addTile(direction.HORIZONTAL, color.RED, shape.SQUARE);
+cell.checkList.addTile(direction.VERTICAL, color.GREEN, shape.CLOVER);
+console.table(cell.checkList.validTiles);
+console.table(cell.checkList.validTileNames);
+cell.checkList.removeTile(direction.HORIZONTAL, color.RED, shape.SQUARE);
+console.table(cell.checkList.validTileNames);
+cell.checkList.removeTile(direction.VERTICAL, color.GREEN, shape.CLOVER);
+console.table(cell.checkList.validTileNames);
