@@ -1,32 +1,72 @@
-export default function Board() {
-  const rows = 3;
-  const columns = 3;
-  const board = [];
+import Cell from "./cell";
+import { cellState } from "./enums/cell-state";
+import { direction } from "./enums/direction";
 
-  //populate board array with Cell objects
-  const resetBoard = () => {
-    for (let i = 0; i < rows; i++) {
-      board[i] = [];
-      for (let j = 0; j < columns; j++) {
-        board[i].push(Cell());
+export default function Board() {
+  let grid = [[Cell()]];
+  grid[0][0].activate();
+
+  let bounds = {
+    left: 0,
+    top: 0,
+    right: 1,
+    bottom: 1,
+    get hSize() {
+      return bounds.right - bounds.left;
+    },
+    get vSize() {
+      return bounds.bottom - bounds.top;
+    },
+  };
+
+  function cells(state = null) {
+    if (!Object.values(cellState).includes(state) && !(state == null)) {
+      throw new Error("A valid cell state was not passed to the function");
+    }
+    if (state == null) {
+      return grid.flat;
+    }
+    return grid.flat.filter((cell) => (cell.state = state));
+  }
+  function positions(state = null) {
+    if (!Object.values(cellState).includes(state) && !(state == null)) {
+      throw new Error("A valid cell state was not passed to the function");
+    }
+    let positionArray = [];
+    for (let i = 0; i < bounds.hSize; i++) {
+      for (let j = 0; j < bounds.vSize; j++) {
+        if (grid[i][j].state == state || state == null) {
+          positionArray.push([i, j]);
+        }
       }
     }
-    console.log("board initialized");
-  };
+    return positionArray;
+  }
 
-  const getBoard = () => board;
-
-  const markBoard = (row, column, playerMark) => {
-    let currentValue = board[row][column].getValue();
-    console.log(currentValue);
-    if (currentValue !== "") {
-      return false;
+  function expand(bound) {
+    if (
+      !Object.values(direction).includes(bound) ||
+      !bound ||
+      bound == direction.HORIZONTAL ||
+      bound == direction.VERTICAL
+    ) {
+      throw new Error("A valid direction was not passed to the function");
     }
-    board[row][column].mark(playerMark);
-    return true;
+    // update bounds +1 in direction
+    // push, unshift 2d!
+  }
+  //showValidMoves(tile){for each active cell check if validTiles.includes([tile.color,tile.shape])}
+  //placeTile(x,y){sendChecklistUpdates()}
+  //
+
+  return {
+    get grid() {
+      return grid;
+    },
+    get bounds() {
+      return bounds;
+    },
+    cells,
+    positions,
   };
-
-  resetBoard();
-
-  return { getBoard, markBoard, resetBoard };
 }

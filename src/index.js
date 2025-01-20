@@ -13,7 +13,8 @@ import Cell from "./modules/game-objects/cell.js";
 import { color } from "./modules/game-objects/enums/color.js";
 import { shape } from "./modules/game-objects/enums/shape.js";
 import { direction } from "./modules/game-objects/enums/direction.js";
-import CheckList from "./modules/abstract/CheckList.js";
+import Board from "./modules/game-objects/board.js";
+import { cellState } from "./modules/game-objects/enums/cell-state.js";
 
 console.log("Hello World!)");
 console.log(`Local Storage available: ${storageAvailable("localStorage")}`);
@@ -50,7 +51,7 @@ addTileElement("star", "purple", pallet)
 
 zpw.appendChild(pallet) */
 
-let bag = Bag()
+/* let bag = Bag()
 bag.fill()
 bag.shuffle()
 let rack = Rack()
@@ -64,9 +65,15 @@ let playedTile = rack.selection.remove() // cell.tile = rack.playSelected()
 console.table(playedTile)
 console.table(rack.tiles)
 rack.addTiles(bag.draw(rack.spaces.count))
-console.table(rack.tiles)
+console.table(rack.tiles) */
 
-/* let cell = Cell();
+let board = Board()
+console.log(board.positions())
+let cell = board.grid[0][0];
+console.log(cell.state)
+//cell.activate();
+console.log(cell.state)
+console.table(cell.checkList.validTiles);
 cell.checkList.addTile(direction.HORIZONTAL, color.RED, shape.CIRCLE);
 cell.checkList.addTile(direction.HORIZONTAL, color.RED, shape.SQUARE);
 cell.checkList.addTile(direction.VERTICAL, color.GREEN, shape.CLOVER);
@@ -75,4 +82,8 @@ console.table(cell.checkList.validTileNames);
 cell.checkList.removeTile(direction.HORIZONTAL, color.RED, shape.SQUARE);
 console.table(cell.checkList.validTileNames);
 cell.checkList.removeTile(direction.VERTICAL, color.GREEN, shape.CLOVER);
-console.table(cell.checkList.validTileNames); */
+console.table(cell.checkList.validTileNames);
+cell.checkList.addTile(direction.VERTICAL, color.YELLOW, shape.DIAMOND);
+cell.checkList.addTile(direction.VERTICAL, color.RED, shape.DIAMOND);
+console.table(cell.checkList.validTileNames);
+console.table(cell.checkList.matrix);

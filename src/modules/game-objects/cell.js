@@ -4,13 +4,25 @@ import { shape } from "./enums/shape";
 import { cellState } from "./enums/cell-state";
 
 export default function Cell() {
-  let tile = undefined;
-  let state = cellState.EMPTY;
-  let checkList = CheckList();
+  let state = cellState.DORMANT;
+  let tile = null;
+  let checkList = null;
+
+  function activate() {
+    if (!(state == cellState.DORMANT)) {
+      throw new Error(
+        "You cannot active a cell which is not in 'dormant' state"
+      );
+    }
+    state = cellState.ACTIVE;
+    checkList = CheckList();
+  }
 
   function placeTile(movingTile) {
-    if (tile) {
-      throw new Error("There is already a tile in this cell");
+    if (!(state = cellState.ACTIVE)) {
+      throw new Error(
+        "You cannot place a tile in a cell which is not in 'active' state"
+      );
     }
     tile = movingTile;
     tile.state = tileState.PLACED;
@@ -18,44 +30,31 @@ export default function Cell() {
   }
 
   function pickTile() {
-    if (!tile) {
-      throw new Error("There is no tile in this cell");
+    if (!(state = cellState.PLACED)) {
+      throw new Error(
+        "You cannot pick a tile up from a cell which is not in 'placed' state"
+      );
     }
     let pickedUpTile = tile;
     pickedUpTile.state = tileState.MOVING;
     state = cellState.EMPTY;
-    tile = undefined;
+    tile = null;
     return pickedUpTile;
   }
 
   function fixTile() {
-    if (!tile) {
-      throw new Error("The is not a tile in this cell to fix yet");
+    if (!(state = cellState.PLACED)) {
+      throw new Error("You cannot fix a tile which is not in 'placed' state");
     }
     tile.state = tileState.FIXED;
     state = cellState.FIXED;
   }
 
+  function killCell() {
+    state = cellState.DEAD;
+  }
+
   function CheckList() {
-    let hTiles = [];
-    let vTiles = [];
-    let validTiles = [];
-
-    function getValidTileNames() {
-      let validTileNames = [];
-      validTiles.forEach((tile) => {
-        validTileNames.push([
-          reverseEnum(color, tile[0]),
-          reverseEnum(shape, tile[1]),
-        ]);
-      });
-      return validTileNames;
-
-      function reverseEnum(e, value) {
-        for (let k in e) if (e[k] == value) return k;
-      }
-    }
-
     let matrix = [];
     for (let i = 0; i < 6; i++) {
       matrix[i] = [];
@@ -63,6 +62,11 @@ export default function Cell() {
         matrix[i].push(0);
       }
     }
+    let hTiles = [];
+    let vTiles = [];
+    let validTiles = [];
+    updateValidTileList();
+
 
     function addTile(direction, color, shape) {
       for (let i = 0; i < 6; i++) {
@@ -124,10 +128,26 @@ export default function Cell() {
           }
         }
         if (validTiles.length == 0) {
-          state = cellState.DEAD;
+          killCell();
         }
       } else {
-        state = cellState.DEAD;
+        validTiles = [];
+        killCell();
+      }
+    }
+
+    function getValidTileNames() {
+      let validTileNames = [];
+      validTiles.forEach((tile) => {
+        validTileNames.push([
+          reverseEnum(color, tile[0]),
+          reverseEnum(shape, tile[1]),
+        ]);
+      });
+      return validTileNames;
+
+      function reverseEnum(e, value) {
+        for (let k in e) if (e[k] == value) return k;
       }
     }
 
@@ -159,14 +179,12 @@ export default function Cell() {
     get state() {
       return state;
     },
-    get empty() {
-      return tile == undefined;
-    },
     get checkList() {
       return checkList;
     },
-    placeTile: placeTile,
-    pickTileUp: pickTile,
+    activate,
+    placeTile,
+    pickTile,
     fixTile,
   };
 }
