@@ -10,11 +10,11 @@ import ZoomPanWindow from "./modules/UI/ui-zoom-pan-window.js";
 import Bag from "./modules/game-objects/bag.js";
 import Rack from "./modules/game-objects/rack.js";
 import Cell from "./modules/game-objects/cell.js";
-import { color } from "./modules/game-objects/enums/color.js";
-import { shape } from "./modules/game-objects/enums/shape.js";
-import { direction } from "./modules/game-objects/enums/direction.js";
+import { Color } from "./modules/game-objects/enums/color.js";
+import { Shape } from "./modules/game-objects/enums/shape.js";
+import { Direction } from "./modules/game-objects/enums/direction.js";
 import Board from "./modules/game-objects/board.js";
-import { cellState } from "./modules/game-objects/enums/cell-state.js";
+import { CellState } from "./modules/game-objects/enums/cell-state.js";
 
 console.log("Hello World!)");
 console.log(`Local Storage available: ${storageAvailable("localStorage")}`);
@@ -70,20 +70,20 @@ console.table(rack.tiles) */
 let board = Board()
 console.log(board.positions())
 let cell = board.grid[0][0];
-console.log(cell.state)
+console.log(cell.checkList)
 //cell.activate();
 console.log(cell.state)
 console.table(cell.checkList.validTiles);
-cell.checkList.addTile(direction.HORIZONTAL, color.RED, shape.CIRCLE);
-cell.checkList.addTile(direction.HORIZONTAL, color.RED, shape.SQUARE);
-cell.checkList.addTile(direction.VERTICAL, color.GREEN, shape.CLOVER);
+cell.checkList.addTile(Direction.HORIZONTAL, Color.RED, Shape.CIRCLE);
+cell.checkList.addTile(Direction.HORIZONTAL, Color.RED, Shape.SQUARE);
+cell.checkList.addTile(Direction.VERTICAL, Color.GREEN, Shape.CLOVER);
 console.table(cell.checkList.validTiles);
 console.table(cell.checkList.validTileNames);
-cell.checkList.removeTile(direction.HORIZONTAL, color.RED, shape.SQUARE);
+cell.checkList.removeTile(Direction.HORIZONTAL, Color.RED, Shape.SQUARE);
 console.table(cell.checkList.validTileNames);
-cell.checkList.removeTile(direction.VERTICAL, color.GREEN, shape.CLOVER);
+cell.checkList.removeTile(Direction.VERTICAL, Color.GREEN, Shape.CLOVER);
 console.table(cell.checkList.validTileNames);
-cell.checkList.addTile(direction.VERTICAL, color.YELLOW, shape.DIAMOND);
-cell.checkList.addTile(direction.VERTICAL, color.RED, shape.DIAMOND);
+cell.checkList.addTile(Direction.VERTICAL, Color.YELLOW, Shape.DIAMOND);
+cell.checkList.addTile(Direction.VERTICAL, Color.RED, Shape.DIAMOND);
 console.table(cell.checkList.validTileNames);
 console.table(cell.checkList.matrix);

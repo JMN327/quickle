@@ -1,4 +1,4 @@
-export const shape = Object.freeze({
+export const Shape = Object.freeze({
   CIRCLE: 0,
   CLOVER: 1,
   CROSS: 2,

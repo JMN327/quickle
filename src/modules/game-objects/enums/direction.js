@@ -1,4 +1,4 @@
-export const direction = Object.freeze({
+export const Direction = Object.freeze({
   HORIZONTAL: "horizontal",
   VERTICAL: "vertical",
   LEFT: "left",

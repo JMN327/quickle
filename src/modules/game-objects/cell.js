@@ -1,57 +1,57 @@
-import { tileState } from "./enums/tile-state";
-import { color } from "./enums/color";
-import { shape } from "./enums/shape";
-import { cellState } from "./enums/cell-state";
+import { TileState } from "./enums/tile-state";
+import { Color } from "./enums/color";
+import { Shape } from "./enums/shape";
+import { CellState } from "./enums/cell-state";
 
 export default function Cell() {
-  let state = cellState.DORMANT;
+  let state = CellState.DORMANT;
   let tile = null;
   let checkList = null;
 
   function activate() {
-    if (!(state == cellState.DORMANT)) {
+    if (!(state == CellState.DORMANT)) {
       throw new Error(
         "You cannot active a cell which is not in 'dormant' state"
       );
     }
-    state = cellState.ACTIVE;
+    state = CellState.ACTIVE;
     checkList = CheckList();
   }
 
-  function placeTile(movingTile) {
-    if (!(state = cellState.ACTIVE)) {
+  function addTile(movingTile) {
+    if (!(state = CellState.ACTIVE)) {
       throw new Error(
         "You cannot place a tile in a cell which is not in 'active' state"
       );
     }
     tile = movingTile;
-    tile.state = tileState.PLACED;
-    state = cellState.PLACED;
+    tile.state = TileState.PLACED;
+    state = CellState.PLACED;
   }
 
-  function pickTile() {
-    if (!(state = cellState.PLACED)) {
+  function removeTile() {
+    if (!(state = CellState.PLACED)) {
       throw new Error(
         "You cannot pick a tile up from a cell which is not in 'placed' state"
       );
     }
     let pickedUpTile = tile;
-    pickedUpTile.state = tileState.MOVING;
-    state = cellState.EMPTY;
+    pickedUpTile.state = TileState.MOVING;
+    state = CellState.EMPTY;
     tile = null;
     return pickedUpTile;
   }
 
   function fixTile() {
-    if (!(state = cellState.PLACED)) {
+    if (!(state = CellState.PLACED)) {
       throw new Error("You cannot fix a tile which is not in 'placed' state");
     }
-    tile.state = tileState.FIXED;
-    state = cellState.FIXED;
+    tile.state = TileState.FIXED;
+    state = CellState.FIXED;
   }
 
   function killCell() {
-    state = cellState.DEAD;
+    state = CellState.DEAD;
   }
 
   function CheckList() {
@@ -140,8 +140,8 @@ export default function Cell() {
       let validTileNames = [];
       validTiles.forEach((tile) => {
         validTileNames.push([
-          reverseEnum(color, tile[0]),
-          reverseEnum(shape, tile[1]),
+          reverseEnum(Color, tile[0]),
+          reverseEnum(Shape, tile[1]),
         ]);
       });
       return validTileNames;
@@ -183,8 +183,8 @@ export default function Cell() {
       return checkList;
     },
     activate,
-    placeTile,
-    pickTile,
+    addTile,
+    removeTile,
     fixTile,
   };
 }

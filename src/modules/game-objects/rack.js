@@ -1,4 +1,4 @@
-import { tileState } from "./enums/tile-state";
+import { TileState } from "./enums/tile-state";
 
 export default function Rack() {
 
@@ -10,18 +10,18 @@ export default function Rack() {
     if (i > 5 || i < 0) {
       throw new Error("Invalid index for selection");
     }
-    tiles[i].state = tileState.SELECTED;
+    tiles[i].state = TileState.SELECTED;
   }
   function deselectSingle(i) {
     if (i > 5 || i < 0) {
       throw new Error("Invalid index for deselection");
     }
-    tiles[i].state = tileState.RACK;
+    tiles[i].state = TileState.RACK;
   }
   function deselectAll() {
     tiles.forEach((tile) => {
       if (tile != null) {
-        tile.state = tileState.RACK;
+        tile.state = TileState.RACK;
       }
     });
   }
@@ -30,7 +30,7 @@ export default function Rack() {
       throw new Error("Invalid index for selection");
     }
     deselectAll();
-    tiles[i].state = tileState.SELECTED;
+    tiles[i].state = TileState.SELECTED;
   }
 
   function rearrange(from, to) {
@@ -48,7 +48,7 @@ export default function Rack() {
       if (tile == null) {
         return;
       }
-      if ((tile.state == tileState.SELECTED)) {
+      if ((tile.state == TileState.SELECTED)) {
         selected.push(index);
       }
     });
@@ -77,7 +77,7 @@ export default function Rack() {
     }
     for (let i = 0; i < arr.length; i++) {
       tiles.splice(emptySpaces[i],1,arr[i])
-      tiles[emptySpaces[i]].state = tileState.RACK
+      tiles[emptySpaces[i]].state = TileState.RACK
     }
   }
 
@@ -88,7 +88,7 @@ export default function Rack() {
       throw new Error("there are no selected tiles on the rack");
     }
     selectionArr.forEach((tileIndex) => {
-      tiles[tileIndex].state = tileState.MOVING;
+      tiles[tileIndex].state = TileState.MOVING;
       removedTileArr.push(tiles.splice(tileIndex, 1, null)[0]);
     });
     return removedTileArr;

@@ -1,11 +1,11 @@
-import { color } from "./enums/color";
-import { shape } from "./enums/shape";
-import { tileState } from "./enums/tile-state";
+import { Color } from "./enums/color";
+import { Shape } from "./enums/shape";
+import { TileState } from "./enums/tile-state";
 import Tile from "./tile";
 
 export default function Bag() {
-  const colorArr = Object.values(color);
-  const shapeArr = Object.values(shape);
+  const colorArr = Object.values(Color);
+  const shapeArr = Object.values(Shape);
   let tiles = [];
 
   function fill() {
@@ -13,7 +13,7 @@ export default function Bag() {
     for (let i = 0; i < 6; i++) {
       for (let j = 0; j < 6; j++) {
         for (let k = 0; k < 3; k++) {
-          tiles.push(Tile(n, colorArr[i], shapeArr[j], tileState.BAG));
+          tiles.push(Tile(n, colorArr[i], shapeArr[j], TileState.BAG));
           n++;
         }
       }

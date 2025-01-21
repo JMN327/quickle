@@ -1,4 +1,4 @@
-export const cellState = Object.freeze({
+export const CellState = Object.freeze({
     DORMANT: "dormant",
     ACTIVE: "active",
     PLACED: "placed",

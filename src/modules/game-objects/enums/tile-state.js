@@ -1,4 +1,4 @@
-export const tileState = Object.freeze({
+export const TileState = Object.freeze({
   BAG: "bag",
   RACK: "rack",
   SELECTED: "selected",
