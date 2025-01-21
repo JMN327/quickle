@@ -67,11 +67,10 @@ console.table(rack.tiles)
 rack.addTiles(bag.draw(rack.spaces.count))
 console.table(rack.tiles) */
 
-let board = Board()
+/* let board = Board()
 console.log(board.positions())
 let cell = board.grid[0][0];
 console.log(cell.checkList)
-//cell.activate();
 console.log(cell.state)
 console.table(cell.checkList.validTiles);
 cell.checkList.addTile(Direction.HORIZONTAL, Color.RED, Shape.CIRCLE);
@@ -86,4 +85,17 @@ console.table(cell.checkList.validTileNames);
 cell.checkList.addTile(Direction.VERTICAL, Color.YELLOW, Shape.DIAMOND);
 cell.checkList.addTile(Direction.VERTICAL, Color.RED, Shape.DIAMOND);
 console.table(cell.checkList.validTileNames);
-console.table(cell.checkList.matrix);
+console.table(cell.checkList.matrix); */
+
+let bag = Bag()
+let rack = Rack()
+let board = Board()
+console.table(board.grid)
+bag.fill()
+bag.shuffle()
+rack.addTiles(bag.draw(rack.spaces.count))
+rack.xSelect(2)
+let movingTile = rack.removeSelection()
+console.log(movingTile[0])
+board.addTile(movingTile[0], 0, 0)
+console.table(board.grid)

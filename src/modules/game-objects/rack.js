@@ -95,8 +95,11 @@ export default function Rack() {
   }
 
   return {
-    tiles,
+    get tiles() {
+      return tiles
+    },
     addTiles,
+    removeSelection,
     rearrange,
     select,
     xSelect,

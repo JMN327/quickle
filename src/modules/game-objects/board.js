@@ -107,32 +107,40 @@ export default function Board() {
     }
   }
 
-  function addTile(row, col, tile) {
+  function addTile(tile, row, col) {
     if (tile.state != TileState.MOVING) {
       throw new Error("You cannot place a tile which is not in 'moving' state");
     }
     let cell = grid[row][col];
     cell.addTile(tile);
-    edges = checkForEdgeGrow(row, col);
+    let edges = checkForEdgeGrow(row, col);
     edges.forEach((direction) => {
-      Board.morph(direction, Morph.GROW);
+      morph(direction, Morph.GROW);
     });
     sendCheckListUpdates(Update.ADD, row, col, tile);
   }
 
-  function removeTile(row, col, tile) {
+  function removeTile(row, col) {
     if (tile.state != TileState.PLACED) {
-      throw new Error("You cannot remove a tile which is not in 'placed' state");
+      throw new Error(
+        "You cannot remove a tile which is not in 'placed' state"
+      );
     }
     let cell = grid[row][col];
-    cell.removeTile(tile);
-    edges = checkForEdgeShrink(row, col);  //// need updating to find shrink edges
+    let removedTile = cell.removeTile();
+    let edges = checkForEdgeShrink(row, col);
     edges.forEach((direction) => {
-      Board.morph(direction, Morph.SHRINK);
+      morph(direction, Morph.SHRINK);
     });
-    sendCheckListUpdates(Update.REMOVE, row, col, tile);
+    sendCheckListUpdates(Update.REMOVE, row, col, removedTile);
   }
 
+  function fixTiles() {
+    cells(CellState.PLACED).forEach((cell) => {
+      cell.state = CellState.FIXED;
+    });
+    return removedTile;
+  }
 
   function checkForEdgeGrow(row, col) {
     let edges = [];
@@ -148,23 +156,48 @@ export default function Board() {
     if (col == bounds.vSize - 1) {
       edges.push(Direction.BOTTOM);
     }
+    return edges;
   }
 
   function checkForEdgeShrink(row, col) {
     let edges = [];
-    if (row == 1) {
-      ///if grid[0].every((cell) => {ce})   ///////// start from here
-      edges.push(Direction.LEFT);
-    }
     if (col == 1) {
-      edges.push(Direction.TOP);
+      if (
+        grid.every((rowArr, index) => {
+          rowArr[0].state = CellState.DORMANT || index == row;
+        })
+      ) {
+        edges.push(Direction.LEFT);
+      }
     }
-    if (row == bounds.hSize - 2) {
-      edges.push(Direction.RIGHT);
+    if (row == 1) {
+      if (
+        grid[0].every((cell, index) => {
+          cell.state = CellState.DORMANT || index == col;
+        })
+      ) {
+        edges.push(Direction.TOP);
+      }
     }
-    if (col == bounds.vSize - 2) {
-      edges.push(Direction.BOTTOM);
+    if (col == bounds.hSize - 2) {
+      if (
+        grid.every((rowArr, index) => {
+          rowArr[bounds.hSize - 1].state = CellState.DORMANT || index == row;
+        })
+      ) {
+        edges.push(Direction.RIGHT);
+      }
     }
+    if (row == bounds.vSize - 2) {
+      if (
+        grid[bounds.vSize - 1].every((cell, index) => {
+          cell.state = CellState.DORMANT || index == col;
+        })
+      ) {
+        edges.push(Direction.BOTTOM);
+      }
+    }
+    return edges;
   }
 
   function sendCheckListUpdates(updateType, row, col, tile) {
@@ -260,6 +293,10 @@ export default function Board() {
   //placeTile(x,y){sendChecklistUpdates()}
   //
 
+  function info() {
+    //let info = 
+  }
+
   return {
     get grid() {
       return grid;
@@ -269,5 +306,9 @@ export default function Board() {
     },
     cells,
     positions,
+    addTile,
+    removeTile,
+    fixTiles,
+    info,
   };
 }
