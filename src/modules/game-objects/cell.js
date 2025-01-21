@@ -9,13 +9,27 @@ export default function Cell() {
   let checkList = null;
 
   function activate() {
+    console.log(state)
+    if (state == CellState.ACTIVE) {
+      return;
+    }
     if (!(state == CellState.DORMANT)) {
       throw new Error(
-        "You cannot active a cell which is not in 'dormant' state"
+        "You cannot activate a cell which is not in 'dormant' state"
       );
     }
     state = CellState.ACTIVE;
     checkList = CheckList();
+  }
+
+  function deactivate() {
+    if (!(state == CellState.ACTIVE)) {
+      throw new Error(
+        "You cannot deactivate a cell which is not in 'active' state"
+      );
+    }
+    state = CellState.DORMANT;
+    checkList = null;
   }
 
   function addTile(movingTile) {
@@ -35,11 +49,9 @@ export default function Cell() {
         "You cannot pick a tile up from a cell which is not in 'placed' state"
       );
     }
-    console.log(tile)
     let pickedUpTile = tile;
-    console.log(pickedUpTile, tile)
     pickedUpTile.state = TileState.MOVING;
-    state = CellState.EMPTY;
+    state = CellState.ACTIVE;
     tile = null;
     return pickedUpTile;
   }
@@ -68,7 +80,6 @@ export default function Cell() {
     let vTiles = [];
     let validTiles = [];
     updateValidTileList();
-
 
     function addTile(direction, color, shape) {
       for (let i = 0; i < 6; i++) {
@@ -185,6 +196,7 @@ export default function Cell() {
       return checkList;
     },
     activate,
+    deactivate,
     addTile,
     removeTile,
     fixTile,
