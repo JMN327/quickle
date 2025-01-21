@@ -35,7 +35,9 @@ export default function Cell() {
         "You cannot pick a tile up from a cell which is not in 'placed' state"
       );
     }
+    console.log(tile)
     let pickedUpTile = tile;
+    console.log(pickedUpTile, tile)
     pickedUpTile.state = TileState.MOVING;
     state = CellState.EMPTY;
     tile = null;

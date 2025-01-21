@@ -108,9 +108,6 @@ export default function Board() {
   }
 
   function addTile(tile, row, col) {
-    if (tile.state != TileState.MOVING) {
-      throw new Error("You cannot place a tile which is not in 'moving' state");
-    }
     let cell = grid[row][col];
     cell.addTile(tile);
     let edges = checkForEdgeGrow(row, col);
@@ -121,11 +118,6 @@ export default function Board() {
   }
 
   function removeTile(row, col) {
-    if (tile.state != TileState.PLACED) {
-      throw new Error(
-        "You cannot remove a tile which is not in 'placed' state"
-      );
-    }
     let cell = grid[row][col];
     let removedTile = cell.removeTile();
     let edges = checkForEdgeShrink(row, col);
@@ -294,7 +286,13 @@ export default function Board() {
   //
 
   function info() {
-    //let info = 
+    let info = new Array(bounds.hSize).fill("").map(() => new Array(bounds.vSize).fill(""));
+    for (let i = 0; i < bounds.hSize; i++) {
+      for (let j = 0; j < bounds.vSize; j++) {
+         info[i][j] = grid[i][j].state//`${grid[i][j]?.tile?.color},${grid[i][j]?.tile?.shape}`
+      }
+    }
+    return info
   }
 
   return {
@@ -309,6 +307,8 @@ export default function Board() {
     addTile,
     removeTile,
     fixTiles,
-    info,
+    get info(){
+      return info()
+    },
   };
 }
