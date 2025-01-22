@@ -212,15 +212,20 @@ export default function Board() {
   }
 
   function sendCheckListUpdates(updateType, row, col, tile) {
-    let updates = getUpdates(row, col);
-    updates.positions.forEach((pos) => {
+    let positions = getUpdates(row, col);
+    positions.forEach((pos) => {
+      console.log("NEW UPDATE")
+      console.log(`Tile played: ${tile.color} ${tile.shape} Board:`);
+      console.table(info());
       if (updateType == Update.ADD) {
+        console.log(`Updating cell [${pos.row},${pos.col}] direction ${pos.direction}with tile color ${tile.color} shape ${tile.shape}`)
         cells[pos.row][pos.col].checkList.addTile(
           pos.direction,
           tile.color,
           tile.shape
         );
-        updates.neighbours.forEach((nbr) => {
+        pos.neighbours.forEach((nbr) => {
+          console.log(`Updating cell [${pos.row},${pos.col}] in direction ${pos.direction} with tile color ${nbr.color} shape ${nbr.shape}`)
           cells[pos.row][pos.col].checkList.addTile(
             pos.direction,
             nbr.color,
@@ -228,34 +233,33 @@ export default function Board() {
           );
         });
       } else if (updateType == Update.REMOVE) {
+        console.log(`Updating cell [${pos.row},${pos.col}] direction ${pos.direction} with tile color ${tile.color} shape ${tile.shape}`)
         cells[pos.row][pos.col].checkList.removeTile(
           pos.direction,
           tile.color,
           tile.shape
         );
       }
-      console.log(tile)
-      console.table(info())
-      console.log (pos.row, pos.col, pos.direction)
-      console.table(updates.neighbours)
-      console.table(cells[pos.row][pos.col].checkList.matrix)
+      console.table(cells[pos.row][pos.col].checkList.matrix);
+      console.log("hTiles " + cells[pos.row][pos.col].checkList.hTiles);
+      console.log("vTiles " + cells[pos.row][pos.col].checkList.vTiles);
     });
   }
 
   function getUpdates(row, col, direction) {
-    let neighbours = [];
     let positions = [];
     if (!(direction == Direction.VERTICAL)) {
       //check horizontal
+      let neighboursToAdd = [];
       let colCheck = col - 1;
       while (colCheck > 0) {
         if (
           cells[row][colCheck]?.state == CellState.PLACED ||
           cells[row][colCheck]?.state == CellState.FIXED
         ) {
-          neighbours.push({
+          neighboursToAdd.push({
             color: cells[row][colCheck].tile.color,
-            shape: cells[row][colCheck].tile.color,
+            shape: cells[row][colCheck].tile.shape,
           });
         } else {
           break;
@@ -266,6 +270,7 @@ export default function Board() {
         row: row,
         col: colCheck,
         direction: Direction.HORIZONTAL,
+        neighbours: [],
       });
       colCheck = col + 1;
       while (colCheck < bounds.hSize) {
@@ -273,9 +278,9 @@ export default function Board() {
           cells[row][colCheck]?.state == CellState.PLACED ||
           cells[row][colCheck]?.state == CellState.FIXED
         ) {
-          neighbours.push({
+          neighboursToAdd.push({
             color: cells[row][colCheck].tile.color,
-            shape: cells[row][colCheck].tile.color,
+            shape: cells[row][colCheck].tile.shape,
           });
         } else {
           break;
@@ -286,17 +291,20 @@ export default function Board() {
         row: row,
         col: colCheck,
         direction: Direction.HORIZONTAL,
+        neighbours: neighboursToAdd,
       });
+      positions[0].neighbours = neighboursToAdd;
     }
     if (!(direction == Direction.HORIZONTAL)) {
       //check vertical
+      let neighboursToAdd = [];
       let rowCheck = row - 1;
       while (rowCheck > 0) {
         if (
           cells[rowCheck][col]?.state == CellState.PLACED ||
           cells[rowCheck][col]?.state == CellState.FIXED
         ) {
-          neighbours.push({
+          neighboursToAdd.push({
             color: cells[rowCheck][col].tile.color,
             shape: cells[rowCheck][col].tile.color,
           });
@@ -309,6 +317,7 @@ export default function Board() {
         row: rowCheck,
         col: col,
         direction: Direction.VERTICAL,
+        neighbours: [],
       });
       rowCheck = row + 1;
       while (rowCheck < bounds.vSize) {
@@ -316,7 +325,7 @@ export default function Board() {
           cells[rowCheck][col]?.state == CellState.PLACED ||
           cells[rowCheck][col]?.state == CellState.FIXED
         ) {
-          neighbours.push({
+          neighboursToAdd.push({
             color: cells[rowCheck][col].tile.color,
             shape: cells[rowCheck][col].tile.color,
           });
@@ -329,9 +338,11 @@ export default function Board() {
         row: rowCheck,
         col: col,
         direction: Direction.VERTICAL,
+        neighbours: neighboursToAdd,
       });
+      positions[2].neighbours = neighboursToAdd;
     }
-    return { positions, neighbours };
+    return positions;
   }
 
   function validPositions(tile) {

@@ -72,6 +72,8 @@ export default function Cell() {
           }
         }
       }
+      console.table(hTiles)
+      console.table(vTiles)
       updateValidTileList();
     }
 
@@ -99,15 +101,17 @@ export default function Cell() {
       }
       updateValidTileList();
     }
-
+    
     function updateValidTileList() {
       let h = hTiles.length;
       let v = vTiles.length;
       let t = h + v;
+      console.log({h,v,t})
       const hTest = (id) => matrix[id[0]][id[1]] + 1 == h;
       let hTestResult = hTiles.every(hTest);
       const vTest = (id) => matrix[id[0]][id[1]] + 1 == v;
       let vTestResult = vTiles.every(vTest);
+      console.log(`hTest ${hTestResult} vTest ${vTestResult}`)
       if (hTestResult && vTestResult) {
         validTiles = [];
         for (let i = 0; i < 6; i++) {
