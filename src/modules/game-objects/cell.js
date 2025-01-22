@@ -141,11 +141,17 @@ export default function Cell() {
       let v = vTiles.length;
       let t = h + v;
       console.log({ h, v, t });
-      console.table(hTiles)
-      console.table(vTiles)
-      console.table(matrix)
+      console.table(hTiles);
+      console.table(vTiles);
+      console.table(matrix);
 
-      const allEqualAndGraterThanZero = arr => arr.every( v => (matrix[v[0]][v[1]] === matrix[arr[0][0]][arr[0][1]] && matrix[v[0]][v[1]]>0 )|| t ===1)
+      const allEqualAndGraterThanZero = (arr) =>
+        arr.every(
+          (v) =>
+            (matrix[v[0]][v[1]] === matrix[arr[0][0]][arr[0][1]] &&
+              matrix[v[0]][v[1]] > 0) ||
+            t === 1
+        );
 
       let hTestResult = allEqualAndGraterThanZero(hTiles);
 
