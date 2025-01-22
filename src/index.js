@@ -97,12 +97,15 @@ rack.addTiles(bag.draw(rack.spaces.count))
 rack.xSelect(2)
 console.log(rack.tiles[rack.selection.indexArr[0]])
 let movingTile = rack.removeSelection()
-board.addTile(movingTile[0], 0, 0)
+
+/* board.addTile(movingTile[0], 0, 0)
 rack.xSelect(3)
 console.log(rack.tiles[rack.selection.indexArr[0]])
-movingTile = rack.removeSelection()
-board.addTile(movingTile[0], 0, 1)
-console.table(board.info)
+movingTile = rack.removeSelection() */
+
+//board.addTile(movingTile[0], 0, 1)
+//console.table(board.info)
+
 /* console.log(board.grid[2][1].checkList.validTileNames)
 board.removeTile(1,1)
 console.table(board.info)

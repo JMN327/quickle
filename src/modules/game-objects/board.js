@@ -11,6 +11,30 @@ export default function Board() {
   let grid = [[Cell()]];
   grid[0][0].activate();
 
+  let leftOffset = 0;
+  let topOffset = 0;
+
+  console.log(grid[0][0]);
+  let x = grid[row(0)][col(0)];
+  console.log(x);
+  console.log(Grid(0,0));
+  
+  function Grid(row, col) {
+    if (col) {
+      const a = row + topOffset
+      const b = col + leftOffset
+      return grid[a][b];
+    }
+    return grid[row + topOffset];
+  }
+
+  function row(row){
+    return row + topOffset
+  }
+  function col(col){
+    return col + leftOffset
+  }
+
   let bounds = {
     left: 0,
     top: 0,
@@ -120,11 +144,13 @@ export default function Board() {
   function addTile(tile, row, col) {
     grid[row][col].addTile(tile);
     let edges = checkForEdgeGrow(row, col);
-    console.log(edges)
+    console.log(edges);
     edges.forEach((direction) => {
       morph(direction, Morph.GROW);
       col = direction == Direction.LEFT ? col + 1 : col;
       row = direction == Direction.TOP ? row + 1 : row;
+      leftOffset += direction == Direction.LEFT ? 1 : 0;
+      topOffset += direction == Direction.TOP ? 1 : 0;
     });
     sendCheckListUpdates(Update.ADD, row, col, tile);
   }
@@ -194,9 +220,9 @@ export default function Board() {
   }
 
   function sendCheckListUpdates(updateType, row, col, tile) {
-    console.log(row, col)
+    console.log(row, col);
     let positionsToUpdate = neighbourPositions(row, col);
-    console.log(positionsToUpdate)
+    console.log(positionsToUpdate);
     positionsToUpdate.forEach((pos) => {
       if (updateType == Update.ADD) {
         grid[pos.row][pos.col].activate();
