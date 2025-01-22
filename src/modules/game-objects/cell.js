@@ -72,8 +72,41 @@ export default function Cell() {
           }
         }
       }
-      console.table(hTiles)
-      console.table(vTiles)
+      console.table(hTiles);
+      console.table(vTiles);
+      updateValidTileList();
+    }
+
+    function addTileH(color, shape) {
+      let toAdd = [color, shape];
+
+      if (hTiles.some((x) => x.every((y) => toAdd.includes(y)))) {
+        return;
+      }
+      hTiles.push(toAdd);
+      for (let i = 0; i < 6; i++) {
+        for (let j = 0; j < 6; j++) {
+          if ((i == color && j != shape) || (i != color && j == shape)) {
+            matrix[i][j] += 1;
+          }
+        }
+      }
+      updateValidTileList();
+    }
+
+    function addTileV(color, shape) {
+      let toAdd = [color, shape];
+      if (vTiles.some((x) => x.every((y) => toAdd.includes(y)))) {
+        return;
+      }
+      vTiles.push(toAdd);
+      for (let i = 0; i < 6; i++) {
+        for (let j = 0; j < 6; j++) {
+          if ((i == color && j != shape) || (i != color && j == shape)) {
+            matrix[i][j] += 1;
+          }
+        }
+      }
       updateValidTileList();
     }
 
@@ -101,17 +134,24 @@ export default function Cell() {
       }
       updateValidTileList();
     }
-    
+
     function updateValidTileList() {
+      //console.trace()
       let h = hTiles.length;
       let v = vTiles.length;
       let t = h + v;
-      console.log({h,v,t})
-      const hTest = (id) => matrix[id[0]][id[1]] + 1 == h;
-      let hTestResult = hTiles.every(hTest);
-      const vTest = (id) => matrix[id[0]][id[1]] + 1 == v;
-      let vTestResult = vTiles.every(vTest);
-      console.log(`hTest ${hTestResult} vTest ${vTestResult}`)
+      console.log({ h, v, t });
+      console.table(hTiles)
+      console.table(vTiles)
+      console.table(matrix)
+
+      const allEqualAndGraterThanZero = arr => arr.every( v => (matrix[v[0]][v[1]] === matrix[arr[0][0]][arr[0][1]] && matrix[v[0]][v[1]]>0 )|| t ===1)
+
+      let hTestResult = allEqualAndGraterThanZero(hTiles);
+
+      let vTestResult = allEqualAndGraterThanZero(vTiles);
+
+      console.log(`hTest ${hTestResult} vTest ${vTestResult}`);
       if (hTestResult && vTestResult) {
         validTiles = [];
         for (let i = 0; i < 6; i++) {
@@ -154,6 +194,8 @@ export default function Cell() {
         return matrix;
       },
       addTile,
+      addTileH,
+      addTileV,
       removeTile,
       get hTiles() {
         return hTiles;

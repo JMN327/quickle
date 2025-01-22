@@ -7,5 +7,6 @@
     "greenyellow",
     "PLAYSELECTED",
     "SWAPSELECTED"
-  ]
+  ],
+  "zenMode.hideLineNumbers": false
 }
