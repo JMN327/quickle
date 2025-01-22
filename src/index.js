@@ -95,13 +95,12 @@ bag.fill()
 board.addTile(bag.quickPick(Color.BLUE, Shape.CLOVER), 0, 0)
 
 board.addTile(bag.quickPick(Color.BLUE, Shape.SQUARE), 0, 1)
-console.table(board.info)
-console.table(board.cells[0][2].checkList.matrix)
-
 board.addTile(bag.quickPick(Color.GREEN, Shape.SQUARE), 1, 1)
-console.table(board.info)
+board.addTile(bag.quickPick(Color.PURPLE, Shape.SQUARE), 2, 1)
+/* console.table(board.info)
 console.table(board.cells[0][2].checkList.matrix)
 console.table(board.cells[0][2].checkList.vTiles)
+console.table(board.cells[0][2].checkList.hTiles) */
 
 
 //board.removeTile(0,0)

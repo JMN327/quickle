@@ -234,13 +234,12 @@ export default function Board() {
           tile.shape
         );
       }
+      console.log(tile)
       console.table(info())
-      console.log (pos.row, pos.col)
-      console.log(update.neighbours)
+      console.log (pos.row, pos.col, pos.direction)
+      console.table(updates.neighbours)
       console.table(cells[pos.row][pos.col].checkList.matrix)
-    }
-  );
-    
+    });
   }
 
   function getUpdates(row, col, direction) {
