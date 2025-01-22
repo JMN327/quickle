@@ -54,6 +54,11 @@ export default function Bag() {
     return tiles.splice(tiles.length, 0, ...arr);
   }
 
+  function quickPick(color, shape) {
+    let quickTile = tiles.indexOf(tiles.filter((tile)=> tile.color == color && tile.shape == shape)[0])
+    return tiles.splice(quickTile, 1);
+  }
+
   return {
     tiles,
     fill,
@@ -63,5 +68,6 @@ export default function Bag() {
     get count() {
       return tiles.length;
     },
+    quickPick,
   };
 }

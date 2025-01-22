@@ -90,23 +90,22 @@ console.table(cell.checkList.matrix); */
 let bag = Bag()
 let rack = Rack()
 let board = Board()
-console.table(board.grid)
+console.table(board.info)
 bag.fill()
-//bag.shuffle()
-rack.addTiles(bag.draw(rack.spaces.count))
-rack.xSelect(2)
-console.log(rack.tiles[rack.selection.indexArr[0]])
-let movingTile = rack.removeSelection()
+board.addTile(bag.quickPick(Color.BLUE, Shape.CLOVER), 0, 0)
 
-/* board.addTile(movingTile[0], 0, 0)
-rack.xSelect(3)
-console.log(rack.tiles[rack.selection.indexArr[0]])
-movingTile = rack.removeSelection() */
+board.addTile(bag.quickPick(Color.BLUE, Shape.SQUARE), 0, 1)
+console.table(board.info)
+console.table(board.cells[0][2].checkList.matrix)
 
-//board.addTile(movingTile[0], 0, 1)
+board.addTile(bag.quickPick(Color.GREEN, Shape.SQUARE), 1, 1)
+console.table(board.info)
+console.table(board.cells[0][2].checkList.matrix)
+console.table(board.cells[0][2].checkList.vTiles)
+
+
+//board.removeTile(0,0)
+//board.removeTile(0, 0)
+
 //console.table(board.info)
 
-/* console.log(board.grid[2][1].checkList.validTileNames)
-board.removeTile(1,1)
-console.table(board.info)
-console.log(board.grid) */

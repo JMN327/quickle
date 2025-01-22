@@ -2,34 +2,15 @@ import { TileState } from "./enums/tile-state";
 import { Color } from "./enums/color";
 import { Shape } from "./enums/shape";
 import { CellState } from "./enums/cell-state";
+import { Direction } from "./enums/direction";
 
 export default function Cell() {
   let state = CellState.DORMANT;
   let tile = null;
-  let checkList = null;
+  let checkList = CheckList();
 
-  function activate() {
-    console.log(state)
-    if (state == CellState.ACTIVE) {
-      return;
-    }
-    if (!(state == CellState.DORMANT)) {
-      throw new Error(
-        "You cannot activate a cell which is not in 'dormant' state"
-      );
-    }
+  function firstCell() {
     state = CellState.ACTIVE;
-    checkList = CheckList();
-  }
-
-  function deactivate() {
-    if (!(state == CellState.ACTIVE)) {
-      throw new Error(
-        "You cannot deactivate a cell which is not in 'active' state"
-      );
-    }
-    state = CellState.DORMANT;
-    checkList = null;
   }
 
   function addTile(movingTile) {
@@ -64,36 +45,32 @@ export default function Cell() {
     state = CellState.FIXED;
   }
 
-  function killCell() {
-    state = CellState.DEAD;
-  }
-
   function CheckList() {
-    let matrix = [];
-    for (let i = 0; i < 6; i++) {
-      matrix[i] = [];
-      for (let j = 0; j < 6; j++) {
-        matrix[i].push(0);
-      }
-    }
+    let matrix = new Array(6).fill().map(() => new Array(6).fill(0));
     let hTiles = [];
     let vTiles = [];
     let validTiles = [];
     updateValidTileList();
 
     function addTile(direction, color, shape) {
+      let toAdd = [color, shape];
+      if (direction == Direction.HORIZONTAL) {
+        if (hTiles.some((x) => x.every((y) => toAdd.includes(y)))) {
+          return;
+        }
+        hTiles.push(toAdd);
+      } else {
+        if (vTiles.some((x) => x.every((y) => toAdd.includes(y)))) {
+          return;
+        }
+        vTiles.push(toAdd);
+      }
       for (let i = 0; i < 6; i++) {
         for (let j = 0; j < 6; j++) {
-          let toAdd;
           if ((i == color && j != shape) || (i != color && j == shape)) {
             matrix[i][j] += 1;
           }
         }
-      }
-      if (direction == 0) {
-        hTiles.push([color, shape]);
-      } else {
-        vTiles.push([color, shape]);
       }
       updateValidTileList();
     }
@@ -141,11 +118,15 @@ export default function Cell() {
           }
         }
         if (validTiles.length == 0) {
-          killCell();
+          state = CellState.DEAD;
+        } else if (validTiles.length == 36) {
+          state = CellState.DORMANT;
+        } else {
+          state = CellState.ACTIVE;
         }
       } else {
         validTiles = [];
-        killCell();
+        state = CellState.DEAD;
       }
     }
 
@@ -195,10 +176,9 @@ export default function Cell() {
     get checkList() {
       return checkList;
     },
-    activate,
-    deactivate,
     addTile,
     removeTile,
     fixTile,
+    firstCell,
   };
 }
