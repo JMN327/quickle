@@ -60,24 +60,32 @@ export default function Cell() {
       bTiles: [],
     };
     let validTiles = [];
-    updateValidTilesForWord(Direction.HORIZONTAL);
-    updateValidTilesForWord(Direction.VERTICAL);
+    updateValidTilesForWord(Direction.LEFT);
+    updateValidTilesForWord(Direction.TOP);
     updateValidTilesForCell();
 
     function updateValidTilesForWord(direction) {
       let word;
-      let tiles;
+      let tiles = [];
       switch (direction) {
-        case Direction.HORIZONTAL:
+        case Direction.LEFT:
           word = hWord;
           tiles = hWord.lTiles.concat(hWord.rTiles);
           break;
-
-        case Direction.VERTICAL:
+        case Direction.TOP:
+          word = vWord;
+          tiles = vWord.tTiles.concat(vWord.bTiles);
+          break;
+        case Direction.RIGHT:
+          word = hWord;
+          tiles = hWord.lTiles.concat(hWord.rTiles);
+          break;
+        case Direction.BOTTOM:
           word = vWord;
           tiles = vWord.tTiles.concat(vWord.bTiles);
           break;
       }
+
       let t = tiles.length;
 
       // test get the slot in each matrix for each tile on the list and checks
@@ -116,40 +124,51 @@ export default function Cell() {
       });
     }
 
+    function updateCellState() {
+      let n = validTiles.length;
+      if (n == 36) {
+        state = CellState.DORMANT;
+        return;
+      }
+      if (n == 0) {
+        state = CellState.DEAD;
+        return;
+      }
+      state = CellState.ACTIVE;
+    }
+
     function addTile(direction, color, shape) {
       let tiles;
       switch (direction) {
         case Direction.LEFT:
-          tiles = rTiles;
+          tiles = hWord.rTiles;
           break;
 
         case Direction.TOP:
-          tiles = bTiles;
+          tiles = vWord.bTiles;
           break;
         case Direction.RIGHT:
-          tiles = lTiles;
+          tiles = hWord.lTiles;
           break;
 
         case Direction.BOTTOM:
-          tiles = tTiles;
+          tiles = vWord.tTiles;
           break;
       }
-      pushTileToTilesListIfNew(tiles, color, shape);
-      updateMatrix(direction, color, shape);
-      updateValidTileListForWord(direction);
-      updateValidTilesForCell();
-      updateCellState();
-    }
-
-    function pushTileToTilesListIfNew(tiles, color, shape) {
       if (hasElement(tiles, [color, shape])) {
+        console.log(`tile ${reverseEnum(Color,color)} ${reverseEnum(Shape,shape)} already part of the list`)
         return;
       }
       tiles.push([color, shape]);
       function hasElement(arr, el) {
         return arr.some((x) => x[0] === el[0] && x[1] === el[1]);
       }
+      updateMatrix(direction, Morph.ADD, color, shape);
+      updateValidTilesForWord(direction);
+      updateValidTilesForCell();
+      updateCellState();
     }
+
 
     function removeTile(direction, color, shape) {
       if (direction == 0) {
@@ -178,7 +197,7 @@ export default function Cell() {
 
     function updateMatrix(direction, morph, color, shape) {
       let matrix;
-      let increment;
+      let increment = 0;
       switch (morph) {
         case Morph.ADD:
           increment = 1;
@@ -189,16 +208,16 @@ export default function Cell() {
       }
       switch (direction) {
         case Direction.LEFT:
-          matrix = hWord;
+          matrix = hWord.matrix;
           break;
         case Direction.TOP:
-          matrix = vWord;
+          matrix = vWord.matrix;
           break;
         case Direction.RIGHT:
-          matrix = hWord;
+          matrix = hWord.matrix;
           break;
         case Direction.BOTTOM:
-          matrix = vWord;
+          matrix = vWord.matrix;
           break;
       }
       for (let i = 0; i < 6; i++) {
@@ -219,16 +238,27 @@ export default function Cell() {
         ]);
       });
       return validTileNames;
+    }
 
-      function reverseEnum(e, value) {
-        for (let k in e) if (e[k] == value) return k;
+    function reverseEnum(e, value) {
+      for (let k in e) if (e[k] == value) return k;
+    }
+
+    function matrix(direction) {
+      switch (direction) {
+        case Direction.LEFT:
+          return hWord.matrix;
+        case Direction.TOP:
+          return vWord.matrix;
+        case Direction.RIGHT:
+          return hWord.matrix;
+        case Direction.BOTTOM:
+          return vWord.matrix;
       }
     }
 
     return {
-      get matrix() {
-        return hWord;
-      },
+      matrix,
       addTile,
       removeTile,
       get hTiles() {

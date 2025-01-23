@@ -221,10 +221,10 @@ export default function Board() {
   function addToCheckLists(row, col, tile) {
     let hTilesToAdd = [{ color: tile.color, shape: tile.shape }];
     let vTilesToAdd = [{ color: tile.color, shape: tile.shape }];
-    let lCell = {};
-    let tCell = {};
-    let rCell = {};
-    let bCell = {};
+    let lCell = { direction: null, row: null, col: null };
+    let tCell = { direction: null, row: null, col: null };
+    let rCell = { direction: null, row: null, col: null };
+    let bCell = { direction: null, row: null, col: null };
 
     console.log("NEW CHECKLIST UPDATE");
     console.log(
@@ -312,59 +312,64 @@ export default function Board() {
         }
       }
       console.log(`Radiated ${direction} to cell [${newRow},${newCol}]`);
-      updateCell = { direction, row: newRow, col: newCol };
+      updateCell.direction = direction;
+      updateCell.row = newRow;
+      updateCell.col = newCol;
       //console.table(cellsToUpdate)
       //console.table(tilesToAdd)
     }
 
     function sendTiles(direction) {
-      let cellsToUpdate = [lCell, tCell, rCell, bCell];
+      let uCell;
       let tilesToAdd;
       switch (direction) {
         case Direction.LEFT:
           tilesToAdd = hTilesToAdd;
+          uCell = lCell;
           break;
 
         case Direction.TOP:
           tilesToAdd = vTilesToAdd;
+          uCell = tCell;
           break;
         case Direction.RIGHT:
           tilesToAdd = hTilesToAdd;
+          uCell = rCell;
           break;
 
         case Direction.BOTTOM:
           tilesToAdd = vTilesToAdd;
+          uCell = bCell;
           break;
       }
-      cellsToUpdate.forEach((cell) => {
+
+      console.log(
+        `NEW CELL CHECK: ${direction} updating cell [${uCell.row}][${uCell.col}] checklist matrix BEFORE update:`
+      );
+      console.table(cells[uCell.row][uCell.col].checkList.matrix(direction));
+
+      tilesToAdd.forEach((t) => {
         console.log(
-          `NEW CELL CHECK: ${direction} updating cell [${cell.row}][${cell.col}] checklist matrix BEFORE update:`
+          `Updating cell [${uCell.row},${uCell.col}] with tile ${reverseEnum(
+            Color,
+            t.color
+          )} ${reverseEnum(Shape, t.shape)}`
         );
-        console.table(cells[cell.row][cell.col].checkList.matrix);
 
-        tilesToAdd.forEach((t) => {
-          console.log(
-            `Updating cell [${cell.row},${cell.col}] with tile ${reverseEnum(
-              Color,
-              t.color
-            )} ${reverseEnum(Shape, t.shape)}`
-          );
-
-          cells[cell.row][cell.col].checkList.addTile(
-            direction,
-            t.color,
-            t.shape
-          );
-        });
-
-        console.log(
-          `${direction}  updated cell [${cell.row}][${cell.col}] checklist matrix AFTER update:`
+        cells[uCell.row][uCell.col].checkList.addTile(
+          direction,
+          t.color,
+          t.shape
         );
-        console.table(cells[cell.row][cell.col].checkList.matrix);
-        console.log(`NEW TILE STATE: ${cells[cell.row][cell.col].state}`);
-        console.log(`Valid tiles for cell after updates:`);
-        console.table(cells[cell.row][cell.col].checkList.validTileNames);
       });
+
+      console.log(
+        `${direction}  updated cell [${uCell.row}][${uCell.col}] checklist matrix AFTER update:`
+      );
+      console.table(cells[uCell.row][uCell.col].checkList.matrix(direction));
+      console.log(`NEW TILE STATE: ${cells[uCell.row][uCell.col].state}`);
+      console.log(`Valid tiles for cell after updates:`);
+      console.table(cells[uCell.row][uCell.col].checkList.validTileNames);
     }
 
     console.log(`UPDATES FINISHED.  Board:`);
