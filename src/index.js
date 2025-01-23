@@ -87,15 +87,23 @@ cell.checkList.addTile(Direction.VERTICAL, Color.RED, Shape.DIAMOND);
 console.table(cell.checkList.validTileNames);
 console.table(cell.checkList.matrix); */
 
-let bag = Bag()
-let rack = Rack()
-let board = Board()
-console.table(board.info)
-bag.fill()
+let bag = Bag();
+let rack = Rack();
+let board = Board();
+console.table(board.info);
+bag.fill();
 
-board.addTile(bag.quickPick(Color.RED, Shape.CIRCLE), 0, 0)
-board.addTile(bag.quickPick(Color.RED, Shape.CLOVER), 0, 1)
-board.addTile(bag.quickPick(Color.RED, Shape.CIRCLE), -1, 1)
+board.addTile(bag.quickPick(Color.RED, Shape.CIRCLE), 0, 0);
+board.addTile(bag.quickPick(Color.RED, Shape.CLOVER), 0, 1);
+board.addTile(bag.quickPick(Color.GREEN, Shape.CLOVER), -1, 1);
+board.addTile(bag.quickPick(Color.PURPLE, Shape.CLOVER), -2, 1);
+board.addTile(bag.quickPick(Color.PURPLE, Shape.STAR), -2, 0);
+board.removeTile(-2, 0);
+
+console.log(`Valid tiles at cell [2,1]`)
+console.table(board.cells[2][1].checkList.validTileNames);
+console.log(`Valid tiles at cell [1,1]`)
+console.table(board.cells[1][1].checkList.validTileNames);
 //board.addTile(bag.quickPick(Color.RED, Shape.CROSS), -1, 1)
 //board.addTile(bag.quickPick(Color.RED, Shape.DIAMOND), -2, 1)
 //board.addTile(bag.quickPick(Color.BLUE, Shape.CIRCLE), -2, 0)
@@ -107,9 +115,7 @@ console.table(board.cells[0][2].checkList.matrix)
 console.table(board.cells[0][2].checkList.vTiles)
 console.table(board.cells[0][2].checkList.hTiles) */
 
-
 //board.removeTile(0,0)
 //board.removeTile(0, 0)
 
 //console.table(board.info)
-

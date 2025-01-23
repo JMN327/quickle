@@ -3,7 +3,7 @@ import { Color } from "./enums/color";
 import { Shape } from "./enums/shape";
 import { CellState } from "./enums/cell-state";
 import { Direction } from "./enums/direction";
-import { Morph } from "./enums/morph";
+import { Increment } from "./enums/increment";
 
 export default function Cell() {
   let state = CellState.DORMANT;
@@ -100,6 +100,7 @@ export default function Cell() {
             word.matrix[tiles[0][0]][tiles[0][1]] &&
           word.matrix[tile[0]][tile[1]] + 1 === t
       );
+      console.log(test)
       word.validTiles = [];
       if (test) {
         for (let i = 0; i < 6; i++) {
@@ -114,7 +115,7 @@ export default function Cell() {
 
     function updateValidTilesForCell() {
       //intersect h + v valid tiles
-      let validTiles = [];
+      validTiles = [];
       hWord.validTiles.forEach((hTile) => {
         vWord.validTiles.forEach((vTile) => {
           if (hTile[0] == vTile[0] && hTile[1] == vTile[1]) {
@@ -137,7 +138,7 @@ export default function Cell() {
       state = CellState.ACTIVE;
     }
 
-    function addTile(direction, color, shape) {
+    function incrementTile(direction, increment, color, shape) {
       let tiles;
       switch (direction) {
         case Direction.LEFT:
@@ -155,55 +156,38 @@ export default function Cell() {
           tiles = vWord.tTiles;
           break;
       }
-      if (hasElement(tiles, [color, shape])) {
-        console.log(`tile ${reverseEnum(Color,color)} ${reverseEnum(Shape,shape)} already part of the list`)
-        return;
+      switch (increment) {
+        case Increment.ADD:
+          if (tiles.some((tile) => tile[0] === color && tile[1] === shape[1])) {
+            console.log(`tile ${reverseEnum(Color,color)} ${reverseEnum(Shape,shape)} already part of the list`)
+            return;
+          }
+          tiles.push([color, shape]);
+          break;
+        case Increment.REMOVE:
+          let tileIndex = tiles.findIndex((tile) => tile[0] == color && tile[1] == shape);
+          if (tileIndex < 0) {
+            throw new Error("The tile to remove is not on the checklist");
+          }
+          tiles.splice(tileIndex, 1);
+          break;
+
       }
-      tiles.push([color, shape]);
-      function hasElement(arr, el) {
-        return arr.some((x) => x[0] === el[0] && x[1] === el[1]);
-      }
-      updateMatrix(direction, Morph.ADD, color, shape);
+      updateMatrix(direction, increment, color, shape);
       updateValidTilesForWord(direction);
       updateValidTilesForCell();
       updateCellState();
     }
 
-
-    function removeTile(direction, color, shape) {
-      if (direction == 0) {
-        let tileIndex = lTiles.findIndex((t) => t[0] == color && t[1] == shape);
-        if (tileIndex < 0) {
-          throw new Error("The tile to remove is not on the checklist");
-        }
-        lTiles.splice(tileIndex, 1);
-      } else {
-        let tileIndex = tTiles.findIndex((t) => t[0] == color && t[1] == shape);
-        if (tileIndex < 0) {
-          throw new Error("The tile to remove is not on the checklist");
-        }
-        tTiles.splice(tileIndex, 1);
-      }
-      for (let i = 0; i < 6; i++) {
-        for (let j = 0; j < 6; j++) {
-          let toAdd;
-          if ((i == color && j != shape) || (i != color && j == shape)) {
-            hWord[i][j] += -1;
-          }
-        }
-      }
-      updateValidTileListForWord();
-    }
-
-    function updateMatrix(direction, morph, color, shape) {
+    function updateMatrix(direction, increment, color, shape) {
       let matrix;
-      let increment = 0;
-      switch (morph) {
-        case Morph.ADD:
-          increment = 1;
+      let inc = 0;
+      switch (increment) {
+        case Increment.ADD:
+          inc = 1;
           break;
-        case Morph.REMOVE:
-          increment = -1;
+        case Increment.REMOVE:
+          inc = -1;
           break;
       }
       switch (direction) {
@@ -223,7 +207,7 @@ export default function Cell() {
       for (let i = 0; i < 6; i++) {
         for (let j = 0; j < 6; j++) {
           if ((i == color && j != shape) || (i != color && j == shape)) {
-            matrix[i][j] += increment;
+            matrix[i][j] += inc;
           }
         }
       }
@@ -259,8 +243,7 @@ export default function Cell() {
 
     return {
       matrix,
-      addTile,
-      removeTile,
+      incrementTile,
       get hTiles() {
         return lTiles;
       },
