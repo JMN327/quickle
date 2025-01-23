@@ -1,5 +1,5 @@
 export const Morph = Object.freeze({
-    GROW: "1",
-    SHRINK: "-1",
+    ADD: "1",
+    REMOVE: "-1",
   });
   

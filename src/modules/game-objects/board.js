@@ -83,44 +83,44 @@ export default function Board() {
     switch (direction) {
       case Direction.LEFT:
         cells.forEach((arr) => {
-          if (morphType == Morph.GROW) {
+          if (morphType == Morph.ADD) {
             arr.unshift(Cell());
-          } else if (morphType == Morph.SHRINK) {
+          } else if (morphType == Morph.REMOVE) {
             arr.shift();
           }
         });
         break;
 
       case Direction.TOP:
-        if (morphType == Morph.GROW) {
+        if (morphType == Morph.ADD) {
           cells.unshift(
             Array(bounds.hSize)
               .fill()
               .map((x) => Cell())
           );
-        } else if (morphType == Morph.SHRINK) {
+        } else if (morphType == Morph.REMOVE) {
           cells.shift();
         }
         break;
 
       case Direction.RIGHT:
         cells.forEach((arr) => {
-          if (morphType == Morph.GROW) {
+          if (morphType == Morph.ADD) {
             arr.push(Cell());
-          } else if (morphType == Morph.SHRINK) {
+          } else if (morphType == Morph.REMOVE) {
             arr.pop();
           }
         });
         break;
 
       case Direction.BOTTOM:
-        if (morphType == Morph.GROW) {
+        if (morphType == Morph.ADD) {
           cells.push(
             Array(bounds.hSize)
               .fill()
               .map((x) => Cell())
           );
-        } else if (morphType == Morph.SHRINK) {
+        } else if (morphType == Morph.REMOVE) {
           cells.pop();
         }
         break;
@@ -128,16 +128,19 @@ export default function Board() {
   }
 
   function addTile(tile, row, col) {
-    console.log(`ADDING TILE ${reverseEnum(Color, tile[0].color)} ${reverseEnum(Shape, tile[0].shape)} at [${row},${col}]`)
+    console.log(
+      `ADDING TILE ${reverseEnum(Color, tile[0].color)} ${reverseEnum(
+        Shape,
+        tile[0].shape
+      )} at [${row},${col}]`
+    );
     tile = tile[0];
     row = cellsRow(row);
     col = cellsCol(col);
-    console.log(row, col)
-    console.log(cells)
     cells[row][col].addTile(tile);
     let edges = checkForEdgeGrow(row, col);
     edges.forEach((direction) => {
-      morph(direction, Morph.GROW);
+      morph(direction, Morph.ADD);
       col = direction == Direction.LEFT ? col + 1 : col;
       row = direction == Direction.TOP ? row + 1 : row;
       leftOffset += direction == Direction.LEFT ? 1 : 0;
@@ -154,7 +157,7 @@ export default function Board() {
     sendCheckListUpdates(Update.REMOVE, row, col, removedTile);
     let edges = checkForEdgeShrink(row, col);
     edges.forEach((direction) => {
-      morph(direction, Morph.SHRINK);
+      morph(direction, Morph.REMOVE);
       leftOffset += direction == Direction.LEFT ? -1 : 0;
       topOffset += direction == Direction.TOP ? -1 : 0;
     });
@@ -216,17 +219,19 @@ export default function Board() {
   }
 
   function addToCheckLists(row, col, tile) {
-    let hCellsToUpdate = [];
     let hTilesToAdd = [{ color: tile.color, shape: tile.shape }];
-    let vCellsToUpdate = [];
     let vTilesToAdd = [{ color: tile.color, shape: tile.shape }];
-    
+    let lCell = {};
+    let tCell = {};
+    let rCell = {};
+    let bCell = {};
+
     console.log("NEW CHECKLIST UPDATE");
     console.log(
       `Tile played: ${reverseEnum(Color, tile.color)} ${reverseEnum(
         Shape,
         tile.shape
-      )} Board:`
+      )} Board BEFORE updates:`
     );
     console.table(info());
 
@@ -234,18 +239,20 @@ export default function Board() {
     radiate(Direction.TOP);
     radiate(Direction.RIGHT);
     radiate(Direction.BOTTOM);
+    sendTiles(Direction.LEFT);
+    sendTiles(Direction.TOP);
+    sendTiles(Direction.RIGHT);
+    sendTiles(Direction.BOTTOM);
 
     function radiate(direction) {
       let condition;
       let increment;
-      let newCol;
-      let newRow;
-      let cellsToUpdate;
+      let newCol = col;
+      let newRow = row;
+      let updateCell;
       let tilesToAdd;
       switch (direction) {
         case Direction.LEFT:
-          newCol = col;
-          newRow = row;
           condition = () => {
             return newCol > 0;
           };
@@ -253,12 +260,10 @@ export default function Board() {
             return newCol--;
           };
           tilesToAdd = hTilesToAdd;
-          cellsToUpdate = hCellsToUpdate;
+          updateCell = lCell;
           break;
 
         case Direction.TOP:
-          newCol = col;
-          newRow = row;
           condition = () => {
             return newRow > 0;
           };
@@ -266,12 +271,10 @@ export default function Board() {
             return newRow--;
           };
           tilesToAdd = vTilesToAdd;
-          cellsToUpdate = vCellsToUpdate;
+          updateCell = tCell;
           break;
 
         case Direction.RIGHT:
-          newCol = col;
-          newRow = row;
           condition = () => {
             return newCol < bounds.hSize;
           };
@@ -279,12 +282,10 @@ export default function Board() {
             return newCol++;
           };
           tilesToAdd = hTilesToAdd;
-          cellsToUpdate = hCellsToUpdate;
+          updateCell = rCell;
           break;
 
         case Direction.BOTTOM:
-          newCol = col;
-          newRow = row;
           condition = () => {
             return newRow < bounds.vSize;
           };
@@ -292,13 +293,12 @@ export default function Board() {
             return newRow++;
           };
           tilesToAdd = vTilesToAdd;
-          cellsToUpdate = vCellsToUpdate;
+          updateCell = bCell;
           break;
       }
 
       while (condition()) {
         increment();
-        console.log(`${direction} newRow ${newRow} newCol ${newCol}`)
         if (
           cells[newRow][newCol].state == CellState.PLACED ||
           cells[newRow][newCol].state == CellState.FIXED
@@ -311,61 +311,63 @@ export default function Board() {
           break;
         }
       }
-      cellsToUpdate.push({ row: newRow, col: newCol });
+      console.log(`Radiated ${direction} to cell [${newRow},${newCol}]`);
+      updateCell = { direction, row: newRow, col: newCol };
       //console.table(cellsToUpdate)
       //console.table(tilesToAdd)
     }
 
-    hCellsToUpdate.forEach((hCell) => {
-      console.log(
-        `Horizontally updating cell [${hCell.row}][${hCell.col}] checklist matrix BEFORE update:`
-      );
-      console.table(cells[hCell.row][hCell.col].checkList.matrix);
-      hTilesToAdd.forEach((hTile) => {
+    function sendTiles(direction) {
+      let cellsToUpdate = [lCell, tCell, rCell, bCell];
+      let tilesToAdd;
+      switch (direction) {
+        case Direction.LEFT:
+          tilesToAdd = hTilesToAdd;
+          break;
+
+        case Direction.TOP:
+          tilesToAdd = vTilesToAdd;
+          break;
+        case Direction.RIGHT:
+          tilesToAdd = hTilesToAdd;
+          break;
+
+        case Direction.BOTTOM:
+          tilesToAdd = vTilesToAdd;
+          break;
+      }
+      cellsToUpdate.forEach((cell) => {
         console.log(
-          `Updating cell [${hCell.row},${hCell.col}] with tile ${reverseEnum(
-            Color,
-            hTile.color
-          )} ${reverseEnum(Shape, hTile.shape)}`
+          `NEW CELL CHECK: ${direction} updating cell [${cell.row}][${cell.col}] checklist matrix BEFORE update:`
         );
+        console.table(cells[cell.row][cell.col].checkList.matrix);
 
-        cells[hCell.row][hCell.col].checkList.addTileH(
-          hTile.color,
-          hTile.shape
-        );
-      });
-      console.log(
-        `Horizontally updated cell [${hCell.row}][${hCell.col}] checklist matrix AFTER update:`
-      );
-      console.table(cells[hCell.row][hCell.col].checkList.matrix);
-    });
+        tilesToAdd.forEach((t) => {
+          console.log(
+            `Updating cell [${cell.row},${cell.col}] with tile ${reverseEnum(
+              Color,
+              t.color
+            )} ${reverseEnum(Shape, t.shape)}`
+          );
 
-    vCellsToUpdate.forEach((vCell) => {
-      console.log(
-        `Updating cell [${vCell.row}][${vCell.col}] checklist matrix BEFORE update:`
-      );
-      console.table(cells[vCell.row][vCell.col].checkList.matrix);
-      vTilesToAdd.forEach((vTile) => {
+          cells[cell.row][cell.col].checkList.addTile(
+            direction,
+            t.color,
+            t.shape
+          );
+        });
+
         console.log(
-          `Vertically updating cell [${vCell.row},${
-            vCell.col
-          }] with tile ${reverseEnum(Color, vTile.color)} ${reverseEnum(
-            Shape,
-            vTile.shape
-          )}`
+          `${direction}  updated cell [${cell.row}][${cell.col}] checklist matrix AFTER update:`
         );
-
-        cells[vCell.row][vCell.col].checkList.addTileV(
-          vTile.color,
-          vTile.shape
-        );
+        console.table(cells[cell.row][cell.col].checkList.matrix);
+        console.log(`NEW TILE STATE: ${cells[cell.row][cell.col].state}`);
+        console.log(`Valid tiles for cell after updates:`);
+        console.table(cells[cell.row][cell.col].checkList.validTileNames);
       });
-      console.log(
-        `Vertically updating cell [${vCell.row}][${vCell.col}] checklist matrix AFTER update:`
-      );
-      console.table(cells[vCell.row][vCell.col].checkList.matrix);
-    });
-    console.log("UPDATES FINISHED.  Board:")
+    }
+
+    console.log(`UPDATES FINISHED.  Board:`);
     console.table(info());
   }
 
