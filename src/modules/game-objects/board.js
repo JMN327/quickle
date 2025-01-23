@@ -1,9 +1,7 @@
 import Cell from "./cell";
 import { CellState } from "./enums/cell-state";
 import { Direction } from "./enums/direction";
-import { Increment } from "./enums/increment";
-import { TileState } from "./enums/tile-state";
-import { Update } from "./enums/update-type";
+import { AddRemove } from "./enums/addRemove";
 import { Color } from "./enums/color";
 import { Shape } from "./enums/shape";
 
@@ -12,14 +10,7 @@ export default function Board() {
   let topOffset = 0;
 
   let cells = [[Cell()]];
-  cells[0][0].firstCell();
-
-  function cellsRow(row) {
-    return row + topOffset;
-  }
-  function cellsCol(col) {
-    return col + leftOffset;
-  }
+  cells[0][0].activateFirstCell();
 
   let bounds = {
     left: 0,
@@ -32,11 +23,11 @@ export default function Board() {
     get vSize() {
       return bounds.bottom - bounds.top;
     },
-    increment(direction, morphType) {
+    addRemove(direction, addRemove) {
       if (direction == Direction.LEFT || direction == Direction.TOP) {
-        bounds[direction] -= 1 * morphType;
+        bounds[direction] -= 1 * addRemove;
       } else {
-        bounds[direction] += 1 * morphType;
+        bounds[direction] += 1 * addRemove;
       }
     },
     get info() {
@@ -44,7 +35,61 @@ export default function Board() {
     },
   };
 
-  function cellGroup(state = null) {
+  function addTile(tile, row, col) {
+    console.log(
+      `ADDING TILE ${reverseEnum(Color, tile[0].color)} ${reverseEnum(
+        Shape,
+        tile[0].shape
+      )} at [${row},${col}]`
+    );
+    tile = tile[0]; //change once passing tile better implemented
+    row = cellsOffsetRow(row);
+    col = cellsOffsetCol(col);
+
+    // validity checks to be handed to player //
+    if (!tileIsValid(tile, row, col)) {
+      throw new Error("The tile is not on the cells valid tiles list");
+    }
+    if (!cellIsActive) {
+      throw new Error("The cell is not active");
+      
+    }
+    cells[row][col].addTile(tile);
+    edgeGrowDirections(row, col).forEach((direction) => {
+      AddRemoveBoardEdges(direction, AddRemove.ADD);
+      col = direction == Direction.LEFT ? col + 1 : col;
+      row = direction == Direction.TOP ? row + 1 : row;
+      leftOffset += direction == Direction.LEFT ? 1 : 0;
+      topOffset += direction == Direction.TOP ? 1 : 0;
+    });
+    updateCheckLists(AddRemove.ADD, row, col, tile);
+  }
+
+  function removeTile(row, col) {
+    console.log(`REMOVING TILE at [${row},${col}]`);
+    row = cellsOffsetRow(row);
+    col = cellsOffsetCol(col);
+    console.log(leftOffset, topOffset);
+    console.log(row);
+    let removedTile = cells[row][col].removeTile();
+    console.log(removedTile);
+    updateCheckLists(AddRemove.REMOVE, row, col, removedTile);
+    let edges = checkForEdgeShrink(row, col);
+    edges.forEach((direction) => {
+      AddRemoveBoardEdges(direction, AddRemove.REMOVE);
+      leftOffset += direction == Direction.LEFT ? 1 : 0;
+      topOffset += direction == Direction.TOP ? 1 : 0;
+    });
+  }
+
+  function fixTiles() {
+    cellsByState(CellState.PLACED).forEach((cell) => {
+      cell.state = CellState.FIXED;
+    });
+    return removedTile;
+  }
+
+  function cellsByState(state = null) {
     if (!Object.values(CellState).includes(state) && !(state == null)) {
       throw new Error("A valid cell state was not passed to the function");
     }
@@ -53,7 +98,8 @@ export default function Board() {
     }
     return cells.flat().filter((cell) => cell.state == state);
   }
-  function positions(state = null) {
+  
+  function positionsByState(state = null) {
     if (!Object.values(CellState).includes(state) && !(state == null)) {
       throw new Error("A valid cell state was not passed to the function");
     }
@@ -68,109 +114,33 @@ export default function Board() {
     return positionArray;
   }
 
-  function incrementBoardDimensions(direction, increment) {
-    if (
-      !Object.values(Direction).includes(direction) ||
-      !direction ||
-      direction == Direction.HORIZONTAL ||
-      direction == Direction.VERTICAL
-    ) {
-      throw new Error("A valid direction was not passed to the function");
+  function info() {
+    let info = new Array(bounds.vSize)
+      .fill("")
+      .map(() => new Array(bounds.hSize).fill(""));
+    for (let i = 0; i < bounds.vSize; i++) {
+      for (let j = 0; j < bounds.hSize; j++) {
+        info[i][j] = `${cells[i][j]?.state} ${
+          reverseEnum(Color, cells[i][j]?.tile?.color) || ""
+        } ${cells[i][j]?.tile?.color || ""} ${
+          reverseEnum(Shape, cells[i][j]?.tile?.shape) || ""
+        } ${cells[i][j]?.tile?.shape || ""}`;
+      }
     }
-    //update bounds
-    bounds.increment(direction, increment);
-    // update grid
-    switch (direction) {
-      case Direction.LEFT:
-        cells.forEach((arr) => {
-          if (increment == Increment.ADD) {
-            arr.unshift(Cell());
-          } else if (increment == Increment.REMOVE) {
-            arr.shift();
-          }
-        });
-        break;
-      case Direction.TOP:
-        if (increment == Increment.ADD) {
-          cells.unshift(
-            Array(bounds.hSize)
-              .fill()
-              .map((x) => Cell())
-          );
-        } else if (increment == Increment.REMOVE) {
-          cells.shift();
-        }
-        break;
-      case Direction.RIGHT:
-        cells.forEach((arr) => {
-          if (increment == Increment.ADD) {
-            arr.push(Cell());
-          } else if (increment == Increment.REMOVE) {
-            arr.pop();
-          }
-        });
-        break;
-      case Direction.BOTTOM:
-        if (increment == Increment.ADD) {
-          cells.push(
-            Array(bounds.hSize)
-              .fill()
-              .map((x) => Cell())
-          );
-        } else if (increment == Increment.REMOVE) {
-          cells.pop();
-        }
-        break;
-    }
+    return info;
   }
 
-  function addTile(tile, row, col) {
-    console.log(
-      `ADDING TILE ${reverseEnum(Color, tile[0].color)} ${reverseEnum(
-        Shape,
-        tile[0].shape
-      )} at [${row},${col}]`
+  function tileIsValid(tile, row, col) {
+    return cells[row][col].checkList.validTiles.some(
+      (validTile) => validTile[0] == tile.color && validTile[1] == tile.shape
     );
-    tile = tile[0]; //change once passing tile better implemented
-    row = cellsRow(row);
-    col = cellsCol(col);
-    cells[row][col].addTile(tile);
-    let edges = checkForEdgeGrow(row, col);
-    edges.forEach((direction) => {
-      incrementBoardDimensions(direction, Increment.ADD);
-      col = direction == Direction.LEFT ? col + 1 : col;
-      row = direction == Direction.TOP ? row + 1 : row;
-      leftOffset += direction == Direction.LEFT ? 1 : 0;
-      topOffset += direction == Direction.TOP ? 1 : 0;
-    });
-    updateCheckLists(Increment.ADD, row, col, tile);
+  }
+  
+  function cellIsActive(){
+    return cells[row][col].state == CellState.ACTIVE;
   }
 
-  function removeTile(row, col) {
-    console.log(`REMOVING TILE at [${row},${col}]`);
-    row = cellsRow(row);
-    col = cellsCol(col);
-    console.log(leftOffset, topOffset);
-    console.log(row);
-    let removedTile = cells[row][col].removeTile();
-    console.log(removedTile);
-    updateCheckLists(Increment.REMOVE, row, col, removedTile);
-    let edges = checkForEdgeShrink(row, col);
-    edges.forEach((direction) => {
-      incrementBoardDimensions(direction, Increment.REMOVE);
-      leftOffset += direction == Direction.LEFT ? 1 : 0;
-      topOffset += direction == Direction.TOP ? 1 : 0;
-    });
-  }
-
-  function fixTiles() {
-    cellGroup(CellState.PLACED).forEach((cell) => {
-      cell.state = CellState.FIXED;
-    });
-    return removedTile;
-  }
-
-  function checkForEdgeGrow(row, col) {
+  function edgeGrowDirections(row, col) {
     let edges = [];
     if (col == 0) {
       edges.push(Direction.LEFT);
@@ -218,9 +188,9 @@ export default function Board() {
     return edges;
   }
 
-  function updateCheckLists(increment, row, col, tile) {
-    let hTilesToIncrement = [{ color: tile.color, shape: tile.shape }];
-    let vTilesToIncrement = [{ color: tile.color, shape: tile.shape }];
+  function updateCheckLists(addRemove, row, col, tile) {
+    let hTilesToAddRemove = [{ color: tile.color, shape: tile.shape }];
+    let vTilesToAddRemove = [{ color: tile.color, shape: tile.shape }];
     let lCell = { direction: null, row: null, col: null };
     let tCell = { direction: null, row: null, col: null };
     let rCell = { direction: null, row: null, col: null };
@@ -246,20 +216,20 @@ export default function Board() {
 
     function radiate(direction) {
       let condition;
-      let increment;
+      let addRemove;
       let newCol = col;
       let newRow = row;
       let updateCell;
-      let tilesToIncrement;
+      let tilesToAddRemove;
       switch (direction) {
         case Direction.LEFT:
           condition = () => {
             return newCol > 0;
           };
-          increment = () => {
+          addRemove = () => {
             return newCol--;
           };
-          tilesToIncrement = hTilesToIncrement;
+          tilesToAddRemove = hTilesToAddRemove;
           updateCell = lCell;
           break;
 
@@ -267,10 +237,10 @@ export default function Board() {
           condition = () => {
             return newRow > 0;
           };
-          increment = () => {
+          addRemove = () => {
             return newRow--;
           };
-          tilesToIncrement = vTilesToIncrement;
+          tilesToAddRemove = vTilesToAddRemove;
           updateCell = tCell;
           break;
 
@@ -278,10 +248,10 @@ export default function Board() {
           condition = () => {
             return newCol < bounds.hSize;
           };
-          increment = () => {
+          addRemove = () => {
             return newCol++;
           };
-          tilesToIncrement = hTilesToIncrement;
+          tilesToAddRemove = hTilesToAddRemove;
           updateCell = rCell;
           break;
 
@@ -289,21 +259,21 @@ export default function Board() {
           condition = () => {
             return newRow < bounds.vSize;
           };
-          increment = () => {
+          addRemove = () => {
             return newRow++;
           };
-          tilesToIncrement = vTilesToIncrement;
+          tilesToAddRemove = vTilesToAddRemove;
           updateCell = bCell;
           break;
       }
 
       while (condition()) {
-        increment();
+        addRemove();
         if (
           cells[newRow][newCol].state == CellState.PLACED ||
           cells[newRow][newCol].state == CellState.FIXED
         ) {
-          tilesToIncrement.push({
+          tilesToAddRemove.push({
             color: cells[newRow][newCol].tile.color,
             shape: cells[newRow][newCol].tile.shape,
           });
@@ -321,22 +291,22 @@ export default function Board() {
 
     function sendTiles(direction) {
       let uCell;
-      let tilesToIncrement;
+      let tilesToAddRemove;
       switch (direction) {
         case Direction.LEFT:
-          tilesToIncrement = hTilesToIncrement;
+          tilesToAddRemove = hTilesToAddRemove;
           uCell = lCell;
           break;
         case Direction.TOP:
-          tilesToIncrement = vTilesToIncrement;
+          tilesToAddRemove = vTilesToAddRemove;
           uCell = tCell;
           break;
         case Direction.RIGHT:
-          tilesToIncrement = hTilesToIncrement;
+          tilesToAddRemove = hTilesToAddRemove;
           uCell = rCell;
           break;
         case Direction.BOTTOM:
-          tilesToIncrement = vTilesToIncrement;
+          tilesToAddRemove = vTilesToAddRemove;
           uCell = bCell;
           break;
       }
@@ -346,7 +316,7 @@ export default function Board() {
       );
       console.table(cells[uCell.row][uCell.col].checkList.matrix(direction));
 
-      tilesToIncrement.forEach((t) => {
+      tilesToAddRemove.forEach((t) => {
         console.log(
           `Updating cell [${uCell.row},${uCell.col}] with tile ${reverseEnum(
             Color,
@@ -354,9 +324,9 @@ export default function Board() {
           )} ${reverseEnum(Shape, t.shape)}`
         );
 
-        cells[uCell.row][uCell.col].checkList.incrementTile(
+        cells[uCell.row][uCell.col].checkList.addRemoveTile(
           direction,
-          increment,
+          addRemove,
           t.color,
           t.shape
         );
@@ -375,56 +345,88 @@ export default function Board() {
     console.table(info());
   }
 
-  function validPositions(tile) {
-    // come back once tile placing and info sending sorted
-
-    // check line(s) of any already played tiles
-    // cross with
-    //(tile){board.cells.forEach cell.checklist.validTiles.includes([tile.color,tile.shape])}
-    if (tile) {
-      Board.positions(CellState.ACTIVE).forEach((pos) => {
-        cells[pos[0]][pos[1]].checkList.validTiles.includes(tile);
-      });
+  function AddRemoveBoardEdges(direction, addRemove) {
+    if (
+      !Object.values(Direction).includes(direction) ||
+      !direction ||
+      direction == Direction.HORIZONTAL ||
+      direction == Direction.VERTICAL
+    ) {
+      throw new Error("A valid direction was not passed to the function");
     }
+    //update bounds
+    bounds.addRemove(direction, addRemove);
+    // update grid
+    switch (direction) {
+      case Direction.LEFT:
+        cells.forEach((arr) => {
+          if (addRemove == AddRemove.ADD) {
+            arr.unshift(Cell());
+          } else if (addRemove == AddRemove.REMOVE) {
+            arr.shift();
+          }
+        });
+        break;
+      case Direction.TOP:
+        if (addRemove == AddRemove.ADD) {
+          cells.unshift(
+            Array(bounds.hSize)
+              .fill()
+              .map((x) => Cell())
+          );
+        } else if (addRemove == AddRemove.REMOVE) {
+          cells.shift();
+        }
+        break;
+      case Direction.RIGHT:
+        cells.forEach((arr) => {
+          if (addRemove == AddRemove.ADD) {
+            arr.push(Cell());
+          } else if (addRemove == AddRemove.REMOVE) {
+            arr.pop();
+          }
+        });
+        break;
+      case Direction.BOTTOM:
+        if (addRemove == AddRemove.ADD) {
+          cells.push(
+            Array(bounds.hSize)
+              .fill()
+              .map((x) => Cell())
+          );
+        } else if (addRemove == AddRemove.REMOVE) {
+          cells.pop();
+        }
+        break;
+    }
+  }
+
+  function cellsOffsetRow(row) {
+    return row + topOffset;
+  }
+
+  function cellsOffsetCol(col) {
+    return col + leftOffset;
   }
 
   function reverseEnum(e, value) {
     for (let k in e) if (e[k] == value) return k;
   }
 
-  function info() {
-    let info = new Array(bounds.vSize)
-      .fill("")
-      .map(() => new Array(bounds.hSize).fill(""));
-    for (let i = 0; i < bounds.vSize; i++) {
-      for (let j = 0; j < bounds.hSize; j++) {
-        info[i][j] = `${cells[i][j]?.state} ${
-          reverseEnum(Color, cells[i][j]?.tile?.color) || ""
-        } ${cells[i][j]?.tile?.color || ""} ${
-          reverseEnum(Shape, cells[i][j]?.tile?.shape) || ""
-        } ${cells[i][j]?.tile?.shape || ""}`;
-      }
-    }
-    return info;
-  }
-
   return {
     get cells() {
       return cells;
     },
-    get gridCount() {
-      return cells.flat().length;
-    },
     get bounds() {
       return bounds;
     },
-    cellGroup,
-    positions,
-    addTile,
-    removeTile,
-    fixTiles,
     get info() {
       return info();
     },
+    cellsByState,
+    positionsByState,
+    addTile,
+    removeTile,
+    fixTiles,
   };
 }

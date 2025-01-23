@@ -1,16 +1,16 @@
-import { TileState } from "./enums/tile-state";
 import { Color } from "./enums/color";
 import { Shape } from "./enums/shape";
 import { CellState } from "./enums/cell-state";
+import { TileState } from "./enums/tile-state";
 import { Direction } from "./enums/direction";
-import { Increment } from "./enums/increment";
+import { AddRemove } from "./enums/addRemove";
 
 export default function Cell() {
   let state = CellState.DORMANT;
   let tile = null;
   let checkList = CheckList();
 
-  function firstCell() {
+  function activateFirstCell() {
     state = CellState.ACTIVE;
   }
 
@@ -47,6 +47,11 @@ export default function Cell() {
   }
 
   function CheckList() {
+    // tiles as [color,shape] pairs are tested for validity
+    // against a 6 x 6 matrix with 6 colors for rows and 
+    // 6 shapes for columns.  When a tile is placed, cells
+    // which are influenced by it have their check list updated
+
     let hWord = {
       matrix: new Array(6).fill().map(() => new Array(6).fill(0)),
       validTiles: [],
@@ -63,6 +68,71 @@ export default function Cell() {
     updateValidTilesForWord(Direction.LEFT);
     updateValidTilesForWord(Direction.TOP);
     updateValidTilesForCell();
+
+    function addRemoveTile(direction, addRemove, color, shape) {
+      let tiles;
+      switch (direction) {
+        case Direction.LEFT:
+          tiles = hWord.rTiles;
+          break;
+
+        case Direction.TOP:
+          tiles = vWord.bTiles;
+          break;
+        case Direction.RIGHT:
+          tiles = hWord.lTiles;
+          break;
+
+        case Direction.BOTTOM:
+          tiles = vWord.tTiles;
+          break;
+      }
+      switch (addRemove) {
+        case AddRemove.ADD:
+          if (tiles.some((tile) => tile[0] === color && tile[1] === shape[1])) {
+            console.log(`tile ${reverseEnum(Color,color)} ${reverseEnum(Shape,shape)} already part of the list`)
+            return;
+          }
+          tiles.push([color, shape]);
+          break;
+        case AddRemove.REMOVE:
+          let tileIndex = tiles.findIndex((tile) => tile[0] == color && tile[1] == shape);
+          if (tileIndex < 0) {
+            throw new Error("The tile to remove is not on the checklist");
+          }
+          tiles.splice(tileIndex, 1);
+          break;
+
+      }
+      updateMatrix(direction, addRemove, color, shape);
+      updateValidTilesForWord(direction);
+      updateValidTilesForCell();
+      updateCellState();
+    }
+
+    function matrix(direction) {
+      switch (direction) {
+        case Direction.LEFT:
+          return hWord.matrix;
+        case Direction.TOP:
+          return vWord.matrix;
+        case Direction.RIGHT:
+          return hWord.matrix;
+        case Direction.BOTTOM:
+          return vWord.matrix;
+      }
+    }
+
+    function getValidTileNames() {
+      let validTileNames = [];
+      validTiles.forEach((tile) => {
+        validTileNames.push([
+          reverseEnum(Color, tile[0]),
+          reverseEnum(Shape, tile[1]),
+        ]);
+      });
+      return validTileNames;
+    }
 
     function updateValidTilesForWord(direction) {
       let word;
@@ -138,55 +208,14 @@ export default function Cell() {
       state = CellState.ACTIVE;
     }
 
-    function incrementTile(direction, increment, color, shape) {
-      let tiles;
-      switch (direction) {
-        case Direction.LEFT:
-          tiles = hWord.rTiles;
-          break;
-
-        case Direction.TOP:
-          tiles = vWord.bTiles;
-          break;
-        case Direction.RIGHT:
-          tiles = hWord.lTiles;
-          break;
-
-        case Direction.BOTTOM:
-          tiles = vWord.tTiles;
-          break;
-      }
-      switch (increment) {
-        case Increment.ADD:
-          if (tiles.some((tile) => tile[0] === color && tile[1] === shape[1])) {
-            console.log(`tile ${reverseEnum(Color,color)} ${reverseEnum(Shape,shape)} already part of the list`)
-            return;
-          }
-          tiles.push([color, shape]);
-          break;
-        case Increment.REMOVE:
-          let tileIndex = tiles.findIndex((tile) => tile[0] == color && tile[1] == shape);
-          if (tileIndex < 0) {
-            throw new Error("The tile to remove is not on the checklist");
-          }
-          tiles.splice(tileIndex, 1);
-          break;
-
-      }
-      updateMatrix(direction, increment, color, shape);
-      updateValidTilesForWord(direction);
-      updateValidTilesForCell();
-      updateCellState();
-    }
-
-    function updateMatrix(direction, increment, color, shape) {
+    function updateMatrix(direction, addRemove, color, shape) {
       let matrix;
       let inc = 0;
-      switch (increment) {
-        case Increment.ADD:
+      switch (addRemove) {
+        case AddRemove.ADD:
           inc = 1;
           break;
-        case Increment.REMOVE:
+        case AddRemove.REMOVE:
           inc = -1;
           break;
       }
@@ -213,42 +242,13 @@ export default function Cell() {
       }
     }
 
-    function getValidTileNames() {
-      let validTileNames = [];
-      validTiles.forEach((tile) => {
-        validTileNames.push([
-          reverseEnum(Color, tile[0]),
-          reverseEnum(Shape, tile[1]),
-        ]);
-      });
-      return validTileNames;
-    }
-
     function reverseEnum(e, value) {
       for (let k in e) if (e[k] == value) return k;
     }
 
-    function matrix(direction) {
-      switch (direction) {
-        case Direction.LEFT:
-          return hWord.matrix;
-        case Direction.TOP:
-          return vWord.matrix;
-        case Direction.RIGHT:
-          return hWord.matrix;
-        case Direction.BOTTOM:
-          return vWord.matrix;
-      }
-    }
-
     return {
-      matrix,
-      incrementTile,
-      get hTiles() {
-        return lTiles;
-      },
-      get vTiles() {
-        return tTiles;
+      get matrix() {
+        return matrix;
       },
       get validTiles() {
         return validTiles;
@@ -256,6 +256,7 @@ export default function Cell() {
       get validTileNames() {
         return getValidTileNames();
       },
+      addRemoveTile,
     };
   }
 
@@ -272,6 +273,6 @@ export default function Cell() {
     addTile,
     removeTile,
     fixTile,
-    firstCell,
+    activateFirstCell,
   };
 }

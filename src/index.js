@@ -98,7 +98,7 @@ board.addTile(bag.quickPick(Color.RED, Shape.CLOVER), 0, 1);
 board.addTile(bag.quickPick(Color.GREEN, Shape.CLOVER), -1, 1);
 board.addTile(bag.quickPick(Color.PURPLE, Shape.CLOVER), -2, 1);
 board.addTile(bag.quickPick(Color.PURPLE, Shape.STAR), -2, 0);
-board.removeTile(-2, 0);
+//board.removeTile(-2, 0);
 
 console.log(`Valid tiles at cell [2,1]`)
 console.table(board.cells[2][1].checkList.validTileNames);

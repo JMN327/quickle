@@ -1,6 +1,11 @@
 export default function Player() {
 
-  // MOST OF THIS TO ME MOVED TO PLAYER MANAGER CONTROLLER
+  // MOST OF THIS TO BE MOVED TO PLAYER MANAGER CONTROLLER
+
+  // player handles the movement of tiles and owns a score sheet
+
+  // tile moving to board validity check functions to be handled
+  // here and removed from board
 
     let players = [
       {
