@@ -35,16 +35,16 @@ export default function Board() {
     },
   };
 
-  function addTile(tile, row, col) {
+  function addTile(tile, rowToOffset, colToOffset) {
     console.log(
       `ADDING TILE ${reverseEnum(Color, tile[0].color)} ${reverseEnum(
         Shape,
         tile[0].shape
-      )} at [${row},${col}]`
+      )} at [${rowToOffset},${colToOffset}]`
     );
     tile = tile[0]; //change once passing tile better implemented
-    row = cellsOffsetRow(row);
-    col = cellsOffsetCol(col);
+    let row = cellsOffsetRow(rowToOffset);
+    let col = cellsOffsetCol(colToOffset);
 
     // validity checks to be handed to player //
     if (!tileIsValid(tile, row, col)) {
@@ -52,7 +52,6 @@ export default function Board() {
     }
     if (!cellIsActive) {
       throw new Error("The cell is not active");
-      
     }
     cells[row][col].addTile(tile);
     edgeGrowDirections(row, col).forEach((direction) => {
@@ -65,10 +64,10 @@ export default function Board() {
     updateCheckLists(AddRemove.ADD, row, col, tile);
   }
 
-  function removeTile(row, col) {
-    console.log(`REMOVING TILE at [${row},${col}]`);
-    row = cellsOffsetRow(row);
-    col = cellsOffsetCol(col);
+  function removeTile(rowToOffset, colToOffset) {
+    console.log(`REMOVING TILE at [${rowToOffset},${colToOffset}]`);
+    let row = cellsOffsetRow(rowToOffset);
+    let col = cellsOffsetCol(colToOffset);
     console.log(leftOffset, topOffset);
     console.log(row);
     let removedTile = cells[row][col].removeTile();
@@ -89,6 +88,10 @@ export default function Board() {
     return removedTile;
   }
 
+  function cell(row, col) {
+    return cells[row + topOffset][col + leftOffset];
+  }
+
   function cellsByState(state = null) {
     if (!Object.values(CellState).includes(state) && !(state == null)) {
       throw new Error("A valid cell state was not passed to the function");
@@ -98,7 +101,7 @@ export default function Board() {
     }
     return cells.flat().filter((cell) => cell.state == state);
   }
-  
+
   function positionsByState(state = null) {
     if (!Object.values(CellState).includes(state) && !(state == null)) {
       throw new Error("A valid cell state was not passed to the function");
@@ -120,7 +123,7 @@ export default function Board() {
       .map(() => new Array(bounds.hSize).fill(""));
     for (let i = 0; i < bounds.vSize; i++) {
       for (let j = 0; j < bounds.hSize; j++) {
-        info[i][j] = `${cells[i][j]?.state} ${
+        info[i][j] = `${cells[i][j]?.state}${
           reverseEnum(Color, cells[i][j]?.tile?.color) || ""
         } ${cells[i][j]?.tile?.color || ""} ${
           reverseEnum(Shape, cells[i][j]?.tile?.shape) || ""
@@ -131,13 +134,40 @@ export default function Board() {
   }
 
   function tileIsValid(tile, row, col) {
-    return cells[row][col].checkList.validTiles.some(
+    return cells[row][col].checkList.validSymbols.some(
       (validTile) => validTile[0] == tile.color && validTile[1] == tile.shape
     );
   }
-  
-  function cellIsActive(){
+
+  function cellIsActive() {
     return cells[row][col].state == CellState.ACTIVE;
+  }
+
+  function playableCells(tile, rowToOffset, colToOffset) {
+    if (!tile || !rowToOffset || !rowToOffset) {
+      throw new Error("variables are not optional. Please provide all three");
+    }
+    let row = cellsOffsetRow(rowToOffset);
+    let col = cellsOffsetCol(colToOffset);
+
+    let playableCells = [];
+
+    if (cellsByState(CellState.PLACED).length == 0) {
+      for (let i = 0; i < bounds.vSize; i++) {
+        for (let j = 0; j < bounds.hSize; j++) {
+          if (cells[i][j].state != CellState.ACTIVE) {
+            break;
+          }
+          if (!tileIsValid(tile, row, col)) {
+            break;
+          }
+          playableCells.push([i, j]);
+        }
+      }
+      return playableCells;
+    }
+
+    //logic for lines and radiating
   }
 
   function edgeGrowDirections(row, col) {
@@ -189,13 +219,6 @@ export default function Board() {
   }
 
   function updateCheckLists(addRemove, row, col, tile) {
-    let hTilesToAddRemove = [{ color: tile.color, shape: tile.shape }];
-    let vTilesToAddRemove = [{ color: tile.color, shape: tile.shape }];
-    let lCell = { direction: null, row: null, col: null };
-    let tCell = { direction: null, row: null, col: null };
-    let rCell = { direction: null, row: null, col: null };
-    let bCell = { direction: null, row: null, col: null };
-
     console.log("NEW CHECKLIST UPDATE");
     console.log(
       `Tile played: ${reverseEnum(Color, tile.color)} ${reverseEnum(
@@ -205,89 +228,28 @@ export default function Board() {
     );
     console.table(info());
 
-    radiate(Direction.LEFT);
-    radiate(Direction.TOP);
-    radiate(Direction.RIGHT);
-    radiate(Direction.BOTTOM);
+    // radiate heads from the given tile in a compass direction collecting played or fixed
+    // tiles on the way for checklist updates, stopping at the first active cell
+    // and collecting it to apply checklist updates to or gather valid cells for tiles
+    //to be placed in
+    let l = radiate(Direction.LEFT, row, col);
+    let t = radiate(Direction.TOP, row, col);
+    let r = radiate(Direction.RIGHT, row, col);
+    let b = radiate(Direction.BOTTOM, row, col);
+    let hTilesToAddRemove = [tile];
+    hTilesToAddRemove.concat(l.tilesToAddRemoveIfUpdatingChecklists);
+    hTilesToAddRemove.concat(r.tilesToAddRemoveIfUpdatingChecklists);
+    let vTilesToAddRemove = [tile]
+    vTilesToAddRemove.concat(b.tilesToAddRemoveIfUpdatingChecklists);
+    vTilesToAddRemove.concat(b.tilesToAddRemoveIfUpdatingChecklists);
+    let lCell = l.activeCellFound;
+    let tCell = t.activeCellFound;
+    let rCell = r.activeCellFound;
+    let bCell = b.activeCellFound;
     sendTiles(Direction.LEFT);
     sendTiles(Direction.TOP);
     sendTiles(Direction.RIGHT);
     sendTiles(Direction.BOTTOM);
-
-    function radiate(direction) {
-      let condition;
-      let addRemove;
-      let newCol = col;
-      let newRow = row;
-      let updateCell;
-      let tilesToAddRemove;
-      switch (direction) {
-        case Direction.LEFT:
-          condition = () => {
-            return newCol > 0;
-          };
-          addRemove = () => {
-            return newCol--;
-          };
-          tilesToAddRemove = hTilesToAddRemove;
-          updateCell = lCell;
-          break;
-
-        case Direction.TOP:
-          condition = () => {
-            return newRow > 0;
-          };
-          addRemove = () => {
-            return newRow--;
-          };
-          tilesToAddRemove = vTilesToAddRemove;
-          updateCell = tCell;
-          break;
-
-        case Direction.RIGHT:
-          condition = () => {
-            return newCol < bounds.hSize;
-          };
-          addRemove = () => {
-            return newCol++;
-          };
-          tilesToAddRemove = hTilesToAddRemove;
-          updateCell = rCell;
-          break;
-
-        case Direction.BOTTOM:
-          condition = () => {
-            return newRow < bounds.vSize;
-          };
-          addRemove = () => {
-            return newRow++;
-          };
-          tilesToAddRemove = vTilesToAddRemove;
-          updateCell = bCell;
-          break;
-      }
-
-      while (condition()) {
-        addRemove();
-        if (
-          cells[newRow][newCol].state == CellState.PLACED ||
-          cells[newRow][newCol].state == CellState.FIXED
-        ) {
-          tilesToAddRemove.push({
-            color: cells[newRow][newCol].tile.color,
-            shape: cells[newRow][newCol].tile.shape,
-          });
-        } else {
-          break;
-        }
-      }
-      console.log(`Radiated ${direction} to cell [${newRow},${newCol}]`);
-      updateCell.direction = direction;
-      updateCell.row = newRow;
-      updateCell.col = newCol;
-      //console.table(cellsToUpdate)
-      //console.table(tilesToAdd)
-    }
 
     function sendTiles(direction) {
       let uCell;
@@ -312,37 +274,101 @@ export default function Board() {
       }
 
       console.log(
-        `NEW CELL CHECK: ${direction} updating cell [${uCell.row}][${uCell.col}] checklist matrix BEFORE update:`
+        `NEW CELL CHECK FROM: ${direction} updating cell [${uCell.row}][${uCell.col}] checklist matrix BEFORE update:`
       );
       console.table(cells[uCell.row][uCell.col].checkList.matrix(direction));
 
-      tilesToAddRemove.forEach((t) => {
+      tilesToAddRemove.forEach((tile) => {
         console.log(
           `Updating cell [${uCell.row},${uCell.col}] with tile ${reverseEnum(
             Color,
-            t.color
-          )} ${reverseEnum(Shape, t.shape)}`
+            tile.color
+          )} ${reverseEnum(Shape, tile.shape)}`
         );
 
-        cells[uCell.row][uCell.col].checkList.addRemoveTile(
+        cells[uCell.row][uCell.col].checkList.addRemoveSymbol(
           direction,
           addRemove,
-          t.color,
-          t.shape
+          tile.color,
+          tile.shape,
         );
       });
 
       console.log(
-        `${direction}  updated cell [${uCell.row}][${uCell.col}] checklist matrix AFTER update:`
+        `CELL CHECK OVER FROM:${direction}, updated cell [${uCell.row}][${uCell.col}] checklist matrix AFTER update:`
       );
       console.table(cells[uCell.row][uCell.col].checkList.matrix(direction));
-      console.log(`NEW TILE STATE: ${cells[uCell.row][uCell.col].state}`);
+      console.log(
+        `CELL [${uCell.row},${uCell.col}] NEW CELL STATE: ${
+          cells[uCell.row][uCell.col].state
+        }`
+      );
       console.log(`Valid tiles for cell after updates:`);
-      console.table(cells[uCell.row][uCell.col].checkList.validTileNames);
+      console.table(cells[uCell.row][uCell.col].checkList.validSymbolsText);
     }
 
     console.log(`UPDATES FINISHED.  Board:`);
     console.table(info());
+  }
+
+  function radiate(direction, row, col) {
+    let condition;
+    let increment;
+    let newCol = col;
+    let newRow = row;
+    let activeCellFound = { direction: null, row: null, col: null };
+    let tilesToAddRemoveIfUpdatingChecklists = [];
+    switch (direction) {
+      case Direction.LEFT:
+        condition = () => {
+          return newCol > 0;
+        };
+        increment = () => {
+          return newCol--;
+        };
+        break;
+      case Direction.TOP:
+        condition = () => {
+          return newRow > 0;
+        };
+        increment = () => {
+          return newRow--;
+        };
+        break;
+      case Direction.RIGHT:
+        condition = () => {
+          return newCol < bounds.hSize;
+        };
+        increment = () => {
+          return newCol++;
+        };
+        break;
+      case Direction.BOTTOM:
+        condition = () => {
+          return newRow < bounds.vSize;
+        };
+        increment = () => {
+          return newRow++;
+        };
+        break;
+    }
+
+    while (condition()) {
+      increment();
+      if (
+        cells[newRow][newCol].state == CellState.PLACED ||
+        cells[newRow][newCol].state == CellState.FIXED
+      ) {
+        tilesToAddRemoveIfUpdatingChecklists.push(cells[newRow][newCol].tile);
+      } else {
+        break;
+      }
+    }
+    //console.log(`Radiated ${direction} to cell [${newRow},${newCol}]`);
+    activeCellFound.direction = direction;
+    activeCellFound.row = newRow;
+    activeCellFound.col = newCol;
+    return { activeCellFound, tilesToAddRemoveIfUpdatingChecklists };
   }
 
   function AddRemoveBoardEdges(direction, addRemove) {
@@ -414,6 +440,7 @@ export default function Board() {
   }
 
   return {
+    cell,
     get cells() {
       return cells;
     },

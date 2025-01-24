@@ -47,66 +47,69 @@ export default function Cell() {
   }
 
   function CheckList() {
-    // tiles as [color,shape] pairs are tested for validity
-    // against a 6 x 6 matrix with 6 colors for rows and 
-    // 6 shapes for columns.  When a tile is placed, cells
-    // which are influenced by it have their check list updated
+    // symbols as abstract [color,shape] pairs taken from the tiles
+    // are tested for validity against a 6 x 6
+    // matrix with 6 colors for rows and  6 shapes for columns.
+    // When a tile is placed, cells which are influenced
+    // by it have their check list updated.
 
     let hWord = {
       matrix: new Array(6).fill().map(() => new Array(6).fill(0)),
-      validTiles: [],
-      lTiles: [],
-      rTiles: [],
+      validSymbols: [],
+      lSymbols: [],
+      rSymbols: [],
     };
     let vWord = {
       matrix: new Array(6).fill().map(() => new Array(6).fill(0)),
-      validTiles: [],
-      tTiles: [],
-      bTiles: [],
+      validSymbols: [],
+      tSymbols: [],
+      bSymbols: [],
     };
-    let validTiles = [];
-    updateValidTilesForWord(Direction.LEFT);
-    updateValidTilesForWord(Direction.TOP);
-    updateValidTilesForCell();
+    let validSymbols = [];
+    updateValidSymbolsForWord(Direction.LEFT);
+    updateValidSymbolsForWord(Direction.TOP);
+    updateValidSymbolsForCell();
 
-    function addRemoveTile(direction, addRemove, color, shape) {
-      let tiles;
+    function addRemoveSymbol(direction, addRemove, color, shape) {
+      let symbols;
       switch (direction) {
         case Direction.LEFT:
-          tiles = hWord.rTiles;
+          symbols = hWord.rSymbols;
           break;
 
         case Direction.TOP:
-          tiles = vWord.bTiles;
+          symbols = vWord.bSymbols;
           break;
         case Direction.RIGHT:
-          tiles = hWord.lTiles;
+          symbols = hWord.lSymbols;
           break;
 
         case Direction.BOTTOM:
-          tiles = vWord.tTiles;
+          symbols = vWord.tSymbols;
           break;
       }
       switch (addRemove) {
         case AddRemove.ADD:
-          if (tiles.some((tile) => tile[0] === color && tile[1] === shape[1])) {
-            console.log(`tile ${reverseEnum(Color,color)} ${reverseEnum(Shape,shape)} already part of the list`)
+          console.log(`Checking if symbol color ${color}, shape ${shape} is already in the list: ${JSON.stringify(symbols)}`)
+          if (symbols.some((symbol) => symbol[0] == color && symbol[1] == shape)) {
+            console.log(`symbol ${reverseEnum(Color,color)} ${reverseEnum(Shape,shape)} already part of the list`)
             return;
           }
-          tiles.push([color, shape]);
+          console.log(`Symbol not in the list.  Adding it and updating checklist now`)
+          symbols.push([color, shape]);
           break;
         case AddRemove.REMOVE:
-          let tileIndex = tiles.findIndex((tile) => tile[0] == color && tile[1] == shape);
-          if (tileIndex < 0) {
-            throw new Error("The tile to remove is not on the checklist");
+          let symbolIndex = symbols.findIndex((symbol) => symbol[0] == color && symbol[1] == shape);
+          if (symbolIndex < 0) {
+            throw new Error("The symbol to remove is not on the checklist");
           }
-          tiles.splice(tileIndex, 1);
+          symbols.splice(symbolIndex, 1);
           break;
 
       }
       updateMatrix(direction, addRemove, color, shape);
-      updateValidTilesForWord(direction);
-      updateValidTilesForCell();
+      updateValidSymbolsForWord(direction);
+      updateValidSymbolsForCell();
       updateCellState();
     }
 
@@ -123,80 +126,79 @@ export default function Cell() {
       }
     }
 
-    function getValidTileNames() {
-      let validTileNames = [];
-      validTiles.forEach((tile) => {
-        validTileNames.push([
-          reverseEnum(Color, tile[0]),
-          reverseEnum(Shape, tile[1]),
+    function getValidSymbolsText() {
+      let validSymbolNames = [];
+      validSymbols.forEach((symbol) => {
+        validSymbolNames.push([
+          reverseEnum(Color, symbol[0]),
+          reverseEnum(Shape, symbol[1]),
         ]);
       });
-      return validTileNames;
+      return validSymbolNames;
     }
 
-    function updateValidTilesForWord(direction) {
+    function updateValidSymbolsForWord(direction) {
       let word;
-      let tiles = [];
+      let symbols = [];
       switch (direction) {
         case Direction.LEFT:
           word = hWord;
-          tiles = hWord.lTiles.concat(hWord.rTiles);
+          symbols = hWord.lSymbols.concat(hWord.rSymbols);
           break;
         case Direction.TOP:
           word = vWord;
-          tiles = vWord.tTiles.concat(vWord.bTiles);
+          symbols = vWord.tSymbols.concat(vWord.bSymbols);
           break;
         case Direction.RIGHT:
           word = hWord;
-          tiles = hWord.lTiles.concat(hWord.rTiles);
+          symbols = hWord.lSymbols.concat(hWord.rSymbols);
           break;
         case Direction.BOTTOM:
           word = vWord;
-          tiles = vWord.tTiles.concat(vWord.bTiles);
+          symbols = vWord.tSymbols.concat(vWord.bSymbols);
           break;
       }
 
-      let t = tiles.length;
+      let t = symbols.length;
 
-      // test get the slot in each matrix for each tile on the list and checks
+      // test get the slot in each matrix for each symbol on the list and checks
       // 1. if they are all equal
-      // 2. if they are equal to the total number of tiles minus 1
-      // these conditions should be necessary & sufficient for the tiles
-      // represented by the entries in the matrix which equal the tile count
-      // to be valid tiles for the word in the given direction
-      let test = tiles.every(
-        (tile) =>
-          word.matrix[tile[0]][tile[1]] ===
-            word.matrix[tiles[0][0]][tiles[0][1]] &&
-          word.matrix[tile[0]][tile[1]] + 1 === t
+      // 2. if they are equal to the total number of symbols minus 1
+      // these conditions should be necessary & sufficient for the symbol
+      // represented by the entries in the matrix which equal the symbol count
+      // to be valid symbols for the word in the given direction
+      let test = symbols.every(
+        (symbol) =>
+          word.matrix[symbol[0]][symbol[1]] ===
+            word.matrix[symbols[0][0]][symbols[0][1]] &&
+          word.matrix[symbol[0]][symbol[1]] + 1 === t
       );
-      console.log(test)
-      word.validTiles = [];
+      word.validSymbols = [];
       if (test) {
         for (let i = 0; i < 6; i++) {
           for (let j = 0; j < 6; j++) {
             if (word.matrix[i][j] == t) {
-              word.validTiles.push([i, j]);
+              word.validSymbols.push([i, j]);
             }
           }
         }
       }
     }
 
-    function updateValidTilesForCell() {
-      //intersect h + v valid tiles
-      validTiles = [];
-      hWord.validTiles.forEach((hTile) => {
-        vWord.validTiles.forEach((vTile) => {
-          if (hTile[0] == vTile[0] && hTile[1] == vTile[1]) {
-            validTiles.push([hTile[0], hTile[1]]);
+    function updateValidSymbolsForCell() {
+      //intersect h + v valid symbols
+      validSymbols = [];
+      hWord.validSymbols.forEach((hSymbol) => {
+        vWord.validSymbols.forEach((vSymbol) => {
+          if (hSymbol[0] == vSymbol[0] && hSymbol[1] == vSymbol[1]) {
+            validSymbols.push([hSymbol[0], hSymbol[1]]);
           }
         });
       });
     }
 
     function updateCellState() {
-      let n = validTiles.length;
+      let n = validSymbols.length;
       if (n == 36) {
         state = CellState.DORMANT;
         return;
@@ -250,13 +252,13 @@ export default function Cell() {
       get matrix() {
         return matrix;
       },
-      get validTiles() {
-        return validTiles;
+      get validSymbols() {
+        return validSymbols;
       },
-      get validTileNames() {
-        return getValidTileNames();
+      get validSymbolsText() {
+        return getValidSymbolsText();
       },
-      addRemoveTile,
+      addRemoveSymbol,
     };
   }
 

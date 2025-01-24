@@ -94,16 +94,23 @@ console.table(board.info);
 bag.fill();
 
 board.addTile(bag.quickPick(Color.RED, Shape.CIRCLE), 0, 0);
+console.table(board.cell(0,-1).checkList.validSymbolsText)
 board.addTile(bag.quickPick(Color.RED, Shape.CLOVER), 0, 1);
+console.table(board.cell(0,-1).checkList.validSymbolsText)
 board.addTile(bag.quickPick(Color.GREEN, Shape.CLOVER), -1, 1);
+console.log(board.cell(0,-1).state)
 board.addTile(bag.quickPick(Color.PURPLE, Shape.CLOVER), -2, 1);
+console.log(board.cell(0,-1).state)
 board.addTile(bag.quickPick(Color.PURPLE, Shape.STAR), -2, 0);
+console.log(board.cell(0,-1).state)
+board.addTile(bag.quickPick(Color.PURPLE, Shape.DIAMOND), -2, -1);
+board.addTile(bag.quickPick(Color.GREEN, Shape.DIAMOND), -1, -1);
+console.table(board.cell(0,-1).checkList.validSymbolsText)
 //board.removeTile(-2, 0);
 
-console.log(`Valid tiles at cell [2,1]`)
-console.table(board.cells[2][1].checkList.validTileNames);
-console.log(`Valid tiles at cell [1,1]`)
-console.table(board.cells[1][1].checkList.validTileNames);
+
+
+console.log(board.cell(0,-1).state)
 //board.addTile(bag.quickPick(Color.RED, Shape.CROSS), -1, 1)
 //board.addTile(bag.quickPick(Color.RED, Shape.DIAMOND), -2, 1)
 //board.addTile(bag.quickPick(Color.BLUE, Shape.CIRCLE), -2, 0)
