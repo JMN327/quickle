@@ -47,7 +47,7 @@ export default function Board() {
     let col = cellsOffsetCol(colToOffset);
 
     // validity checks to be handed to player //
-    if (!tileIsValid(tile, row, col)) {
+    if (!tileIsValidForCell(tile, row, col)) {
       throw new Error("The tile is not on the cells valid tiles list");
     }
     if (!cellIsActive) {
@@ -82,17 +82,21 @@ export default function Board() {
   }
 
   function fixTiles() {
-    cellsByState(CellState.PLACED).forEach((cell) => {
-      cell.state = CellState.FIXED;
+    let hmm = positionsByCellState(CellState.PLACED);
+    console.log(hmm);
+    positionsByCellState(CellState.PLACED).forEach((pos) => {
+      console.log(pos);
+      cells[pos[0]][pos[1]].fixTile();
     });
-    return removedTile;
+    console.log(`PLACED TILES NOW FIXED. Board:`);
+    console.table(info());
   }
 
   function cell(row, col) {
     return cells[row + topOffset][col + leftOffset];
   }
 
-  function cellsByState(state = null) {
+  function cellsByCellState(state = null) {
     if (!Object.values(CellState).includes(state) && !(state == null)) {
       throw new Error("A valid cell state was not passed to the function");
     }
@@ -102,13 +106,13 @@ export default function Board() {
     return cells.flat().filter((cell) => cell.state == state);
   }
 
-  function positionsByState(state = null) {
+  function positionsByCellState(state = null) {
     if (!Object.values(CellState).includes(state) && !(state == null)) {
       throw new Error("A valid cell state was not passed to the function");
     }
     let positionArray = [];
-    for (let i = 0; i < bounds.hSize; i++) {
-      for (let j = 0; j < bounds.vSize; j++) {
+    for (let i = 0; i < bounds.vSize; i++) {
+      for (let j = 0; j < bounds.hSize; j++) {
         if (cells[i][j].state == state || state == null) {
           positionArray.push([i, j]);
         }
@@ -133,7 +137,13 @@ export default function Board() {
     return info;
   }
 
-  function tileIsValid(tile, row, col) {
+  function tileIsValidForCell(tile, row, col) {
+    console.log(
+      `Check tile ${reverseEnum(Color, tile.color)} ${reverseEnum(
+        Shape,
+        tile.shape
+      )} is valid for cell [${row},${col}]`
+    );
     return cells[row][col].checkList.validSymbols.some(
       (validTile) => validTile[0] == tile.color && validTile[1] == tile.shape
     );
@@ -143,27 +153,62 @@ export default function Board() {
     return cells[row][col].state == CellState.ACTIVE;
   }
 
-  function playableCells(tile, rowToOffset, colToOffset) {
-    if (!tile || !rowToOffset || !rowToOffset) {
-      throw new Error("variables are not optional. Please provide all three");
+  function playableCells(tile) {
+    if (!tile) {
+      throw new Error("No tile provided");
     }
-    let row = cellsOffsetRow(rowToOffset);
-    let col = cellsOffsetCol(colToOffset);
-
     let playableCells = [];
-
-    if (cellsByState(CellState.PLACED).length == 0) {
+    let placedTileCount = cellsByCellState(CellState.PLACED).length;
+    if (placedTileCount == 0) {
       for (let i = 0; i < bounds.vSize; i++) {
         for (let j = 0; j < bounds.hSize; j++) {
           if (cells[i][j].state != CellState.ACTIVE) {
-            break;
+            console.log(`[${i},${j}] state: ${cells[i][j].state}`);
+          } else if (!tileIsValidForCell(tile[0], i, j)) { ////more problems with tiles coming out of bag as array
+            console.log(`[${i},${j}] not valid`);
+          } else {
+            playableCells.push([, i, j]);
           }
-          if (!tileIsValid(tile, row, col)) {
-            break;
-          }
-          playableCells.push([i, j]);
         }
       }
+      return playableCells;
+    }
+
+    if (placedTileCount == 1) {
+      let placedCells = positionsByCellState(CellState.PLACED);
+      let fromRow = placedCells[0][0];
+      let fromCol = placedCells[0][1];
+      let checkCells = [];
+      Object.values(Direction).forEach((direction) => {
+        checkCells.push(radiate(direction, fromRow, fromCol).activeCellFound);
+      });
+      checkCells.filter((cell) => {
+        tileIsValidForCell(tile, cell.row, cell.col);
+      });
+      playableCells = checkCells;
+      console.table(playableCells);
+      return playableCells;
+    }
+
+    if (placedTileCount > 1) {
+      let directions = [];
+      let placedCells = positionsByCellState(CellState.PLACED);
+      let fromRow = placedCells[0][0];
+      let fromCol = placedCells[0][1];
+      if ((placedCells[0][0] = placedCells[1][0])) {
+        directions = [Direction.LEFT, Direction.RIGHT];
+      } else {
+        directions = [Direction.TOP, Direction.BOTTOM];
+      }
+      let checkCells = [];
+      directions.forEach((direction) => {
+        checkCells.push(radiate(direction, fromRow, fromCol).activeCellFound);
+      });
+      checkCells.filter((cell) => {
+        tileIsValidForCell(tile, cell.row, cell.col);
+      });
+      playableCells = checkCells;
+      console.table(playableCells);
       return playableCells;
     }
 
@@ -239,7 +284,7 @@ export default function Board() {
     let hTilesToAddRemove = [tile];
     hTilesToAddRemove.concat(l.tilesToAddRemoveIfUpdatingChecklists);
     hTilesToAddRemove.concat(r.tilesToAddRemoveIfUpdatingChecklists);
-    let vTilesToAddRemove = [tile]
+    let vTilesToAddRemove = [tile];
     vTilesToAddRemove.concat(b.tilesToAddRemoveIfUpdatingChecklists);
     vTilesToAddRemove.concat(b.tilesToAddRemoveIfUpdatingChecklists);
     let lCell = l.activeCellFound;
@@ -290,7 +335,7 @@ export default function Board() {
           direction,
           addRemove,
           tile.color,
-          tile.shape,
+          tile.shape
         );
       });
 
@@ -372,12 +417,7 @@ export default function Board() {
   }
 
   function AddRemoveBoardEdges(direction, addRemove) {
-    if (
-      !Object.values(Direction).includes(direction) ||
-      !direction ||
-      direction == Direction.HORIZONTAL ||
-      direction == Direction.VERTICAL
-    ) {
+    if (!Object.values(Direction).includes(direction) || !direction) {
       throw new Error("A valid direction was not passed to the function");
     }
     //update bounds
@@ -450,8 +490,9 @@ export default function Board() {
     get info() {
       return info();
     },
-    cellsByState,
-    positionsByState,
+    cellsByState: cellsByCellState,
+    positionsByState: positionsByCellState,
+    playableCells,
     addTile,
     removeTile,
     fixTiles,
