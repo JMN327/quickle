@@ -5,7 +5,9 @@ export default function Player() {
   // player handles the movement of tiles and owns a score sheet
 
   // tile moving to board validity check functions to be handled
-  // here and removed from board
+  // here and removed from board.  BUT board needs to transmit
+  // validity for a given tile based on currently placed tiles
+  // - so another board function needed
 
     let players = [
       {
