@@ -95,11 +95,19 @@ bag.fill();
 
 board.addTile(bag.quickPick(Color.RED, Shape.CIRCLE), 0, 0);
 board.addTile(bag.quickPick(Color.RED, Shape.SQUARE), 0, 1);
-board.removeTile(0, 1);
 board.fixTiles()
-console.table(board.playableCells(bag.quickPick(Color.RED, Shape.DIAMOND)))
+board.addTile(bag.quickPick(Color.BLUE, Shape.SQUARE), -1, 1);
+board.addTile(bag.quickPick(Color.GREEN, Shape.SQUARE), 1, 1);
+board.fixTiles()
+board.addTile(bag.quickPick(Color.RED, Shape.SQUARE), -1, 0);
+board.addTile(bag.quickPick(Color.RED, Shape.CLOVER), -2, 0);
+board.addTile(bag.quickPick(Color.RED, Shape.DIAMOND), -3, 0);
+board.addTile(bag.quickPick(Color.RED, Shape.STAR), -4, 0);
+board.addTile(bag.quickPick(Color.RED, Shape.CROSS), -5, 0);
 
-console.table(board.cell(0,-1).checkList.validSymbolsText)
-console.table(board.cell(0,-1).state)
+
+//console.table(board.playableCells(bag.quickPick(Color.RED, Shape.DIAMOND)))
+
+
 console.table(board.info)
 

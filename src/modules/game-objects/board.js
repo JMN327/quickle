@@ -62,6 +62,8 @@ export default function Board() {
       topOffset += direction == Direction.TOP ? 1 : 0;
     });
     updateCheckLists(AddRemove.ADD, row, col, tile);
+
+    console.log(`SCORE IS ${getScore()}`);
   }
 
   function removeTile(rowToOffset, colToOffset) {
@@ -80,18 +82,66 @@ export default function Board() {
   }
 
   function fixTiles() {
-    let hmm = positionsByCellState(CellState.PLACED);
-    console.log(hmm);
     positionsByCellState(CellState.PLACED).forEach((pos) => {
-      console.log(pos);
       cells[pos[0]][pos[1]].fixTile();
     });
     console.log(`PLACED TILES NOW FIXED. Board:`);
     console.table(info());
   }
 
+  function getScore() {
+    let score = 0;
+    let placedCells = positionsByCellState(CellState.PLACED);
+    console.log(
+      `GETTING SCORE FOR PLACED CELLS: ${JSON.stringify(placedCells)}`
+    );
+
+    if (placedCells.length == 1) {
+      score += stem(Direction.LEFT, placedCells[0][0], placedCells[0][1]);
+      score += stem(Direction.TOP, placedCells[0][0], placedCells[0][1]);
+    } else {
+      if (placedCells[0][0] == placedCells[1][0]) {
+        score += stem(Direction.LEFT, placedCells[0][0], placedCells[0][1]);
+        placedCells.forEach((pos) => {
+          score += stem(Direction.TOP, pos[0], pos[1]);
+        });
+      } else {
+        score += stem(Direction.TOP, placedCells[0][0], placedCells[0][1]);
+        placedCells.forEach((pos) => {
+          score += stem(Direction.LEFT, pos[0], pos[1]);
+        });
+      }
+    }
+    return score;
+
+    function stem(direction, row, col) {
+      let directions;
+      let radiateScore = 0;
+      let logString = "";
+      switch (direction) {
+        case Direction.LEFT:
+          directions = [Direction.LEFT, Direction.RIGHT];
+          logString = "horizontally"
+          break;
+        case Direction.TOP:
+          directions = [Direction.TOP, Direction.BOTTOM];
+          logString = "vertically"
+          break;
+      }
+      directions.forEach((direction) => {
+        radiateScore += radiate(direction, row, col).score;
+      });
+      radiateScore = radiateScore != 0 ? radiateScore + 1 : radiateScore;
+      let bingoCheck = (score) => (score == 6 ? 12 : score);
+      radiateScore = bingoCheck(radiateScore);
+      console.log(
+        `Radiate Score for cell [${row},${col}] ${logString} is ${radiateScore}`
+      );
+      return radiateScore;
+    }
+  }
+
   function cell(offsetRow, offsetCol) {
-    console.log(offsetRow + topOffset,offsetCol + leftOffset)
     return cells[offsetRow + topOffset][offsetCol + leftOffset];
   }
 
@@ -163,7 +213,8 @@ export default function Board() {
         for (let j = 0; j < bounds.hSize; j++) {
           if (cells[i][j].state != CellState.ACTIVE) {
             console.log(`[${i},${j}] state: ${cells[i][j].state}`);
-          } else if (!tileIsValidForCell(tile[0], i, j)) { ////more problems with tiles coming out of bag as array
+          } else if (!tileIsValidForCell(tile[0], i, j)) {
+            ////more problems with tiles coming out of bag as array
             console.log(`[${i},${j}] not valid`);
           } else {
             playableCells.push([, i, j]);
@@ -194,7 +245,7 @@ export default function Board() {
       let placedCells = positionsByCellState(CellState.PLACED);
       let fromRow = placedCells[0][0];
       let fromCol = placedCells[0][1];
-      if ((placedCells[0][0] = placedCells[1][0])) {
+      if (placedCells[0][0] == placedCells[1][0]) {
         directions = [Direction.LEFT, Direction.RIGHT];
       } else {
         directions = [Direction.TOP, Direction.BOTTOM];
@@ -362,6 +413,7 @@ export default function Board() {
     let newRow = row;
     let activeCellFound = { direction: null, row: null, col: null };
     let tilesToAddRemoveIfUpdatingChecklists = [];
+    let score = 0;
     switch (direction) {
       case Direction.LEFT:
         condition = () => {
@@ -404,15 +456,15 @@ export default function Board() {
         cells[newRow][newCol].state == CellState.FIXED
       ) {
         tilesToAddRemoveIfUpdatingChecklists.push(cells[newRow][newCol].tile);
+        score++;
       } else {
         break;
       }
     }
-    //console.log(`Radiated ${direction} to cell [${newRow},${newCol}]`);
     activeCellFound.direction = direction;
     activeCellFound.row = newRow;
     activeCellFound.col = newCol;
-    return { activeCellFound, tilesToAddRemoveIfUpdatingChecklists };
+    return { activeCellFound, tilesToAddRemoveIfUpdatingChecklists, score };
   }
 
   function AddRemoveBoardEdges(direction, addRemove) {
@@ -489,8 +541,8 @@ export default function Board() {
     get info() {
       return info();
     },
-    cellsByState: cellsByCellState,
-    positionsByState: positionsByCellState,
+    cellsByCellState,
+    positionsByCellState,
     playableCells,
     addTile,
     removeTile,
