@@ -79,6 +79,7 @@ export default function Board() {
       leftOffset -= direction == Direction.LEFT ? 1 : 0;
       topOffset -= direction == Direction.TOP ? 1 : 0;
     });
+    console.log(`SCORE IS ${getScore()}`)
   }
 
   function fixTiles() {
@@ -316,10 +317,10 @@ export default function Board() {
   function updateCheckLists(addRemove, row, col, tile) {
     console.log("NEW CHECKLIST UPDATE");
     console.log(
-      `Tile played: ${reverseEnum(Color, tile.color)} ${reverseEnum(
+      `Tile added/removed: ${reverseEnum(Color, tile.color)} ${reverseEnum(
         Shape,
         tile.shape
-      )} Board BEFORE updates:`
+      )} Board BEFORE checklist updates:`
     );
     console.table(info());
 

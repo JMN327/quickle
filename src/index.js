@@ -104,6 +104,7 @@ board.addTile(bag.quickPick(Color.RED, Shape.CLOVER), -2, 0);
 board.addTile(bag.quickPick(Color.RED, Shape.DIAMOND), -3, 0);
 board.addTile(bag.quickPick(Color.RED, Shape.STAR), -4, 0);
 board.addTile(bag.quickPick(Color.RED, Shape.CROSS), -5, 0);
+board.removeTile(-5,0)
 
 
 //console.table(board.playableCells(bag.quickPick(Color.RED, Shape.DIAMOND)))
