@@ -15,7 +15,7 @@ export default function Cell() {
   }
 
   function addTile(movingTile) {
-    if (!(state = CellState.ACTIVE)) {
+    if (!(state == CellState.ACTIVE)) {
       throw new Error(
         "You cannot place a tile in a cell which is not in 'active' state"
       );
@@ -26,7 +26,8 @@ export default function Cell() {
   }
 
   function removeTile() {
-    if (!(state = CellState.PLACED)) {
+    console.log(`Removing tile in state: ${state}`)
+    if (!(state == CellState.PLACED)) {
       throw new Error(
         "You cannot pick a tile up from a cell which is not in 'placed' state"
       );
@@ -39,7 +40,7 @@ export default function Cell() {
   }
 
   function fixTile() {
-    if (!(state = CellState.PLACED)) {
+    if (!(state == CellState.PLACED)) {
       throw new Error("You cannot fix a tile which is not in 'placed' state");
     }
     tile.state = TileState.FIXED;
@@ -48,46 +49,56 @@ export default function Cell() {
 
   function CheckList() {
     // symbols as abstract [color,shape] pairs taken from the tiles
-    // are tested for validity against a 6 x 6
-    // matrix with 6 colors for rows and  6 shapes for columns.
+    // are tested for validity against two 6 x 6 matrices
+    // with 6 colors for rows and  6 shapes for columns
+    // (one for the horizontal words and one for vertical).
     // When a tile is placed, cells which are influenced
     // by it have their check list updated.
+    // the valid tiles for the cell are ultimately returned as the
+    // intersection of the two matrices
 
     let hWord = {
       matrix: new Array(6).fill().map(() => new Array(6).fill(0)),
       validSymbols: [],
-      lSymbols: [],
-      rSymbols: [],
+      symbols1: [],
+      symbols2: [],
     };
     let vWord = {
       matrix: new Array(6).fill().map(() => new Array(6).fill(0)),
       validSymbols: [],
-      tSymbols: [],
-      bSymbols: [],
+      symbols1: [],
+      symbols2: [],
     };
     let validSymbols = [];
-    updateValidSymbolsForWord(Direction.LEFT);
-    updateValidSymbolsForWord(Direction.TOP);
+    updateValidSymbolsForWord(hWord);
+    updateValidSymbolsForWord(vWord);
     updateValidSymbolsForCell();
 
     function addRemoveSymbol(direction, addRemove, color, shape) {
       let symbols;
+      let word;
+      let increment;
+
       switch (direction) {
         case Direction.LEFT:
-          symbols = hWord.rSymbols;
+          word = hWord
+          symbols = hWord.symbols2;
           break;
-
         case Direction.TOP:
-          symbols = vWord.bSymbols;
+          word = vWord
+          symbols = vWord.symbols2;
           break;
         case Direction.RIGHT:
-          symbols = hWord.lSymbols;
+          word = hWord
+          symbols = hWord.symbols1;
           break;
-
         case Direction.BOTTOM:
-          symbols = vWord.tSymbols;
+          word = vWord
+          symbols = vWord.symbols1;
           break;
       }
+      let matrix = word.matrix
+
       switch (addRemove) {
         case AddRemove.ADD:
           console.log(`Checking if symbol color ${color}, shape ${shape} is already in the list: ${JSON.stringify(symbols)}`)
@@ -97,6 +108,7 @@ export default function Cell() {
           }
           console.log(`Symbol not in the list.  Adding it and updating checklist now`)
           symbols.push([color, shape]);
+          increment = 1
           break;
         case AddRemove.REMOVE:
           let symbolIndex = symbols.findIndex((symbol) => symbol[0] == color && symbol[1] == shape);
@@ -104,11 +116,12 @@ export default function Cell() {
             throw new Error("The symbol to remove is not on the checklist");
           }
           symbols.splice(symbolIndex, 1);
+          increment = -1
           break;
-
       }
-      updateMatrix(direction, addRemove, color, shape);
-      updateValidSymbolsForWord(direction);
+
+      updateMatrix(matrix, increment, color, shape);
+      updateValidSymbolsForWord(word);
       updateValidSymbolsForCell();
       updateCellState();
     }
@@ -137,28 +150,8 @@ export default function Cell() {
       return validSymbolNames;
     }
 
-    function updateValidSymbolsForWord(direction) {
-      let word;
-      let symbols = [];
-      switch (direction) {
-        case Direction.LEFT:
-          word = hWord;
-          symbols = hWord.lSymbols.concat(hWord.rSymbols);
-          break;
-        case Direction.TOP:
-          word = vWord;
-          symbols = vWord.tSymbols.concat(vWord.bSymbols);
-          break;
-        case Direction.RIGHT:
-          word = hWord;
-          symbols = hWord.lSymbols.concat(hWord.rSymbols);
-          break;
-        case Direction.BOTTOM:
-          word = vWord;
-          symbols = vWord.tSymbols.concat(vWord.bSymbols);
-          break;
-      }
-
+    function updateValidSymbolsForWord(word) {
+      let symbols = [...word.symbols1, ...word.symbols2]
       let t = symbols.length;
 
       // test get the slot in each matrix for each symbol on the list and checks
@@ -210,35 +203,12 @@ export default function Cell() {
       state = CellState.ACTIVE;
     }
 
-    function updateMatrix(direction, addRemove, color, shape) {
-      let matrix;
-      let inc = 0;
-      switch (addRemove) {
-        case AddRemove.ADD:
-          inc = 1;
-          break;
-        case AddRemove.REMOVE:
-          inc = -1;
-          break;
-      }
-      switch (direction) {
-        case Direction.LEFT:
-          matrix = hWord.matrix;
-          break;
-        case Direction.TOP:
-          matrix = vWord.matrix;
-          break;
-        case Direction.RIGHT:
-          matrix = hWord.matrix;
-          break;
-        case Direction.BOTTOM:
-          matrix = vWord.matrix;
-          break;
-      }
+    function updateMatrix(matrix, increment, color, shape) {
+      
       for (let i = 0; i < 6; i++) {
         for (let j = 0; j < 6; j++) {
           if ((i == color && j != shape) || (i != color && j == shape)) {
-            matrix[i][j] += inc;
+            matrix[i][j] += increment;
           }
         }
       }

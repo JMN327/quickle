@@ -68,16 +68,14 @@ export default function Board() {
     console.log(`REMOVING TILE at [${rowToOffset},${colToOffset}]`);
     let row = cellsOffsetRow(rowToOffset);
     let col = cellsOffsetCol(colToOffset);
-    console.log(leftOffset, topOffset);
-    console.log(row);
     let removedTile = cells[row][col].removeTile();
     console.log(removedTile);
     updateCheckLists(AddRemove.REMOVE, row, col, removedTile);
     let edges = checkForEdgeShrink(row, col);
     edges.forEach((direction) => {
       AddRemoveBoardEdges(direction, AddRemove.REMOVE);
-      leftOffset += direction == Direction.LEFT ? 1 : 0;
-      topOffset += direction == Direction.TOP ? 1 : 0;
+      leftOffset -= direction == Direction.LEFT ? 1 : 0;
+      topOffset -= direction == Direction.TOP ? 1 : 0;
     });
   }
 
@@ -92,8 +90,9 @@ export default function Board() {
     console.table(info());
   }
 
-  function cell(row, col) {
-    return cells[row + topOffset][col + leftOffset];
+  function cell(offsetRow, offsetCol) {
+    console.log(offsetRow + topOffset,offsetCol + leftOffset)
+    return cells[offsetRow + topOffset][offsetCol + leftOffset];
   }
 
   function cellsByCellState(state = null) {
@@ -127,7 +126,7 @@ export default function Board() {
       .map(() => new Array(bounds.hSize).fill(""));
     for (let i = 0; i < bounds.vSize; i++) {
       for (let j = 0; j < bounds.hSize; j++) {
-        info[i][j] = `${cells[i][j]?.state}${
+        info[i][j] = `${cells[i][j].state} ${
           reverseEnum(Color, cells[i][j]?.tile?.color) || ""
         } ${cells[i][j]?.tile?.color || ""} ${
           reverseEnum(Shape, cells[i][j]?.tile?.shape) || ""
