@@ -1,6 +1,6 @@
-import { Color } from "./enums/color";
-import { Shape } from "./enums/shape";
-import { TileState } from "./enums/tile-state";
+import { Color } from "../enums/color";
+import { Shape } from "../enums/shape";
+import { TileState } from "../enums/tile-state";
 import Tile from "./tile";
 
 export default function Bag() {

@@ -10,11 +10,11 @@ import ZoomPanWindow from "./modules/UI/ui-zoom-pan-window.js";
 import Bag from "./modules/game-objects/bag.js";
 import Rack from "./modules/game-objects/rack.js";
 import Cell from "./modules/game-objects/cell.js";
-import { Color } from "./modules/game-objects/enums/color.js";
-import { Shape } from "./modules/game-objects/enums/shape.js";
-import { Direction } from "./modules/game-objects/enums/direction.js";
+import { Color } from "./modules/enums/color.js";
+import { Shape } from "./modules/enums/shape.js";
+import { Direction } from "./modules/enums/direction.js";
 import Board from "./modules/game-objects/board.js";
-import { CellState } from "./modules/game-objects/enums/cell-state.js";
+import { CellState } from "./modules/enums/cell-state.js";
 
 console.log("Hello World!)");
 console.log(`Local Storage available: ${storageAvailable("localStorage")}`);

@@ -1,9 +1,9 @@
 import Cell from "./cell";
-import { CellState } from "./enums/cell-state";
-import { Direction } from "./enums/direction";
-import { AddRemove } from "./enums/addRemove";
-import { Color } from "./enums/color";
-import { Shape } from "./enums/shape";
+import { CellState } from "../enums/cell-state";
+import { Direction } from "../enums/direction";
+import { AddRemove } from "../enums/addRemove";
+import { Color } from "../enums/color";
+import { Shape } from "../enums/shape";
 
 export default function Board() {
   let leftOffset = 0;

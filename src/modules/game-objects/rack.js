@@ -1,4 +1,4 @@
-import { TileState } from "./enums/tile-state";
+import { TileState } from "../enums/tile-state";
 
 export default function Rack() {
 

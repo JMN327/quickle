@@ -1,45 +1,46 @@
-let players = [
-    {
-      name: "Player One",
-      rack: [],
-      score: 0,
-      index: 0,
+import { PlayerType } from "../enums/player-type";
+import { Player } from "../game-objects/player";
+
+export default function Players(humanCount, botCount) {
+  if (humanCount > 4 || humanCount < 2) {
+    throw new Error("the count of human players is not valid");
+  }
+  if (humanCount + botCount > 4) {
+    throw new Error("the count of human and bot players is not valid");
+  }
+  let players = [];
+  for (let index = 0; index < humanCount; index++) {
+    players.push(Player(PlayerType.HUMAN));
+  }
+  for (let index = 0; index < botCount; index++) {
+    players.push(Player(PlayerType.BOT));
+  }
+  randomizePlayerOrder();
+
+  let activePlayerIndex = 0;
+  function switchTurn() {
+    activePlayerIndex = (activePlayerIndex + 1) % 4;
+  }
+
+  function randomizePlayerOrder() {
+    let m = players.length;
+    let t;
+    let i;
+    while (m) {
+      i = Math.floor(Math.random() * m--);
+      t = players[m];
+      players[m] = players[i];
+      players[i] = t;
+    }
+  }
+
+  return {
+    get players() {
+      return players;
     },
-    {
-      name: "Player Two",
-      rack: [],
-      score: 0,
-      index: 1,
+    get active() {
+      return players[activePlayerIndex];
     },
-  ];
-
-  let startPlayer = Math.round(Math.random());
-  let activePlayer = players[startPlayer];
-
-  const switchStartPlayer = () => {
-    startPlayer = startPlayer === players[0] ? players[1] : players[0];
-    activePlayer = startPlayer;
+    switchTurn,
   };
-
-  const getActivePlayer = () => activePlayer;
-
-  const switchPlayerTurn = () => {
-    activePlayer = activePlayer === players[0] ? players[1] : players[0];
-  };
-
-  const setPlayerNames = (playerOneName = "Player One" , playerTwoName = "Player Two" ) => {
-    players[0].name = playerOneName 
-    players[1].name = playerTwoName
-  };
-  const setPlayerMarks = (playerOneMark, playerTwoMark) => {
-    players[0].mark = playerOneMark;
-    players[1].mark = playerTwoMark;
-  };
-  const incrementScores = (playerIndex) => {
-    players[playerIndex].score++;
-  };
-  const resetScores = () => {
-    players[0].score = 0;
-    players[1].score = 0;
-  };
-  const getPlayers = () => players;
+}

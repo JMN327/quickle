@@ -1,9 +1,9 @@
-import { Color } from "./enums/color";
-import { Shape } from "./enums/shape";
-import { CellState } from "./enums/cell-state";
-import { TileState } from "./enums/tile-state";
-import { Direction } from "./enums/direction";
-import { AddRemove } from "./enums/addRemove";
+import { Color } from "../enums/color";
+import { Shape } from "../enums/shape";
+import { CellState } from "../enums/cell-state";
+import { TileState } from "../enums/tile-state";
+import { Direction } from "../enums/direction";
+import { AddRemove } from "../enums/addRemove";
 
 export default function Cell() {
   let state = CellState.DORMANT;
