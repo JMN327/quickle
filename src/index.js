@@ -15,6 +15,8 @@ import { Shape } from "./modules/enums/shape.js";
 import { Direction } from "./modules/enums/direction.js";
 import Board from "./modules/game-objects/board.js";
 import { CellState } from "./modules/enums/cell-state.js";
+import Game from "./modules/game-controls/game.js";
+import { PlayerType } from "./modules/enums/player-type.js";
 
 console.log("Hello World!)");
 console.log(`Local Storage available: ${storageAvailable("localStorage")}`);
@@ -51,21 +53,14 @@ addTileElement("star", "purple", pallet)
 
 zpw.appendChild(pallet) */
 
-/* let bag = Bag()
+let bag = Bag()
 bag.fill()
 bag.shuffle()
 let rack = Rack()
+console.table(rack.spaces)
 rack.addTiles(bag.draw(rack.spaces.count))
 console.table(rack.tiles)
-rack.rearrange(0,1)
-console.table(rack.tiles)
-rack.xSelect(2)
-console.table(rack.tiles)
-let playedTile = rack.selection.remove() // cell.tile = rack.playSelected()
-console.table(playedTile)
-console.table(rack.tiles)
-rack.addTiles(bag.draw(rack.spaces.count))
-console.table(rack.tiles) */
+console.log(rack.longestWordLength())
 
 /* let board = Board()
 console.log(board.positions())
@@ -87,7 +82,7 @@ cell.checkList.addTile(Direction.VERTICAL, Color.RED, Shape.DIAMOND);
 console.table(cell.checkList.validTileNames);
 console.table(cell.checkList.matrix); */
 
-let bag = Bag();
+/* let bag = Bag();
 let rack = Rack();
 let board = Board();
 console.table(board.info);
@@ -104,11 +99,10 @@ board.addTile(bag.quickPick(Color.RED, Shape.CLOVER), -2, 0);
 board.addTile(bag.quickPick(Color.RED, Shape.DIAMOND), -3, 0);
 board.addTile(bag.quickPick(Color.RED, Shape.STAR), -4, 0);
 board.addTile(bag.quickPick(Color.RED, Shape.CROSS), -5, 0);
-board.removeTile(-5,0)
-
+board.removeTile(-5,0) */
 
 //console.table(board.playableCells(bag.quickPick(Color.RED, Shape.DIAMOND)))
 
-
-console.table(board.info)
-
+/* let game = Game();
+game.addPlayer({ PlayerType: PlayerType.HUMAN, name: "Stan" });
+console.table(game.board.playableCells(game.bag.quickPick(Color.BLUE,Shape.CIRCLE))); */

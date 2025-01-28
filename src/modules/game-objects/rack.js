@@ -1,10 +1,10 @@
+import { Color } from "../enums/color";
 import { TileState } from "../enums/tile-state";
 
 export default function Rack() {
-
-  let tiles = new Array(6)
-  tiles.fill(null)
-  Object.seal(tiles)
+  let tiles = new Array(6);
+  tiles.fill(null);
+  Object.seal(tiles);
 
   function select(i) {
     if (i > 5 || i < 0) {
@@ -37,9 +37,9 @@ export default function Rack() {
     if (from > 5 || from < 0 || to > 5 || to < 0) {
       throw new Error("Invalid indexes for rearrangement");
     }
-    let gap = tiles[from]
-    tiles[from] = tiles[to]
-    tiles[to] = gap
+    let gap = tiles[from];
+    tiles[from] = tiles[to];
+    tiles[to] = gap;
   }
 
   function getSelection() {
@@ -48,7 +48,7 @@ export default function Rack() {
       if (tile == null) {
         return;
       }
-      if ((tile.state == TileState.SELECTED)) {
+      if (tile.state == TileState.SELECTED) {
         selected.push(index);
       }
     });
@@ -76,8 +76,8 @@ export default function Rack() {
       );
     }
     for (let i = 0; i < arr.length; i++) {
-      tiles.splice(emptySpaces[i],1,arr[i])
-      tiles[emptySpaces[i]].state = TileState.RACK
+      tiles.splice(emptySpaces[i], 1, arr[i]);
+      tiles[emptySpaces[i]].state = TileState.RACK;
     }
   }
 
@@ -94,9 +94,45 @@ export default function Rack() {
     return removedTileArr;
   }
 
+  function longestWordLength() {
+    let colorCounts = {};
+    let maxColor = tiles[0];
+    let maxColorCount = 1;
+    for (let i = 0; i < 6; i++) {
+      let color = tiles[i].color;
+      if (colorCounts[color] == null)
+        colorCounts[color] = { count: 1, shapes: [tiles[i].shape] };
+      else if (!colorCounts[color].shapes.includes(tiles[i].shape)) {
+        colorCounts[color].count++;
+        colorCounts[color].shapes.push(tiles[i].shape);
+      }
+      if (colorCounts[color].count > maxColorCount) {
+        maxColor = color;
+        maxColorCount = colorCounts[color].count;
+      }
+    }
+    let shapeCounts = {};
+    let maxShape = tiles[0];
+    let maxShapeCount = 1;
+    for (let i = 0; i < 6; i++) {
+      let shape = tiles[i].shape;
+      if (shapeCounts[shape] == null)
+        shapeCounts[shape] = { count: 1, colors: [tiles[i].color] };
+      else if (!shapeCounts[shape].colors.includes(tiles[i].color)) {
+        shapeCounts[shape].count++;
+        shapeCounts[shape].colors.push(tiles[i].color);
+      }
+      if (shapeCounts[shape].count > maxShapeCount) {
+        maxShape = shape;
+        maxShapeCount = shapeCounts[shape].count;
+      }
+    }
+    return Math.max(maxColorCount, maxShapeCount);
+  }
+
   return {
     get tiles() {
-      return tiles
+      return tiles;
     },
     addTiles,
     removeSelection,
@@ -105,11 +141,16 @@ export default function Rack() {
     xSelect,
     deselectSingle,
     deselectAll,
+    longestWordLength,
     get spaces() {
-      return {indexArr:getSpaces(), count:getSpaces().length};
+      return { indexArr: getSpaces(), count: getSpaces().length };
     },
     get selection() {
-      return {indexArr:getSelection(), count:getSelection().length, remove:removeSelection};
+      return {
+        indexArr: getSelection(),
+        count: getSelection().length,
+        remove: removeSelection,
+      };
     },
   };
 }

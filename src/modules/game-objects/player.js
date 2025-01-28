@@ -1,7 +1,7 @@
 import { PlayerType } from "../enums/player-type";
 import Rack from "./rack";
 
-export default function Player(playerType = PlayerType.HUMAN) {
+export default function Player(playerType = PlayerType.HUMAN, name = "Human") {
   // MOST OF THIS TO BE MOVED TO PLAYER MANAGER CONTROLLER
 
   // player handles the movement of tiles and owns a score sheet
@@ -12,7 +12,6 @@ export default function Player(playerType = PlayerType.HUMAN) {
   // - so another board function needed
 
   let rack = Rack();
-  let name;
 
   let score = {
     turnScores: [],

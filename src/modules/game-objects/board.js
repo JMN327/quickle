@@ -218,7 +218,7 @@ export default function Board() {
             ////more problems with tiles coming out of bag as array
             console.log(`[${i},${j}] not valid`);
           } else {
-            playableCells.push([, i, j]);
+            playableCells.push([i, j]);
           }
         }
       }
@@ -231,7 +231,7 @@ export default function Board() {
       let fromCol = placedCells[0][1];
       let checkCells = [];
       Object.values(Direction).forEach((direction) => {
-        checkCells.push(radiate(direction, fromRow, fromCol).activeCellFound);
+        checkCells.push({row, col} = radiate(direction, fromRow, fromCol).activeCellFound);
       });
       checkCells.filter((cell) => {
         tileIsValidForCell(tile, cell.row, cell.col);
@@ -253,7 +253,7 @@ export default function Board() {
       }
       let checkCells = [];
       directions.forEach((direction) => {
-        checkCells.push(radiate(direction, fromRow, fromCol).activeCellFound);
+        checkCells.push({row, col} = radiate(direction, fromRow, fromCol).activeCellFound);
       });
       checkCells.filter((cell) => {
         tileIsValidForCell(tile, cell.row, cell.col);
