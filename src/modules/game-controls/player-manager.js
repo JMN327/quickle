@@ -1,6 +1,6 @@
 import Player from "../game-objects/player.js";
 
-export default function Players() {
+export default function PlayerManager() {
   let activePlayerIndex = 0;
   let players = [];
 
@@ -42,6 +42,9 @@ export default function Players() {
   }
 
   return {
+    get players() {
+      return players
+    },
     get active() {
       return players[activePlayerIndex] || null;
     },

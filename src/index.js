@@ -53,13 +53,13 @@ addTileElement("star", "purple", pallet)
 
 zpw.appendChild(pallet) */
 
-let bag = Bag()
+/* let bag = Bag()
 bag.fill()
 bag.shuffle()
 let rack = Rack()
 rack.addTiles(bag.draw(rack.spaces.count))
 console.table(rack.tiles)
-console.log(rack.longestWordLength())
+console.log(rack.longestWordLength()) */
 
 /* let board = Board()
 console.log(board.positions())
@@ -102,6 +102,10 @@ board.removeTile(-5,0) */
 
 //console.table(board.playableCells(bag.quickPick(Color.RED, Shape.DIAMOND)))
 
-/* let game = Game();
-game.addPlayer({ PlayerType: PlayerType.HUMAN, name: "Stan" });
-console.table(game.board.playableCells(game.bag.quickPick(Color.BLUE,Shape.CIRCLE))); */
+let game = Game();
+game.addPlayer({PlayerType:PlayerType.HUMAN,name:"Elspeth"})
+game.addPlayer({PlayerType:PlayerType.HUMAN,name:"Jinny"})
+game.addPlayer({PlayerType:PlayerType.HUMAN,name:"Rose"})
+game.startGame()
+console.log(game.currentPlayer.name)
+

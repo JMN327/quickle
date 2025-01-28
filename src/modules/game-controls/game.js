@@ -1,4 +1,4 @@
-import Players from "./players";
+import PlayerManager from "./player-manager.js";
 import Board from "../game-objects/board";
 import Bag from "../game-objects/bag";
 import { GameState } from "../enums/game-state.js";
@@ -9,32 +9,32 @@ export default function Game() {
   let board = Board();
   let bag = Bag();
   bag.fill();
-  let players = Players();
+  bag.shuffle();
+  let pm = PlayerManager();
   let currentPlayer;
 
   //PRE_GAME
   function addPlayer({ PlayerType, name }) {
     checkGameState(GameState.PRE_GAME);
-    players.addPlayer({ PlayerType, name });
+    pm.addPlayer({ PlayerType, name });
   }
 
   function startGame() {
     checkGameState(GameState.PRE_GAME);
-    if (players.playerCount < 2) {
+    if (pm.playerCount < 2) {
       throw new Error("Cannot start a game with less than two players");
     }
-    players.randomizePlayerOrder;
-    players.forEach((player) => {
+    pm.randomizePlayerOrder();
+    pm.players.forEach((player) => {
       player.rack.addTiles(bag.draw(player.rack.spaces.count));
     });
     let startWordLengths = [];
-    players.forEach((player) => {
-      startWordLengths.push(player.rack.longestWordLength);
+    pm.players.forEach((player) => {
+      startWordLengths.push(player.rack.longestWordLength());
     });
-    players.setStartPlayer(
-      startWordLengths.indexOf(Math.max(...startWordLengths))
-    );
-    currentPlayer = players.active;
+    console.log(startWordLengths.indexOf(Math.max(...startWordLengths)));
+    pm.setStartPlayer(startWordLengths.indexOf(Math.max(...startWordLengths)));
+    currentPlayer = pm.active;
     switchGameState(GameState.PLAYER_TURN);
   }
 
@@ -58,22 +58,21 @@ export default function Game() {
   // SWAP_MODE
 
   function toggleSwapMode() {
-    // puts current players rack into swapmode (need to implement)
+    // puts current players rack into swapMode (need to implement)
   }
 
   function swapSelect(index) {
-    // selects the tile at index for swapping 
+    // selects the tile at index for swapping
   }
 
   function swapSelection() {
     // swaps all the selected tiles for new ones in the bag
   }
 
-
   function nextTurn() {
     checkGameState(GameState.PLAYER_TURN);
-    players.nextPlayer;
-    currentPlayer = players.active;
+    pm.nextPlayer;
+    currentPlayer = pm.active;
   }
 
   //GAME STATE
@@ -81,7 +80,7 @@ export default function Game() {
     state = gameState;
   }
   function checkGameState(gameState) {
-    if (state == gameState) {
+    if (state != gameState) {
       throw new Error(
         `The game is not in the right game state.  Checked state: ${gameState}  Current state: ${state}`
       );
@@ -93,6 +92,9 @@ export default function Game() {
     },
     get board() {
       return board;
+    },
+    get currentPlayer() {
+      return currentPlayer;
     },
     addPlayer,
     startGame,
