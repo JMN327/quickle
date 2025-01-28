@@ -1,10 +1,11 @@
 import PlayerManager from "./player-manager.js";
-import Board from "../game-objects/board";
-import Bag from "../game-objects/bag";
+import Board from "../game-objects/board.js";
+import Bag from "../game-objects/bag.js";
 import { GameState } from "../enums/game-state.js";
 import { Color } from "../enums/color.js";
+import { CellState } from "../enums/cell-state.js";
 
-export default function Game() {
+export default function GameManager() {
   let state = GameState.PRE_GAME;
   let board = Board();
   let bag = Bag();
@@ -26,7 +27,7 @@ export default function Game() {
     }
     pm.randomizePlayerOrder();
     pm.players.forEach((player) => {
-      player.rack.addTiles(bag.draw(player.rack.spaces.count));
+      player.rack.drawTiles(bag.draw(player.rack.spaces.count));
     });
     let startWordLengths = [];
     pm.players.forEach((player) => {
@@ -35,24 +36,37 @@ export default function Game() {
     console.log(startWordLengths.indexOf(Math.max(...startWordLengths)));
     pm.setStartPlayer(startWordLengths.indexOf(Math.max(...startWordLengths)));
     currentPlayer = pm.active;
-    switchGameState(GameState.PLAYER_TURN);
+    switchGameState(GameState.PLAYING);
   }
 
   //PLAYING
 
-  function selectTile(index) {
-    //xSelects the tile at the given index on the players rack
-    function validTilesForSelection() {
-      //shows the valid tiles for the selected tiles
-    }
+  function selectTileOnRack(index) {
+    currentPlayer.rack.selectSingle(index);
+  }
+  function rearrangeTilesOnRack(playerIndex, from, to) {
+    pm.players[playerIndex].rack.rearrangeTiles(from, to);
   }
 
-  function placeTileOnBoard(row, col) {
+  function playableTilesForSelection() {
+    console.log(currentPlayer.rack.selection)
+    let tile = currentPlayer.rack.selection
+    return board.playableCells(tile) ;
+  }
+
+  function placeSelectedTileOnBoard(row, col) {
+    board.addTile(currentPlayer.rack.pickUpSelection(), row, col);
     //places the selected tile on the board
   }
 
   function confirmTurn() {
-    // fixes placed tiles and updates scores
+    if (board.cellsByCellState(CellState.PLACED).length < 1) {
+      throw new Error("cannot confirm turn while no cells have been placed");
+    }
+    let score = board.score;
+    board.fixTiles;
+    currentPlayer.score.add(score);
+    currentPlayer = pm.nextPlayer;
   }
 
   // SWAP_MODE
@@ -99,5 +113,9 @@ export default function Game() {
     addPlayer,
     startGame,
     nextTurn,
+    selectTileOnRack,
+    rearrangeTilesOnRack,
+    playableTilesForSelection,
+    placeSelectedTileOnBoard,
   };
 }

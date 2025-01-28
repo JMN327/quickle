@@ -15,7 +15,7 @@ import { Shape } from "./modules/enums/shape.js";
 import { Direction } from "./modules/enums/direction.js";
 import Board from "./modules/game-objects/board.js";
 import { CellState } from "./modules/enums/cell-state.js";
-import Game from "./modules/game-controls/game.js";
+import GameManager from "./modules/game-controls/game-manager.js";
 import { PlayerType } from "./modules/enums/player-type.js";
 
 console.log("Hello World!)");
@@ -102,10 +102,19 @@ board.removeTile(-5,0) */
 
 //console.table(board.playableCells(bag.quickPick(Color.RED, Shape.DIAMOND)))
 
-let game = Game();
+let game = GameManager();
 game.addPlayer({PlayerType:PlayerType.HUMAN,name:"Elspeth"})
 game.addPlayer({PlayerType:PlayerType.HUMAN,name:"Jinny"})
 game.addPlayer({PlayerType:PlayerType.HUMAN,name:"Rose"})
 game.startGame()
 console.log(game.currentPlayer.name)
+console.table(game.currentPlayer.rack.tiles)
+game.selectTileOnRack(1)
+console.table(game.playableTilesForSelection())
+game.placeSelectedTileOnBoard(0,0)
+console.table(game.board.info)
+game.selectTileOnRack(0)
+console.table(game.playableTilesForSelection())
+
+
 

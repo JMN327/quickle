@@ -63,7 +63,7 @@ export default function Board() {
     });
     updateCheckLists(AddRemove.ADD, row, col, tile);
 
-    console.log(`SCORE IS ${getScore()}`);
+    console.log(`SCORE IS ${score()}`);
   }
 
   function removeTile(rowToOffset, colToOffset) {
@@ -79,7 +79,7 @@ export default function Board() {
       leftOffset -= direction == Direction.LEFT ? 1 : 0;
       topOffset -= direction == Direction.TOP ? 1 : 0;
     });
-    console.log(`SCORE IS ${getScore()}`)
+    console.log(`SCORE IS ${score()}`)
   }
 
   function fixTiles() {
@@ -90,7 +90,7 @@ export default function Board() {
     console.table(info());
   }
 
-  function getScore() {
+  function score() {
     let score = 0;
     let placedCells = positionsByCellState(CellState.PLACED);
     console.log(
@@ -194,9 +194,12 @@ export default function Board() {
         tile.shape
       )} is valid for cell [${row},${col}]`
     );
-    return cells[row][col].checkList.validSymbols.some(
+    let result = cells[row][col].checkList.validSymbols.some(
       (validTile) => validTile[0] == tile.color && validTile[1] == tile.shape
-    );
+    )
+    console.log(`RESULT: ${result}`)
+    return result
+    ;
   }
 
   function cellIsActive() {
@@ -214,8 +217,7 @@ export default function Board() {
         for (let j = 0; j < bounds.hSize; j++) {
           if (cells[i][j].state != CellState.ACTIVE) {
             console.log(`[${i},${j}] state: ${cells[i][j].state}`);
-          } else if (!tileIsValidForCell(tile[0], i, j)) {
-            ////more problems with tiles coming out of bag as array
+          } else if (!tileIsValidForCell(tile, i, j)) {
             console.log(`[${i},${j}] not valid`);
           } else {
             playableCells.push([i, j]);
@@ -231,13 +233,12 @@ export default function Board() {
       let fromCol = placedCells[0][1];
       let checkCells = [];
       Object.values(Direction).forEach((direction) => {
-        checkCells.push({row, col} = radiate(direction, fromRow, fromCol).activeCellFound);
+        let cell = radiate(direction, fromRow, fromCol).activeCellFound;
+        checkCells.push({row:cell.row, col:cell.col});
       });
-      checkCells.filter((cell) => {
+      playableCells = checkCells.filter((cell) => {
         tileIsValidForCell(tile, cell.row, cell.col);
       });
-      playableCells = checkCells;
-      console.table(playableCells);
       return playableCells;
     }
 
@@ -253,17 +254,15 @@ export default function Board() {
       }
       let checkCells = [];
       directions.forEach((direction) => {
-        checkCells.push({row, col} = radiate(direction, fromRow, fromCol).activeCellFound);
+        let cell = radiate(direction, fromRow, fromCol).activeCellFound;
+        checkCells.push({row:cell.row, col:cell.col});
       });
-      checkCells.filter((cell) => {
+      playableCells = checkCells.filter((cell) => {
         tileIsValidForCell(tile, cell.row, cell.col);
       });
-      playableCells = checkCells;
-      console.table(playableCells);
+      console.log(playableCells)
       return playableCells;
     }
-
-    //logic for lines and radiating
   }
 
   function edgeGrowDirections(row, col) {
@@ -541,6 +540,9 @@ export default function Board() {
     },
     get info() {
       return info();
+    },
+    get score() {
+      return score()
     },
     cellsByCellState,
     positionsByCellState,

@@ -25,7 +25,7 @@ export default function Rack() {
       }
     });
   }
-  function xSelect(i) {
+  function selectSingle(i) {
     if (i > 5 || i < 0) {
       throw new Error("Invalid index for selection");
     }
@@ -42,7 +42,7 @@ export default function Rack() {
     tiles[to] = gap;
   }
 
-  function getSelection() {
+  function getRackIndexesOfSelectedTiles() {
     let selected = [];
     tiles.forEach((tile, index) => {
       if (tile == null) {
@@ -65,7 +65,7 @@ export default function Rack() {
     return emptySpaces;
   }
 
-  function addTiles(arr) {
+  function drawTiles(arr) {
     if (!arr) {
       throw new Error("No tiles passed for adding");
     }
@@ -81,8 +81,8 @@ export default function Rack() {
     }
   }
 
-  function removeSelection() {
-    let selectionArr = getSelection();
+  function pickUpSelection() {
+    let selectionArr = getRackIndexesOfSelectedTiles();
     let removedTileArr = [];
     if (!selectionArr) {
       throw new Error("there are no selected tiles on the rack");
@@ -134,11 +134,11 @@ export default function Rack() {
     get tiles() {
       return tiles;
     },
-    addTiles,
-    removeSelection,
+    drawTiles,
+    pickUpSelection,
     rearrange,
     select,
-    xSelect,
+    selectSingle,
     deselectSingle,
     deselectAll,
     longestWordLength,
@@ -146,11 +146,7 @@ export default function Rack() {
       return { indexArr: getSpaces(), count: getSpaces().length };
     },
     get selection() {
-      return {
-        indexArr: getSelection(),
-        count: getSelection().length,
-        remove: removeSelection,
-      };
+      return tiles[getRackIndexesOfSelectedTiles()];
     },
   };
 }
