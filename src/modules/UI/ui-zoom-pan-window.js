@@ -15,8 +15,8 @@ export default function ZoomPanWindow(div) {
 
   ///// Setup view div /////
   let view = addBasicElement("div", ["view"], frame);
-  let viewH = 6400;
-  let viewW = 6400;
+  let viewH = 5000;
+  let viewW = 5000;
   let viewR;
   let viewB;
   setDivSize([view, viewH, viewW]);

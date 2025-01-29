@@ -15,8 +15,7 @@
 }
 
 .pallet {
-  display: flex;
-  gap: 1rem;
+  display: grid;
 }
 
 .svg-tile {
@@ -27,6 +26,7 @@
   align-items: center;
   background-color: black;
   border-radius: .375rem;
+  position: absolute;
 }
 
 .svgTile__svg {
@@ -38,22 +38,22 @@
 
 
 
-.red {
+.RED {
   fill: red;
 }
-.orange {
+.ORANGE {
   fill: orangered;
 }
-.yellow {
+.YELLOW {
   fill: yellow;
 }
-.green {
+.GREEN {
   fill: green;
 }
-.blue {
+.BLUE {
   fill: blue;
 }
-.purple {
+.PURPLE {
   fill: purple;
 }
 
@@ -122,9 +122,7 @@ body {
     rgba(0, 0, 0, 0) 10px)
   ;
 
-  display: flex;
-  justify-content: center;
-  align-items: center;
+
 
 
 }
@@ -172,4 +170,13 @@ body {
   width: 30px;
   height: 30px;
   aspect-ratio: 1;
+}
+
+
+
+.board {
+  height: 100px;
+  width: 100px;
+  background-color: orange;
+  position: absolute;
 }

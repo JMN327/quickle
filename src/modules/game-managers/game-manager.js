@@ -110,6 +110,9 @@ export default function GameManager() {
     get currentPlayer() {
       return currentPlayer;
     },
+    get state() {
+      return state
+    },
     addPlayer,
     startGame,
     nextTurn,

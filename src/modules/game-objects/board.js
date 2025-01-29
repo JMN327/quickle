@@ -79,7 +79,7 @@ export default function Board() {
       leftOffset -= direction == Direction.LEFT ? 1 : 0;
       topOffset -= direction == Direction.TOP ? 1 : 0;
     });
-    console.log(`SCORE IS ${score()}`)
+    console.log(`SCORE IS ${score()}`);
   }
 
   function fixTiles() {
@@ -122,11 +122,11 @@ export default function Board() {
       switch (direction) {
         case Direction.LEFT:
           directions = [Direction.LEFT, Direction.RIGHT];
-          logString = "horizontally"
+          logString = "horizontally";
           break;
         case Direction.TOP:
           directions = [Direction.TOP, Direction.BOTTOM];
-          logString = "vertically"
+          logString = "vertically";
           break;
       }
       directions.forEach((direction) => {
@@ -196,10 +196,9 @@ export default function Board() {
     );
     let result = cells[row][col].checkList.validSymbols.some(
       (validTile) => validTile[0] == tile.color && validTile[1] == tile.shape
-    )
-    console.log(`RESULT: ${result}`)
-    return result
-    ;
+    );
+    console.log(`RESULT: ${result}`);
+    return result;
   }
 
   function cellIsActive() {
@@ -234,11 +233,12 @@ export default function Board() {
       let checkCells = [];
       Object.values(Direction).forEach((direction) => {
         let cell = radiate(direction, fromRow, fromCol).activeCellFound;
-        checkCells.push({row:cell.row, col:cell.col});
+        checkCells.push({ row: cell.row, col: cell.col });
       });
-      playableCells = checkCells.filter((cell) => {
-        tileIsValidForCell(tile, cell.row, cell.col);
-      });
+      playableCells = checkCells.filter((cell) =>
+        tileIsValidForCell(tile, cell.row, cell.col)
+      );
+      console.log(playableCells);
       return playableCells;
     }
 
@@ -255,12 +255,12 @@ export default function Board() {
       let checkCells = [];
       directions.forEach((direction) => {
         let cell = radiate(direction, fromRow, fromCol).activeCellFound;
-        checkCells.push({row:cell.row, col:cell.col});
+        checkCells.push({ row: cell.row, col: cell.col });
       });
-      playableCells = checkCells.filter((cell) => {
-        tileIsValidForCell(tile, cell.row, cell.col);
-      });
-      console.log(playableCells)
+      playableCells = checkCells.filter((cell) =>
+        tileIsValidForCell(tile, cell.row, cell.col)
+      );
+      console.log(playableCells);
       return playableCells;
     }
   }
@@ -542,7 +542,7 @@ export default function Board() {
       return info();
     },
     get score() {
-      return score()
+      return score();
     },
     cellsByCellState,
     positionsByCellState,
