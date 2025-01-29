@@ -2,8 +2,8 @@
   display: grid;
   grid-template-columns: repeat(6, 1fr);
 
-  gap: 4px;
-  padding: 0px;
+  gap: 8px;
+  padding: 8px;
   /* scroll-snap-type: y mandatory; */
 }
 
@@ -14,5 +14,7 @@
 }
 
 .moving {
+  transform: scale(1.075);
   border-radius: 0.5rem;
+
 }

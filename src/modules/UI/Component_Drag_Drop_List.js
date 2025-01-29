@@ -9,8 +9,6 @@ export default function Add_Component_Drag_Drop_Container(
     gridContainerStyles.getPropertyValue("padding-left")
   );
 
-  const dragDropEvent = new Event("dragDrop");
-
   let item = null;
   let itemToLeft = null;
   let itemToLeftLeftX = null;
@@ -25,6 +23,9 @@ export default function Add_Component_Drag_Drop_Container(
   let switchOffset = 0;
   let animating = false;
 
+  let pickUpItemIndex;
+  let swapItemIndex;
+
   gridContainer.addEventListener("dragstart", (event) => {
     event.preventDefault();
   });
@@ -32,10 +33,6 @@ export default function Add_Component_Drag_Drop_Container(
   gridContainer.addEventListener("mousedown", (event) => pickUpGridItem(event));
   document.body.addEventListener("mousemove", (event) => moveGridItem(event));
   document.body.addEventListener("mouseup", (event) => releaseGridItem(event));
-
-/*   gridContainer.addEventListener("contextmenu", (event) => {
-    event.preventDefault();
-  }); */
 
   document.body.addEventListener("mouseleave", (event) => {
     if (event.buttons == 1) {
@@ -47,22 +44,20 @@ export default function Add_Component_Drag_Drop_Container(
     let earlyExitCheck = nonGrabClassArr.some((CssClass) =>
       event.target.classList.contains(CssClass)
     );
-
     if (earlyExitCheck) {
-      return;
-    }
-
-    item = event.target.closest(".grid-item");
-
-    if (!item) {
-      return;
-    }
-    if (event.buttons !== 1) {
       return;
     }
     if (animating) {
       return;
     }
+    if (event.buttons !== 1) {
+      return;
+    }
+    item = event.target.closest(".grid-item");
+    if (!item) {
+      return;
+    }
+    pickUpItemIndex = [...gridContainer.children].indexOf(item);
 
     item.style.zIndex = 1000;
     gridContainerLeft = gridContainer.getBoundingClientRect().left;
@@ -95,6 +90,13 @@ export default function Add_Component_Drag_Drop_Container(
         getImmediateSiblings(item);
 
         animateSnap(itemToRight, -itemWidthSnapshot, 0, 150);
+
+        swapItemIndex = [...gridContainer.children].indexOf(itemToLeft) + 1;
+        const dragDropEvent = new CustomEvent("dragDrop", {
+          detail: { pickup: pickUpItemIndex, swap: swapItemIndex },
+        });
+        gridContainer.dispatchEvent(dragDropEvent);
+        pickUpItemIndex = swapItemIndex;
       }
     }
 
@@ -107,6 +109,16 @@ export default function Add_Component_Drag_Drop_Container(
         getImmediateSiblings(item);
 
         animateSnap(itemToLeft, itemWidthSnapshot, 0, 150);
+
+        let swapItemIndex =
+          [...gridContainer.children].indexOf(itemToRight) == -1
+            ? 5
+            : [...gridContainer.children].indexOf(itemToRight) - 1;
+        const dragDropEvent = new CustomEvent("dragDrop", {
+          detail: { pickup: pickUpItemIndex, swap: swapItemIndex },
+        });
+        gridContainer.dispatchEvent(dragDropEvent);
+        pickUpItemIndex = swapItemIndex;
       }
     }
 
@@ -136,11 +148,16 @@ export default function Add_Component_Drag_Drop_Container(
     if (event.button !== 0) {
       return;
     }
+
+    event.stopImmediatePropagation();
+
     const snapAnimation = animateSnap(item, 0, -itemLocalPosX, 150);
     snapAnimation.onfinish = () => {
       item.style.left = null;
       item.style.zIndex = null;
-      item.classList.remove("moving");
+      if (item.classList.contains("moving")) {
+        item.classList.remove("moving");
+      }
       item = null;
       itemToLeft = null;
       itemToLeftLeftX = null;
@@ -154,14 +171,14 @@ export default function Add_Component_Drag_Drop_Container(
       switchOffset = 0;
       animating = false;
     };
-    return gridContainer.dispatchEvent(dragDropEvent);
   }
 
   function getImmediateSiblings(currentItem) {
     itemToLeft = currentItem.previousElementSibling;
     itemToRight = currentItem.nextElementSibling;
     if (itemToLeft) {
-      itemToLeftLeftX = itemToLeft.getBoundingClientRect().left - gridContainerLeft;
+      itemToLeftLeftX =
+        itemToLeft.getBoundingClientRect().left - gridContainerLeft;
     }
     if (itemToRight) {
       itemToRightRightX =
@@ -179,6 +196,7 @@ export default function Add_Component_Drag_Drop_Container(
     const snapTiming = {
       duration: durationMS,
     };
+
     return thisItem.animate(snap, snapTiming);
   }
 }

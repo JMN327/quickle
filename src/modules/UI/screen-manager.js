@@ -2,12 +2,15 @@ import {
   addBasicElement,
   addTileElement,
   removeAllChildNodes,
-} from "../UI/DOM-elements";
-import ZoomPanWindow from "../UI/ui-zoom-pan-window";
-import GameManager from "./game-manager";
-import { PlayerType } from "../enums/player-type";
-import { CellState } from "../enums/cell-state";
-import Add_Component_Drag_Drop_Container from "../UI/Component_Drag_Drop_List.js"
+} from "./DOM-elements.js";
+import ZoomPanWindow from "./ui-zoom-pan-window.js";
+import GameManager from "../game-managers/game-manager.js";
+import { PlayerType } from "../enums/player-type.js";
+import { CellState } from "../enums/cell-state.js";
+import Add_Component_Drag_Drop_Container, {
+  Add_Component_Drag_Drop_Item,
+} from "./Component_Drag_Drop_List.js";
+import Rack from "../game-objects/rack.js";
 
 export default function screenManager() {
   let tileSize = 100;
@@ -19,20 +22,22 @@ export default function screenManager() {
   let zpw = ZoomPanWindow(frame);
   zpw.bounded = true;
 
-  let rack = addBasicElement("div", ["rack"], body);
-  let tile1 = addBasicElement("div", ["rTile", "grid-item"], rack);
-  let tile2 = addBasicElement("div", ["rTile", "grid-item"], rack);
-  let tile3 = addBasicElement("div", ["rTile", "grid-item"], rack);
-  let tile4 = addBasicElement("div", ["rTile", "grid-item"], rack);
-  let tile5 = addBasicElement("div", ["rTile", "grid-item"], rack);
-  let tile6 = addBasicElement("div", ["rTile", "grid-item"], rack);
-
-  Add_Component_Drag_Drop_Container(rack,[]);
-
   let boardDiv = addBasicElement("div", ["board"], body);
   zpw.appendChild(boardDiv);
 
   let game = GameManager();
+
+  // make setup function
+  game.addPlayer({ PlayerType: PlayerType.HUMAN, name: "Elspeth" });
+  game.addPlayer({ PlayerType: PlayerType.HUMAN, name: "Jinny" });
+  game.addPlayer({ PlayerType: PlayerType.HUMAN, name: "Rose" });
+  game.startGame();
+  let racks = [];
+  let rackDivs = [];
+  game.playerManager.players.forEach((player) => {
+    racks.push(player.rack);
+  });
+  displayRacks();
 
   function displayBoard() {
     let boardSizeW = game.board.bounds.hSize * tileSize;
@@ -64,7 +69,32 @@ export default function screenManager() {
     });
   }
 
-  game.addPlayer({ PlayerType: PlayerType.HUMAN, name: "Elspeth" });
+  function displayRacks() {
+    racks.forEach((rack) => {
+      let rackDiv = addBasicElement("div", ["rack"], body);
+      Add_Component_Drag_Drop_Container(rackDiv, []);
+      rackDiv.addEventListener("dragDrop", (event) => {
+        console.log(
+          `Switching item: ${event.detail.pickup} with item ${event.detail.swap}`
+        );
+        rack.rearrange(event.detail.pickup, event.detail.swap);
+        
+      });
+      rackDiv.addEventListener("mouseup", (event) => {
+        let item = event.target.closest(".grid-item");
+        let selectedItemIndex = [...rackDiv.children].indexOf(item);
+        console.log(`selected item ${selectedItemIndex}`);
+      });
+      rackDivs.push(rackDiv);
+      rack.tiles.forEach((tile) => {
+        let tileDiv = addTileElement(tile.color, tile.shape, rackDiv);
+        Add_Component_Drag_Drop_Item(tileDiv);
+      });
+    });
+  }
+
+
+  /*   game.addPlayer({ PlayerType: PlayerType.HUMAN, name: "Elspeth" });
   game.addPlayer({ PlayerType: PlayerType.HUMAN, name: "Jinny" });
   game.addPlayer({ PlayerType: PlayerType.HUMAN, name: "Rose" });
   game.startGame();
@@ -72,7 +102,7 @@ export default function screenManager() {
   console.table(game.currentPlayer.rack.tiles);
   game.selectTileOnRack(1);
   console.table(game.playableTilesForSelection());
-  game.placeSelectedTileOnBoard(0, 0);
+  game.placeSelectedTileOnBoard(0, 0); */
 
   displayBoard();
   displayPlacedAndFixedTiles();

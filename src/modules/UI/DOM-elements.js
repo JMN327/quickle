@@ -39,7 +39,7 @@ export function addSvgElement(shape, classes = [], parent = null) {
   return svgElement;
 }
 
-export function addTileElement(color, shape, parent = null, left = 0, top = 0) {
+export function addTileElement(color, shape, parent = null, left, top) {
   const svgTile = document.createElement("div");
   svgTile.classList.add("svg-tile");
   svgTile.classList.add(reverseEnum(Shape, shape));
@@ -50,8 +50,11 @@ export function addTileElement(color, shape, parent = null, left = 0, top = 0) {
   use.setAttribute("href", `#${reverseEnum(Shape, shape)}`);
   svg.appendChild(use);
   svgTile.appendChild(svg);
-  svgTile.style.left = `${left}px`;
-  svgTile.style.top = `${top}px`;
+  if (left && top) {
+    svgTile.style.left = `${left}px`;
+    svgTile.style.top = `${top}px`;
+    svgTile.style.position = "absolute"
+  }
 
   if (parent) {
     parent.appendChild(svgTile);

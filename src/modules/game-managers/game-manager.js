@@ -11,31 +11,31 @@ export default function GameManager() {
   let bag = Bag();
   bag.fill();
   bag.shuffle();
-  let pm = PlayerManager();
+  let playerManager = PlayerManager();
   let currentPlayer;
 
   //PRE_GAME
   function addPlayer({ PlayerType, name }) {
     checkGameState(GameState.PRE_GAME);
-    pm.addPlayer({ PlayerType, name });
+    playerManager.addPlayer({ PlayerType, name });
   }
 
   function startGame() {
     checkGameState(GameState.PRE_GAME);
-    if (pm.playerCount < 2) {
+    if (playerManager.playerCount < 2) {
       throw new Error("Cannot start a game with less than two players");
     }
-    pm.randomizePlayerOrder();
-    pm.players.forEach((player) => {
+    playerManager.randomizePlayerOrder();
+    playerManager.players.forEach((player) => {
       player.rack.drawTiles(bag.draw(player.rack.spaces.count));
     });
     let startWordLengths = [];
-    pm.players.forEach((player) => {
+    playerManager.players.forEach((player) => {
       startWordLengths.push(player.rack.longestWordLength());
     });
     console.log(startWordLengths.indexOf(Math.max(...startWordLengths)));
-    pm.setStartPlayer(startWordLengths.indexOf(Math.max(...startWordLengths)));
-    currentPlayer = pm.active;
+    playerManager.setStartPlayer(startWordLengths.indexOf(Math.max(...startWordLengths)));
+    currentPlayer = playerManager.active;
     switchGameState(GameState.PLAYING);
   }
 
@@ -45,7 +45,7 @@ export default function GameManager() {
     currentPlayer.rack.selectSingle(index);
   }
   function rearrangeTilesOnRack(playerIndex, from, to) {
-    pm.players[playerIndex].rack.rearrangeTiles(from, to);
+    playerManager.players[playerIndex].rack.rearrangeTiles(from, to);
   }
 
   function playableTilesForSelection() {
@@ -66,7 +66,7 @@ export default function GameManager() {
     let score = board.score;
     board.fixTiles;
     currentPlayer.score.add(score);
-    currentPlayer = pm.nextPlayer;
+    currentPlayer = playerManager.nextPlayer;
   }
 
   // SWAP_MODE
@@ -85,8 +85,8 @@ export default function GameManager() {
 
   function nextTurn() {
     checkGameState(GameState.PLAYER_TURN);
-    pm.nextPlayer;
-    currentPlayer = pm.active;
+    playerManager.nextPlayer;
+    currentPlayer = playerManager.active;
   }
 
   //GAME STATE
@@ -101,6 +101,9 @@ export default function GameManager() {
     }
   }
   return {
+    get playerManager() {
+      return playerManager
+    },
     get bag() {
       return bag;
     },

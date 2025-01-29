@@ -1,7 +1,7 @@
 import "./styles.css";
 import "./Drag_Drop_List.css";
 import storageAvailable from "./modules/browser-storage.js";
-import screenManager from "./modules/game-managers/screen-manager.js";
+import screenManager from "./modules/UI/screen-manager.js";
 
 console.log("Hello World!)");
 console.log(`Local Storage available: ${storageAvailable("localStorage")}`);

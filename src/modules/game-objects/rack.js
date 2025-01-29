@@ -40,6 +40,7 @@ export default function Rack() {
     let gap = tiles[from];
     tiles[from] = tiles[to];
     tiles[to] = gap;
+    console.log(`tile at index ${from} swapped with tile at index ${to}`)
   }
 
   function getRackIndexesOfSelectedTiles() {
