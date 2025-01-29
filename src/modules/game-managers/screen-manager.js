@@ -7,6 +7,7 @@ import ZoomPanWindow from "../UI/ui-zoom-pan-window";
 import GameManager from "./game-manager";
 import { PlayerType } from "../enums/player-type";
 import { CellState } from "../enums/cell-state";
+import Add_Component_Drag_Drop_Container from "../UI/Component_Drag_Drop_List.js"
 
 export default function screenManager() {
   let tileSize = 100;
@@ -17,6 +18,16 @@ export default function screenManager() {
   setDivSize([frame, frameH, frameW]);
   let zpw = ZoomPanWindow(frame);
   zpw.bounded = true;
+
+  let rack = addBasicElement("div", ["rack"], body);
+  let tile1 = addBasicElement("div", ["rTile", "grid-item"], rack);
+  let tile2 = addBasicElement("div", ["rTile", "grid-item"], rack);
+  let tile3 = addBasicElement("div", ["rTile", "grid-item"], rack);
+  let tile4 = addBasicElement("div", ["rTile", "grid-item"], rack);
+  let tile5 = addBasicElement("div", ["rTile", "grid-item"], rack);
+  let tile6 = addBasicElement("div", ["rTile", "grid-item"], rack);
+
+  Add_Component_Drag_Drop_Container(rack,[]);
 
   let boardDiv = addBasicElement("div", ["board"], body);
   zpw.appendChild(boardDiv);
@@ -65,7 +76,6 @@ export default function screenManager() {
 
   displayBoard();
   displayPlacedAndFixedTiles();
-
 
   function setDivSize([div, h, w]) {
     if (h) {

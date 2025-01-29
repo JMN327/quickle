@@ -18,6 +18,16 @@
   display: grid;
 }
 
+.rack {
+  background-color: yellow;
+}
+
+.rTile {
+  width: 100px;
+  height: 100px;
+  background-color: orangered;
+}
+
 .svg-tile {
   width: 100px;
   height: 100px;
@@ -63,7 +73,7 @@ body {
   justify-content: center;
   align-items: center;
   gap: 2rem;
-  height: 100vh;
+  /* height: 100vh; */
 }
 
 

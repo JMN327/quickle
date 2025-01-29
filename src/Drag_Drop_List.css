@@ -1,0 +1,17 @@
+.grid-container {
+    display: grid; 
+    grid-template-rows: 1fr;
+    gap: 4px;
+    padding: 0px;
+    /* scroll-snap-type: y mandatory; */
+  }
+
+  .grid-item {
+    user-select: none;
+    position: relative;
+    border-radius: .5rem;
+  }
+  
+  .moving {
+    border-radius: .5rem;
+  }

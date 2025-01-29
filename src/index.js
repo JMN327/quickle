@@ -1,5 +1,6 @@
 import "./styles.css";
-import storageAvailable from "./modules/browser-storage.js"
+import "./Drag_Drop_List.css";
+import storageAvailable from "./modules/browser-storage.js";
 import screenManager from "./modules/game-managers/screen-manager.js";
 
 console.log("Hello World!)");
@@ -7,8 +8,6 @@ console.log(`Local Storage available: ${storageAvailable("localStorage")}`);
 console.log(`Session Storage available: ${storageAvailable("sessionStorage")}`);
 
 screenManager();
-
-
 
 /* let bag = Bag()
 bag.fill()
@@ -73,5 +72,3 @@ console.table(game.board.info)
 game.selectTileOnRack(0)
 console.table(game.playableTilesForSelection())
  */
-
-
