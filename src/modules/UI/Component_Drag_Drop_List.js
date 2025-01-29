@@ -5,23 +5,23 @@ export default function Add_Component_Drag_Drop_Container(
   gridContainer.classList.add("grid-container");
   const gridContainerStyles = getComputedStyle(gridContainer);
   let gap = parseInt(gridContainerStyles.getPropertyValue("gap"));
-  let paddingTop = parseInt(
-    gridContainerStyles.getPropertyValue("padding-top")
+  let paddingLeft = parseInt(
+    gridContainerStyles.getPropertyValue("padding-left")
   );
 
   const dragDropEvent = new Event("dragDrop");
 
   let item = null;
-  let itemAbove = null;
-  let itemAboveTopY = null;
-  let itemBelow = null;
-  let itemBelowBottomY = null;
-  let gridContainerTop = null;
+  let itemToLeft = null;
+  let itemToLeftLeftX = null;
+  let itemToRight = null;
+  let itemToRightRightX = null;
+  let gridContainerLeft = null;
   let pointerOffset = null;
-  let initialItemPosY = null;
-  let itemContainerTopY = null;
-  let itemContainerBottomY = null;
-  let itemLocalPosY = null;
+  let initialItemPosX = null;
+  let itemContainerLeftX = null;
+  let itemContainerRightX = null;
+  let itemLocalPosX = null;
   let switchOffset = 0;
   let animating = false;
 
@@ -65,9 +65,9 @@ export default function Add_Component_Drag_Drop_Container(
     }
 
     item.style.zIndex = 1000;
-    gridContainerTop = gridContainer.getBoundingClientRect().top;
-    initialItemPosY = item.getBoundingClientRect().top;
-    pointerOffset = event.clientY - initialItemPosY;
+    gridContainerLeft = gridContainer.getBoundingClientRect().left;
+    initialItemPosX = item.getBoundingClientRect().left;
+    pointerOffset = event.clientX - initialItemPosX;
     getImmediateSiblings(item);
   }
 
@@ -83,48 +83,48 @@ export default function Add_Component_Drag_Drop_Container(
       return;
     }
     item.classList.add("moving");
-    itemContainerTopY = event.clientY - pointerOffset - gridContainerTop;
-    itemContainerBottomY = itemContainerTopY + item.offsetHeight;
+    itemContainerLeftX = event.clientX - pointerOffset - gridContainerLeft;
+    itemContainerRightX = itemContainerLeftX + item.offsetWidth;
 
-    //swap if higher than item above
-    if (itemAbove) {
-      if (itemContainerTopY <= itemAboveTopY) {
-        let itemHeightSnapshot = itemAbove.offsetHeight;
-        switchOffset += gap + itemHeightSnapshot;
-        item.parentNode.insertBefore(item, itemAbove);
+    //swap if further left than item to left
+    if (itemToLeft) {
+      if (itemContainerLeftX <= itemToLeftLeftX) {
+        let itemWidthSnapshot = itemToLeft.offsetWidth;
+        switchOffset += gap + itemWidthSnapshot;
+        item.parentNode.insertBefore(item, itemToLeft);
         getImmediateSiblings(item);
 
-        animateSnap(itemBelow, -itemHeightSnapshot, 0, 150);
+        animateSnap(itemToRight, -itemWidthSnapshot, 0, 150);
       }
     }
 
-    //swap if lower than item below
-    if (itemBelow) {
-      if (itemContainerBottomY >= itemBelowBottomY) {
-        let itemHeightSnapshot = itemBelow.offsetHeight;
-        switchOffset -= gap + itemHeightSnapshot;
-        item.parentNode.insertBefore(item, itemBelow.nextElementSibling);
+    //swap if further right than item to right
+    if (itemToRight) {
+      if (itemContainerRightX >= itemToRightRightX) {
+        let itemWidthSnapshot = itemToRight.offsetWidth;
+        switchOffset -= gap + itemWidthSnapshot;
+        item.parentNode.insertBefore(item, itemToRight.nextElementSibling);
         getImmediateSiblings(item);
 
-        animateSnap(itemAbove, itemHeightSnapshot, 0, 150);
+        animateSnap(itemToLeft, itemWidthSnapshot, 0, 150);
       }
     }
 
-    itemLocalPosY =
-      event.clientY - initialItemPosY + switchOffset - pointerOffset;
+    itemLocalPosX =
+      event.clientX - initialItemPosX + switchOffset - pointerOffset;
 
     //set the actual position of the grid-item
-    if (itemContainerBottomY < item.offsetHeight) {
+    if (itemContainerRightX < item.offsetWidth) {
       /* item.parentNode.prepend(item); */
-      itemLocalPosY = -paddingTop;
+      itemLocalPosX = -paddingLeft;
     } else if (
-      itemContainerTopY >
-      gridContainer.offsetHeight - item.offsetHeight
+      itemContainerLeftX >
+      gridContainer.offsetWidth - item.offsetWidth
     ) {
       /* item.parentNode.append(item); */
-      itemLocalPosY = paddingTop;
+      itemLocalPosX = paddingLeft;
     }
-    item.style.top = itemLocalPosY + "px";
+    item.style.left = itemLocalPosX + "px";
 
     getImmediateSiblings(item);
   }
@@ -136,21 +136,21 @@ export default function Add_Component_Drag_Drop_Container(
     if (event.button !== 0) {
       return;
     }
-    const snapAnimation = animateSnap(item, 0, -itemLocalPosY, 150);
+    const snapAnimation = animateSnap(item, 0, -itemLocalPosX, 150);
     snapAnimation.onfinish = () => {
-      item.style.top = null;
+      item.style.left = null;
       item.style.zIndex = null;
       item.classList.remove("moving");
       item = null;
-      itemAbove = null;
-      itemAboveTopY = null;
-      itemBelow = null;
-      itemBelowBottomY = null;
-      gridContainerTop = null;
+      itemToLeft = null;
+      itemToLeftLeftX = null;
+      itemToRight = null;
+      itemToRightRightX = null;
+      gridContainerLeft = null;
       pointerOffset = null;
-      initialItemPosY = null;
-      itemContainerTopY = null;
-      itemLocalPosY = null;
+      initialItemPosX = null;
+      itemContainerLeftX = null;
+      itemLocalPosX = null;
       switchOffset = 0;
       animating = false;
     };
@@ -158,23 +158,23 @@ export default function Add_Component_Drag_Drop_Container(
   }
 
   function getImmediateSiblings(currentItem) {
-    itemAbove = currentItem.previousElementSibling;
-    itemBelow = currentItem.nextElementSibling;
-    if (itemAbove) {
-      itemAboveTopY = itemAbove.getBoundingClientRect().top - gridContainerTop;
+    itemToLeft = currentItem.previousElementSibling;
+    itemToRight = currentItem.nextElementSibling;
+    if (itemToLeft) {
+      itemToLeftLeftX = itemToLeft.getBoundingClientRect().left - gridContainerLeft;
     }
-    if (itemBelow) {
-      itemBelowBottomY =
-        itemBelow.getBoundingClientRect().top +
-        itemBelow.offsetHeight -
-        gridContainerTop;
+    if (itemToRight) {
+      itemToRightRightX =
+        itemToRight.getBoundingClientRect().left +
+        itemToRight.offsetWidth -
+        gridContainerLeft;
     }
   }
 
   function animateSnap(thisItem, startPosition, endPosition, durationMS) {
     const snap = [
-      { transform: `translate(0px, ${startPosition}px)` },
-      { transform: `translate(0px, ${endPosition}px)` },
+      { transform: `translate(${startPosition}px, 0px)` },
+      { transform: `translate(${endPosition}px, 0px)` },
     ];
     const snapTiming = {
       duration: durationMS,

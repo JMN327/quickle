@@ -1,17 +1,18 @@
 .grid-container {
-    display: grid; 
-    grid-template-rows: 1fr;
-    gap: 4px;
-    padding: 0px;
-    /* scroll-snap-type: y mandatory; */
-  }
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
 
-  .grid-item {
-    user-select: none;
-    position: relative;
-    border-radius: .5rem;
-  }
-  
-  .moving {
-    border-radius: .5rem;
-  }
+  gap: 4px;
+  padding: 0px;
+  /* scroll-snap-type: y mandatory; */
+}
+
+.grid-item {
+  user-select: none;
+  position: relative;
+  border-radius: 0.5rem;
+}
+
+.moving {
+  border-radius: 0.5rem;
+}
