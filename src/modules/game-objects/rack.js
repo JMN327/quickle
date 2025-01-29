@@ -149,5 +149,8 @@ export default function Rack() {
     get selection() {
       return tiles[getRackIndexesOfSelectedTiles()];
     },
+    get selectionIndexes() {
+      return getRackIndexesOfSelectedTiles();
+    },
   };
 }

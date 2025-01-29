@@ -77,13 +77,24 @@ export default function screenManager() {
         console.log(
           `Switching item: ${event.detail.pickup} with item ${event.detail.swap}`
         );
+        //rackDiv.querySelector(".selected")?.classList.remove("selected")
+        //rack.deselectAll()
         rack.rearrange(event.detail.pickup, event.detail.swap);
         
       });
       rackDiv.addEventListener("mouseup", (event) => {
         let item = event.target.closest(".grid-item");
+        if (item.classList.contains("moving")) {
+          console.log(`moving, no select`)
+          return
+        }
         let selectedItemIndex = [...rackDiv.children].indexOf(item);
-        console.log(`selected item ${selectedItemIndex}`);
+        console.log(selectedItemIndex != rack.selectionIndexes[0])
+        if (selectedItemIndex != rack.selectionIndexes[0]) {
+          rack.selectSingle(selectedItemIndex)
+          rackDiv.querySelector(".selected")?.classList.remove("selected")
+          item.classList.add("selected")
+        }
       });
       rackDivs.push(rackDiv);
       rack.tiles.forEach((tile) => {

@@ -148,9 +148,6 @@ export default function Add_Component_Drag_Drop_Container(
     if (event.button !== 0) {
       return;
     }
-
-    event.stopImmediatePropagation();
-
     const snapAnimation = animateSnap(item, 0, -itemLocalPosX, 150);
     snapAnimation.onfinish = () => {
       item.style.left = null;
