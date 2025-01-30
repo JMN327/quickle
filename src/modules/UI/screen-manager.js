@@ -82,7 +82,9 @@ export default function screenManager() {
         pos[1] * gridSizePX
       );
     })
-
+  }
+  function removeValidEmptySpacesOnBoardForSelectedTile() {
+    removeAllChildNodesByCssClass(boardDiv,"valid-space")
   }
 
 
@@ -112,13 +114,17 @@ export default function screenManager() {
         }
         let selectedItemIndex = [...rackDiv.children].indexOf(item);
         if (selectedItemIndex == rack.selectionIndexes[0]) {
+          Array.from(rackDiv.children).forEach((child) =>child.classList.remove("not-selected"))
           rackDiv.querySelector(".selected")?.classList.remove("selected");
           rack.deselectSingle(selectedItemIndex);
+          removeValidEmptySpacesOnBoardForSelectedTile()
           return;
         }
         rack.selectSingle(selectedItemIndex);
+        Array.from(rackDiv.children).forEach((child) =>child.classList.add("not-selected"))
         rackDiv.querySelector(".selected")?.classList.remove("selected");
         item.classList.add("selected");
+        item.classList.remove("not-selected");
         displayValidEmptySpacesOnBoardForSelectedTile()
       });
       rackDivs.push(rackDiv);
