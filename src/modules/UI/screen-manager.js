@@ -36,8 +36,8 @@ export default function screenManager() {
   game.startGame();
   let racks = [];
   let rackDivs = [];
-  
   setupRacks();
+  setupBoardClicks();
 
   function displayBoard() {
     let boardSizeW = game.board.bounds.hSize * gridSizePX;
@@ -51,7 +51,7 @@ export default function screenManager() {
   }
 
   function displayPlacedAndFixedTilesOnBoard() {
-    removeAllChildNodesByCssClass(boardDiv,"svg-tile")
+    removeAllChildNodesByCssClass(boardDiv, "svg-tile");
     let tilePositionsOnBoard = [
       ...game.board.positionsByCellState(CellState.PLACED),
       ...game.board.positionsByCellState(CellState.FIXED),
@@ -71,22 +71,34 @@ export default function screenManager() {
   }
 
   function displayValidEmptySpacesOnBoardForSelectedTile() {
-    console.log(`VALID SPACES FOR SELECTED TILE:`)
-    console.table(game.playableTilesForSelection())
-    removeAllChildNodesByCssClass(boardDiv,"valid-space")
-    game.playableTilesForSelection().forEach((pos)=>{
-      console.log(pos)
-      addValidSpaceElement(
-        boardDiv,
-        pos[0] * gridSizePX,
-        pos[1] * gridSizePX
-      );
-    })
+    console.log(`VALID SPACES FOR SELECTED TILE:`);
+    console.table(game.playableTilesForSelection());
+    removeAllChildNodesByCssClass(boardDiv, "valid-space");
+    game.playableTilesForSelection().forEach((pos) => {
+      console.log(pos);
+      addValidSpaceElement(boardDiv, pos[0] * gridSizePX, pos[1] * gridSizePX);
+    });
   }
   function removeValidEmptySpacesOnBoardForSelectedTile() {
-    removeAllChildNodesByCssClass(boardDiv,"valid-space")
+    removeAllChildNodesByCssClass(boardDiv, "valid-space");
   }
 
+  function setupBoardClicks() {
+    boardDiv.addEventListener("mouseup", (event) => {
+      let gridPos = [
+        Math.floor(
+          (event.clientX - boardDiv.getBoundingClientRect().left) / gridSizePX
+        ),
+        Math.floor(
+          (event.clientY - boardDiv.getBoundingClientRect().top) / gridSizePX
+        ),
+      ];
+      console.log(gridPos);
+      game.placeSelectedTileOnBoard(gridPos[0], gridPos[1])
+      displayBoard()
+      displayPlacedAndFixedTilesOnBoard()
+    });
+  }
 
   function setupRacks() {
     game.playerManager.players.forEach((player) => {
@@ -114,18 +126,22 @@ export default function screenManager() {
         }
         let selectedItemIndex = [...rackDiv.children].indexOf(item);
         if (selectedItemIndex == rack.selectionIndexes[0]) {
-          Array.from(rackDiv.children).forEach((child) =>child.classList.remove("not-selected"))
+          Array.from(rackDiv.children).forEach((child) =>
+            child.classList.remove("not-selected")
+          );
           rackDiv.querySelector(".selected")?.classList.remove("selected");
           rack.deselectSingle(selectedItemIndex);
-          removeValidEmptySpacesOnBoardForSelectedTile()
+          removeValidEmptySpacesOnBoardForSelectedTile();
           return;
         }
         rack.selectSingle(selectedItemIndex);
-        Array.from(rackDiv.children).forEach((child) =>child.classList.add("not-selected"))
+        Array.from(rackDiv.children).forEach((child) =>
+          child.classList.add("not-selected")
+        );
         rackDiv.querySelector(".selected")?.classList.remove("selected");
         item.classList.add("selected");
         item.classList.remove("not-selected");
-        displayValidEmptySpacesOnBoardForSelectedTile()
+        displayValidEmptySpacesOnBoardForSelectedTile();
       });
       rackDivs.push(rackDiv);
       rack.tiles.forEach((tile) => {
@@ -135,11 +151,16 @@ export default function screenManager() {
     });
   }
 
-/*   console.log(game.currentPlayer.name);
-  console.table(game.currentPlayer.rack.tiles);
-  game.selectTileOnRack(1);
-  console.table(game.playableTilesForSelection());
-  game.placeSelectedTileOnBoard(0, 0); */
+  function placeSelectedTileOnBoard(){
+
+  }
+
+
+  /*   console.log(game.currentPlayer.name);
+    console.table(game.currentPlayer.rack.tiles);
+    game.selectTileOnRack(1);
+    console.table(game.playableTilesForSelection());
+    game.placeSelectedTileOnBoard(0, 0); */
 
   displayBoard();
   displayPlacedAndFixedTilesOnBoard();
