@@ -1,7 +1,9 @@
 import {
   addBasicElement,
   addTileElement,
+  addValidSpaceElement,
   removeAllChildNodes,
+  removeAllChildNodesByCssClass,
 } from "./DOM-elements.js";
 import ZoomPanWindow from "./ui-zoom-pan-window.js";
 import GameManager from "../game-managers/game-manager.js";
@@ -13,7 +15,7 @@ import Add_Component_Drag_Drop_Container, {
 import Rack from "../game-objects/rack.js";
 
 export default function screenManager() {
-  let tileSize = 100;
+  let gridSizePX = 100;
   let body = document.querySelector("body");
   let frame = addBasicElement("div", ["zpw"], body);
   let frameH = 900;
@@ -34,14 +36,12 @@ export default function screenManager() {
   game.startGame();
   let racks = [];
   let rackDivs = [];
-  game.playerManager.players.forEach((player) => {
-    racks.push(player.rack);
-  });
-  displayRacks();
+  
+  setupRacks();
 
   function displayBoard() {
-    let boardSizeW = game.board.bounds.hSize * tileSize;
-    let boardSizeH = game.board.bounds.vSize * tileSize;
+    let boardSizeW = game.board.bounds.hSize * gridSizePX;
+    let boardSizeH = game.board.bounds.vSize * gridSizePX;
     let styles = boardDiv.style;
     styles.width = `${boardSizeW}px`;
     styles.height = `${boardSizeH}px`;
@@ -50,7 +50,8 @@ export default function screenManager() {
     styles.top = `${zpw.viewHeight / 2 - boardSizeH / 2}px`;
   }
 
-  function displayPlacedAndFixedTiles() {
+  function displayPlacedAndFixedTilesOnBoard() {
+    removeAllChildNodesByCssClass(boardDiv,"svg-tile")
     let tilePositionsOnBoard = [
       ...game.board.positionsByCellState(CellState.PLACED),
       ...game.board.positionsByCellState(CellState.FIXED),
@@ -63,13 +64,32 @@ export default function screenManager() {
         tile.color,
         tile.shape,
         boardDiv,
-        pos[0] * tileSize,
-        pos[1] * tileSize
+        pos[0] * gridSizePX,
+        pos[1] * gridSizePX
       );
     });
   }
 
-  function displayRacks() {
+  function displayValidEmptySpacesOnBoardForSelectedTile() {
+    console.log(`VALID SPACES FOR SELECTED TILE:`)
+    console.table(game.playableTilesForSelection())
+    removeAllChildNodesByCssClass(boardDiv,"valid-space")
+    game.playableTilesForSelection().forEach((pos)=>{
+      console.log(pos)
+      addValidSpaceElement(
+        boardDiv,
+        pos[0] * gridSizePX,
+        pos[1] * gridSizePX
+      );
+    })
+
+  }
+
+
+  function setupRacks() {
+    game.playerManager.players.forEach((player) => {
+      racks.push(player.rack);
+    });
     racks.forEach((rack) => {
       let rackDiv = addBasicElement("div", ["rack"], body);
       Add_Component_Drag_Drop_Container(rackDiv, []);
@@ -80,21 +100,26 @@ export default function screenManager() {
         //rackDiv.querySelector(".selected")?.classList.remove("selected")
         //rack.deselectAll()
         rack.rearrange(event.detail.pickup, event.detail.swap);
-        
       });
       rackDiv.addEventListener("mouseup", (event) => {
         let item = event.target.closest(".grid-item");
+        if (!item) {
+          return;
+        }
         if (item.classList.contains("moving")) {
-          console.log(`moving, no select`)
-          return
+          console.log(`moving, no select`);
+          return;
         }
         let selectedItemIndex = [...rackDiv.children].indexOf(item);
-        console.log(selectedItemIndex != rack.selectionIndexes[0])
-        if (selectedItemIndex != rack.selectionIndexes[0]) {
-          rack.selectSingle(selectedItemIndex)
-          rackDiv.querySelector(".selected")?.classList.remove("selected")
-          item.classList.add("selected")
+        if (selectedItemIndex == rack.selectionIndexes[0]) {
+          rackDiv.querySelector(".selected")?.classList.remove("selected");
+          rack.deselectSingle(selectedItemIndex);
+          return;
         }
+        rack.selectSingle(selectedItemIndex);
+        rackDiv.querySelector(".selected")?.classList.remove("selected");
+        item.classList.add("selected");
+        displayValidEmptySpacesOnBoardForSelectedTile()
       });
       rackDivs.push(rackDiv);
       rack.tiles.forEach((tile) => {
@@ -104,19 +129,14 @@ export default function screenManager() {
     });
   }
 
-
-  /*   game.addPlayer({ PlayerType: PlayerType.HUMAN, name: "Elspeth" });
-  game.addPlayer({ PlayerType: PlayerType.HUMAN, name: "Jinny" });
-  game.addPlayer({ PlayerType: PlayerType.HUMAN, name: "Rose" });
-  game.startGame();
   console.log(game.currentPlayer.name);
   console.table(game.currentPlayer.rack.tiles);
   game.selectTileOnRack(1);
   console.table(game.playableTilesForSelection());
-  game.placeSelectedTileOnBoard(0, 0); */
+  game.placeSelectedTileOnBoard(0, 0);
 
   displayBoard();
-  displayPlacedAndFixedTiles();
+  displayPlacedAndFixedTilesOnBoard();
 
   function setDivSize([div, h, w]) {
     if (h) {

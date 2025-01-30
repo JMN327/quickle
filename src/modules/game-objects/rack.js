@@ -5,6 +5,7 @@ export default function Rack() {
   let tiles = new Array(6);
   tiles.fill(null);
   Object.seal(tiles);
+  let singleSelected;
 
   function select(i) {
     if (i > 5 || i < 0) {
@@ -30,6 +31,8 @@ export default function Rack() {
       throw new Error("Invalid index for selection");
     }
     deselectAll();
+    console.log(tiles)
+    console.log(i)
     tiles[i].state = TileState.SELECTED;
   }
 
@@ -45,6 +48,7 @@ export default function Rack() {
 
   function getRackIndexesOfSelectedTiles() {
     let selected = [];
+    selected = tiles.filter((tile)=>{})
     tiles.forEach((tile, index) => {
       if (tile == null) {
         return;

@@ -136,6 +136,9 @@ export default function Add_Component_Drag_Drop_Container(
       /* item.parentNode.append(item); */
       itemLocalPosX = paddingLeft;
     }
+    if (item.classList.contains("selected")) {
+      item.style.top = "-24px"
+    }
     item.style.left = itemLocalPosX + "px";
 
     getImmediateSiblings(item);
@@ -147,6 +150,9 @@ export default function Add_Component_Drag_Drop_Container(
     }
     if (event.button !== 0) {
       return;
+    }
+    if (item.classList.contains("selected")) {
+      item.style.top = null
     }
     const snapAnimation = animateSnap(item, 0, -itemLocalPosX, 150);
     snapAnimation.onfinish = () => {
@@ -186,10 +192,19 @@ export default function Add_Component_Drag_Drop_Container(
   }
 
   function animateSnap(thisItem, startPosition, endPosition, durationMS) {
-    const snap = [
-      { transform: `translate(${startPosition}px, 0px)` },
-      { transform: `translate(${endPosition}px, 0px)` },
-    ];
+    let snap;
+    console.log(thisItem.classList.contains("selected"))
+    if (thisItem.classList.contains("selected")) {
+       snap = [
+        { transform: `translate(${startPosition}px, -24px) scale(1.075)` },
+        { transform: `translate(${endPosition}px, -24px) scale(1.075)` },
+      ];
+    } else {
+       snap = [
+        { transform: `translate(${startPosition}px, 0px) scale(1)` },
+        { transform: `translate(${endPosition}px, 0px) scale(1)` },
+      ];
+    }
     const snapTiming = {
       duration: durationMS,
     };

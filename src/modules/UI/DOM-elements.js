@@ -62,10 +62,29 @@ export function addTileElement(color, shape, parent = null, left, top) {
   return svgTile;
 }
 
+export function addValidSpaceElement(parent = null, left, top) {
+  const space = document.createElement("div")
+  space.classList.add("valid-space")
+  space.style.left = `${left}px`;
+  space.style.top = `${top}px`;
+  space.style.position = "absolute"
+
+  if (parent) {
+    parent.appendChild(space);
+  }
+}
+
 export function removeAllChildNodes(parent) {
   while (parent.firstChild) {
     parent.removeChild(parent.firstChild);
   }
+}
+export function removeAllChildNodesByCssClass(parent, cssClass) {
+  Array.from(parent.children).forEach((child)=>{
+    if (child.classList.contains(cssClass)) {
+      parent.removeChild(child)
+    }
+  })
 }
 
 function reverseEnum(e, value) {

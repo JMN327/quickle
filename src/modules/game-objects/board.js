@@ -233,10 +233,10 @@ export default function Board() {
       let checkCells = [];
       Object.values(Direction).forEach((direction) => {
         let cell = radiate(direction, fromRow, fromCol).activeCellFound;
-        checkCells.push({ row: cell.row, col: cell.col });
+        checkCells.push([cell.row,cell.col]);
       });
       playableCells = checkCells.filter((cell) =>
-        tileIsValidForCell(tile, cell.row, cell.col)
+        tileIsValidForCell(tile, cell[0], cell[1])
       );
       console.log(playableCells);
       return playableCells;
@@ -255,10 +255,10 @@ export default function Board() {
       let checkCells = [];
       directions.forEach((direction) => {
         let cell = radiate(direction, fromRow, fromCol).activeCellFound;
-        checkCells.push({ row: cell.row, col: cell.col });
+        checkCells.push([cell.row,cell.col]);
       });
       playableCells = checkCells.filter((cell) =>
-        tileIsValidForCell(tile, cell.row, cell.col)
+        tileIsValidForCell(tile, cell[0], cell[1])
       );
       console.log(playableCells);
       return playableCells;
