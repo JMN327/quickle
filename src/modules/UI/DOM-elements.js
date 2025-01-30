@@ -64,6 +64,9 @@ export function addTileElement(color, shape, parent = null, left, top) {
 
 export function addValidSpaceElement(parent = null, left, top) {
   const space = document.createElement("div")
+  const border = document.createElement("div")
+  border.classList.add("valid-space__border")
+  space.appendChild(border)
   space.classList.add("valid-space")
   space.style.left = `${left}px`;
   space.style.top = `${top}px`;

@@ -129,11 +129,11 @@ export default function screenManager() {
     });
   }
 
-  console.log(game.currentPlayer.name);
+/*   console.log(game.currentPlayer.name);
   console.table(game.currentPlayer.rack.tiles);
   game.selectTileOnRack(1);
   console.table(game.playableTilesForSelection());
-  game.placeSelectedTileOnBoard(0, 0);
+  game.placeSelectedTileOnBoard(0, 0); */
 
   displayBoard();
   displayPlacedAndFixedTilesOnBoard();

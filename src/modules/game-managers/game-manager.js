@@ -36,6 +36,7 @@ export default function GameManager() {
     console.log(startWordLengths.indexOf(Math.max(...startWordLengths)));
     playerManager.setStartPlayer(startWordLengths.indexOf(Math.max(...startWordLengths)));
     currentPlayer = playerManager.active;
+    console.log(`GAME STARTED  Start player is ${currentPlayer.name}`)
     switchGameState(GameState.PLAYING);
   }
 
