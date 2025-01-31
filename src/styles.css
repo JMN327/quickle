@@ -11,7 +11,7 @@
   line-height: 1.25rem;
 
   --border-radius-small: 0.5rem;
-  --standard-box-shadow: 0px 0.375rem 0.25rem -0.0625rem rgba(0, 0, 0, 0.15);
+  --standard-box-shadow: 0px 0.375rem 0.25rem -0.0625rem rgba(255, 197, 130, 0.15);
 }
 
 .pallet {
@@ -21,7 +21,7 @@
 .rack {
   background-color: rgb(230, 214, 180);
   border-radius: 0.5rem;
-  box-shadow: 0px 3px 4px 2px rgba(0, 0, 0, 0.363);
+  box-shadow: 0px 3px 4px 2px rgba(255, 197, 130, 0.15);
 }
 
 .svg-tile {
