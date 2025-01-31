@@ -29,11 +29,7 @@ export default function screenManager() {
   let rackDivs = []; // = setup rackDivs
 
   //setup zpw
-  let frame = addBasicElement("div", ["zpw"], containerDiv);
-  let frameH = 900;
-  let frameW = 900;
-  setDivSize([frame, frameH, frameW]);
-  let zpw = ZoomPanWindow(frame);
+  let zpw = ZoomPanWindow(containerDiv);
   zpw.bounded = true;
 
   zpw.appendChild(boardDiv);

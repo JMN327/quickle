@@ -1,17 +1,24 @@
 import { addBasicElement, addSvgElement } from "./DOM-elements.js";
 
-export default function ZoomPanWindow(div) {
-  if (!div) {
+export default function ZoomPanWindow(containerDiv) {
+  if (!containerDiv) {
     return null;
   }
+  
+  ///// set up zoom pan window /////
+  let zpw = addBasicElement("div", ["zpw"], containerDiv);
+  let zpwH = 900;
+  let zpwW = 900;
+  setDivSize([zpw, zpwH, zpwW]);
 
   ///// Setup frame div /////
-  const frame = addBasicElement("div", ["frame"], div);
+  const frame = addBasicElement("div", ["frame"], zpw);
   let frameLimits = frame.getBoundingClientRect();
   const frameL = frameLimits.left;
   const frameT = frameLimits.top;
   const frameW = frameLimits.width;
   const frameH = frameLimits.height;
+
 
   ///// Setup view div /////
   let view = addBasicElement("div", ["view"], frame);
@@ -189,7 +196,6 @@ export default function ZoomPanWindow(div) {
   });
 
   frame.addEventListener("mousedown", (event) => {
-    console.log(event.target);
     if (event.buttons !== 1) {
       return;
     }
