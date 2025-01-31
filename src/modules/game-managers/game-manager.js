@@ -52,6 +52,9 @@ export default function GameManager() {
   function playableTilesForSelection() {
     console.log(currentPlayer.rack.selection)
     let tile = currentPlayer.rack.selection
+    if (tile == undefined) {
+      return
+    }
     return board.playableCells(tile) ;
   }
 

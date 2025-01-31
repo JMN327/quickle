@@ -1,5 +1,6 @@
 import {
   addBasicElement,
+  addNullRackTile,
   addTileElement,
   addValidSpaceElement,
   removeAllChildNodes,
@@ -15,88 +16,52 @@ import Add_Component_Drag_Drop_Container, {
 import Rack from "../game-objects/rack.js";
 
 export default function screenManager() {
-  let gridSizePX = 100;
-  let body = document.querySelector("body");
-  let frame = addBasicElement("div", ["zpw"], body);
+  let gridSizePx = 100;
+  let containerDiv = document.querySelector("body");
+
+  //module scoped variables
+  let game = GameManager(); // maybe player details and start game
+  let players = []; // setup players
+  let playerDivs = []; // setup player spaces
+  let board = game.board;
+  let boardDiv = addBasicElement("div", ["board"], containerDiv); //setup board
+  let racks = []; // = setup racks
+  let rackDivs = []; // = setup rackDivs
+
+  //setup zpw
+  let frame = addBasicElement("div", ["zpw"], containerDiv);
   let frameH = 900;
   let frameW = 900;
   setDivSize([frame, frameH, frameW]);
   let zpw = ZoomPanWindow(frame);
   zpw.bounded = true;
 
-  let boardDiv = addBasicElement("div", ["board"], body);
   zpw.appendChild(boardDiv);
 
-  let game = GameManager();
-
-  // make setup function
+  // setup Game
   game.addPlayer({ PlayerType: PlayerType.HUMAN, name: "Elspeth" });
   game.addPlayer({ PlayerType: PlayerType.HUMAN, name: "Jinny" });
   game.addPlayer({ PlayerType: PlayerType.HUMAN, name: "Rose" });
   game.startGame();
-  let racks = [];
-  let rackDivs = [];
   setupRacks();
-  setupBoardClicks();
+  setupBoard();
 
-  function displayBoard() {
-    let boardSizeW = game.board.bounds.hSize * gridSizePX;
-    let boardSizeH = game.board.bounds.vSize * gridSizePX;
-    let styles = boardDiv.style;
-    styles.width = `${boardSizeW}px`;
-    styles.height = `${boardSizeH}px`;
-    console.log(zpw.viewWidth / 2 - boardSizeW / 2);
-    styles.left = `${zpw.viewWidth / 2 - boardSizeW / 2}px`;
-    styles.top = `${zpw.viewHeight / 2 - boardSizeH / 2}px`;
-  }
-
-  function displayPlacedAndFixedTilesOnBoard() {
-    removeAllChildNodesByCssClass(boardDiv, "svg-tile");
-    let tilePositionsOnBoard = [
-      ...game.board.positionsByCellState(CellState.PLACED),
-      ...game.board.positionsByCellState(CellState.FIXED),
-    ];
-    console.log(tilePositionsOnBoard);
-    tilePositionsOnBoard.forEach((pos) => {
-      let tile = game.board.cells[pos[0]][pos[1]].tile;
-      console.log(game.board.cells[pos[0]][pos[1]].tile);
-      addTileElement(
-        tile.color,
-        tile.shape,
-        boardDiv,
-        pos[0] * gridSizePX,
-        pos[1] * gridSizePX
-      );
-    });
-  }
-
-  function displayValidEmptySpacesOnBoardForSelectedTile() {
-    console.log(`VALID SPACES FOR SELECTED TILE:`);
-    console.table(game.playableTilesForSelection());
-    removeAllChildNodesByCssClass(boardDiv, "valid-space");
-    game.playableTilesForSelection().forEach((pos) => {
-      console.log(pos);
-      addValidSpaceElement(boardDiv, pos[0] * gridSizePX, pos[1] * gridSizePX);
-    });
-  }
-  function removeValidEmptySpacesOnBoardForSelectedTile() {
-    removeAllChildNodesByCssClass(boardDiv, "valid-space");
-  }
-
-  function setupBoardClicks() {
+  function setupBoard() {
     boardDiv.addEventListener("mouseup", (event) => {
       let gridPos = [
         Math.floor(
-          (event.clientX - boardDiv.getBoundingClientRect().left) / gridSizePX
+          (event.clientY - boardDiv.getBoundingClientRect().top) / gridSizePx
         ),
         Math.floor(
-          (event.clientY - boardDiv.getBoundingClientRect().top) / gridSizePX
+          (event.clientX - boardDiv.getBoundingClientRect().left) / gridSizePx
         ),
       ];
       console.log(gridPos);
-      game.placeSelectedTileOnBoard(gridPos[0], gridPos[1])
-      displayBoard()
-      displayPlacedAndFixedTilesOnBoard()
+      game.placeSelectedTileOnBoard(gridPos[0], gridPos[1]);
+      displayBoard();
+      displayPlacedAndFixedTilesOnBoard();
+      displayRacks();
+      displayPlayableTilesForSelection();
     });
   }
 
@@ -105,14 +70,12 @@ export default function screenManager() {
       racks.push(player.rack);
     });
     racks.forEach((rack) => {
-      let rackDiv = addBasicElement("div", ["rack"], body);
+      let rackDiv = addBasicElement("div", ["rack"], containerDiv);
       Add_Component_Drag_Drop_Container(rackDiv, []);
       rackDiv.addEventListener("dragDrop", (event) => {
         console.log(
           `Switching item: ${event.detail.pickup} with item ${event.detail.swap}`
         );
-        //rackDiv.querySelector(".selected")?.classList.remove("selected")
-        //rack.deselectAll()
         rack.rearrange(event.detail.pickup, event.detail.swap);
       });
       rackDiv.addEventListener("mouseup", (event) => {
@@ -141,20 +104,74 @@ export default function screenManager() {
         rackDiv.querySelector(".selected")?.classList.remove("selected");
         item.classList.add("selected");
         item.classList.remove("not-selected");
-        displayValidEmptySpacesOnBoardForSelectedTile();
+        displayPlayableTilesForSelection();
       });
       rackDivs.push(rackDiv);
-      rack.tiles.forEach((tile) => {
-        let tileDiv = addTileElement(tile.color, tile.shape, rackDiv);
+    });
+    displayRacks();
+  }
+
+  function displayBoard() {
+    let boardSizeW = board.bounds.hSize * gridSizePx;
+    let boardSizeH = board.bounds.vSize * gridSizePx;
+    let leftOffset = board.bounds.left * gridSizePx;
+    let topOffset = board.bounds.top * gridSizePx;
+    let styles = boardDiv.style;
+    styles.width = `${boardSizeW}px`;
+    styles.height = `${boardSizeH}px`;
+    let centre = [zpw.viewWidth / 2, zpw.viewHeight / 2];
+    console.log(zpw.viewWidth / 2 - boardSizeW / 2);
+    styles.left = `${zpw.viewWidth / 2 + leftOffset - gridSizePx / 2}px`;
+    styles.top = `${zpw.viewHeight / 2 + topOffset - gridSizePx / 2}px`;
+  }
+
+  function displayRacks() {
+    for (let i = 0; i < rackDivs.length; i++) {
+      removeAllChildNodes(rackDivs[i]);
+      racks[i].tiles.forEach((tile) => {
+        let tileDiv;
+        if (tile == null) {
+          tileDiv = addNullRackTile(rackDivs[i]);
+        } else {
+          tileDiv = addTileElement(tile.color, tile.shape, rackDivs[i]);
+        }
         Add_Component_Drag_Drop_Item(tileDiv);
       });
+    }
+  }
+
+  function displayPlacedAndFixedTilesOnBoard() {
+    removeAllChildNodesByCssClass(boardDiv, "svg-tile");
+    let tilePositionsOnBoard = [
+      ...board.positionsByCellState(CellState.PLACED),
+      ...board.positionsByCellState(CellState.FIXED),
+    ];
+    console.log(tilePositionsOnBoard);
+    tilePositionsOnBoard.forEach((pos) => {
+      let tile = board.cells[pos[0]][pos[1]].tile;
+      console.log(board.cells[pos[0]][pos[1]].tile);
+      addTileElement(
+        tile.color,
+        tile.shape,
+        boardDiv,
+        pos[0] * gridSizePx,
+        pos[1] * gridSizePx
+      );
     });
   }
 
-  function placeSelectedTileOnBoard(){
-
+  function displayPlayableTilesForSelection() {
+    console.log(`VALID SPACES FOR SELECTED TILE:`);
+    console.table(game.playableTilesForSelection());
+    removeAllChildNodesByCssClass(boardDiv, "valid-space");
+    game.playableTilesForSelection()?.forEach((pos) => {
+      console.log(pos);
+      addValidSpaceElement(boardDiv, pos[0] * gridSizePx, pos[1] * gridSizePx);
+    });
   }
-
+  function removeValidEmptySpacesOnBoardForSelectedTile() {
+    removeAllChildNodesByCssClass(boardDiv, "valid-space");
+  }
 
   /*   console.log(game.currentPlayer.name);
     console.table(game.currentPlayer.rack.tiles);

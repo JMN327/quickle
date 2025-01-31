@@ -39,7 +39,7 @@ export function addSvgElement(shape, classes = [], parent = null) {
   return svgElement;
 }
 
-export function addTileElement(color, shape, parent = null, left, top) {
+export function addTileElement(color, shape, parent = null, top, left) {
   const svgTile = document.createElement("div");
   svgTile.classList.add("svg-tile");
   svgTile.classList.add(reverseEnum(Shape, shape));
@@ -62,7 +62,16 @@ export function addTileElement(color, shape, parent = null, left, top) {
   return svgTile;
 }
 
-export function addValidSpaceElement(parent = null, left, top) {
+export function addNullRackTile(parent = null) {
+  const nullTile = document.createElement("div");
+  nullTile.classList.add("null-tile");
+  if (parent) {
+    parent.appendChild(nullTile);
+  }
+  return nullTile;
+}
+
+export function addValidSpaceElement(parent = null, top, left) {
   const space = document.createElement("div")
   const border = document.createElement("div")
   border.classList.add("valid-space__border")

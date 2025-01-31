@@ -2,10 +2,30 @@ import "./styles.css";
 import "./Drag_Drop_List.css";
 import storageAvailable from "./modules/browser-storage.js";
 import screenManager from "./modules/UI/screen-manager.js";
+import { addBasicElement } from "./modules/UI/DOM-elements.js";
+import ZoomPanWindow from "./modules/UI/ui-zoom-pan-window.js";
 
 console.log("Hello World!)");
 console.log(`Local Storage available: ${storageAvailable("localStorage")}`);
 console.log(`Session Storage available: ${storageAvailable("sessionStorage")}`);
+
+/* let containerDiv = document.querySelector("body");
+let frame = addBasicElement("div", ["zpw"], containerDiv);
+  let frameH = 900;
+  let frameW = 900;
+  setDivSize([frame, frameH, frameW]);
+  let zpw = ZoomPanWindow(frame);
+  zpw.bounded = true;
+
+
+  function setDivSize([div, h, w]) {
+    if (h) {
+      div.style.height = h + "px";
+    }
+    if (w) {
+      div.style.width = w + "px";
+    }
+  } */
 
 screenManager();
 

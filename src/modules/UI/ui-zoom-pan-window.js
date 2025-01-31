@@ -223,6 +223,9 @@ export default function ZoomPanWindow(div) {
   });
 
   document.body.addEventListener("mouseup", (event) => {
+    if (!viewMouseDown) {
+      return;
+    }
     viewMouseDown = false;
     viewPos = viewMovingPos;
   });

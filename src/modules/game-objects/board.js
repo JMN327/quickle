@@ -35,16 +35,16 @@ export default function Board() {
     },
   };
 
-  function addTile(tile, rowToOffset, colToOffset) {
+  function addTile(tile, row, col) {
     console.log(
       `ADDING TILE ${reverseEnum(Color, tile[0].color)} ${reverseEnum(
         Shape,
         tile[0].shape
-      )} at [${rowToOffset},${colToOffset}]`
+      )} at [${row},${col}]`
     );
     tile = tile[0]; //change once passing tile better implemented
-    let row = cellsOffsetRow(rowToOffset);
-    let col = cellsOffsetCol(colToOffset);
+    /* let row = cellsOffsetRow(rowToOffset);
+    let col = cellsOffsetCol(colToOffset); */
 
     // validity checks to be handed to player //
     if (!tileIsValidForCell(tile, row, col)) {
@@ -54,6 +54,7 @@ export default function Board() {
       throw new Error("The cell is not active");
     }
     cells[row][col].addTile(tile);
+    console.log(`EDGES TO GROW ${JSON.stringify(edgeGrowDirections(row, col))}`)
     edgeGrowDirections(row, col).forEach((direction) => {
       AddRemoveBoardEdges(direction, AddRemove.ADD);
       col = direction == Direction.LEFT ? col + 1 : col;
