@@ -11,7 +11,7 @@ export default function ZoomPanWindow(containerDiv) {
   let zpwW = 900;
   setDivSizePx([zpw, zpwH, zpwW]); */
   zpw.style.width = "calc(100vw - 100px)" 
-  zpw.style.height = "calc(100vh - 75px)" 
+  zpw.style.height = "calc(100vh - 282px)" 
 
   ///// Setup frame div /////
   const frame = addBasicElement("div", ["frame"], zpw);

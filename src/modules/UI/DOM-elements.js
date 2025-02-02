@@ -46,7 +46,7 @@ export function addTileElement(color, shape, parent = null, top, left) {
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.classList.add("svg-tile__svg");
   const use = document.createElementNS("http://www.w3.org/2000/svg", "use");
-  use.setAttribute("href", `#`);
+  use.setAttribute("href", `#${reverseEnum(Shape, shape)}`);
   svg.appendChild(use);
   svgTile.appendChild(svg);
   if (left && top) {

@@ -28,7 +28,7 @@ export default function screenManager() {
   let board = game.board;
   let boardUI = addBasicElement("div", ["board"], containerDiv); //setup board
   let zpwUI = ZoomPanWindow(containerDiv);
-  zpwUI.bounded = true;
+  zpwUI.bounded = false;
   zpwUI.appendChild(boardUI);
 
   // setup Game
@@ -78,6 +78,7 @@ export default function screenManager() {
     });
     rackElement.addEventListener("mouseup", (event) => {
       let item = event.target.closest(".grid-item");
+      console.log(item)
       if (!item) {
         return;
       }
@@ -108,6 +109,7 @@ export default function screenManager() {
     for (let i = 0; i < 6; i++) {
       let tileSpace = addTileElement(5, 5, rackElement);
       tileSpace.classList.add("null-tile");
+      Add_Component_Drag_Drop_Item(tileSpace)
     }
 
     return rackElement;
