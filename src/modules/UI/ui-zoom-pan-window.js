@@ -4,12 +4,14 @@ export default function ZoomPanWindow(containerDiv) {
   if (!containerDiv) {
     return null;
   }
-  
+
   ///// set up zoom pan window /////
   let zpw = addBasicElement("div", ["zpw"], containerDiv);
-  let zpwH = 900;
+/*   let zpwH = 900;
   let zpwW = 900;
-  setDivSize([zpw, zpwH, zpwW]);
+  setDivSizePx([zpw, zpwH, zpwW]); */
+  zpw.style.width = "calc(100vw - 100px)" 
+  zpw.style.height = "calc(100vh - 75px)" 
 
   ///// Setup frame div /////
   const frame = addBasicElement("div", ["frame"], zpw);
@@ -19,14 +21,13 @@ export default function ZoomPanWindow(containerDiv) {
   const frameW = frameLimits.width;
   const frameH = frameLimits.height;
 
-
   ///// Setup view div /////
   let view = addBasicElement("div", ["view"], frame);
   let viewH = 5000;
   let viewW = 5000;
   let viewR;
   let viewB;
-  setDivSize([view, viewH, viewW]);
+  setDivSizePx([view, viewH, viewW]);
   let viewMouseDown = false;
   let bounded = true;
 
@@ -84,7 +85,7 @@ export default function ZoomPanWindow(containerDiv) {
   let zoomScaleFactor = 1.1;
 
   ///// utilities /////
-  function setDivSize([div, h, w]) {
+  function setDivSizePx([div, h, w]) {
     if (h) {
       div.style.height = h + "px";
     }
@@ -294,6 +295,9 @@ export default function ZoomPanWindow(containerDiv) {
   }
 
   return {
+    get zoomScale() {
+      return zoomScaleFactor ** zoomLevel;
+    },
     get zoomLevelMax() {
       return zoomLevelMax;
     },
@@ -323,7 +327,7 @@ export default function ZoomPanWindow(containerDiv) {
       }
       factor = factor > 2 ? 2 : factor;
       factor = factor < 1 ? 1 : factor;
-      zoomScaleFactor = factor
+      zoomScaleFactor = factor;
     },
     get viewWidth() {
       return viewW;
@@ -338,7 +342,7 @@ export default function ZoomPanWindow(containerDiv) {
         );
       }
       viewW = width;
-      setDivSize([view, viewH, viewW]);
+      setDivSizePx([view, viewH, viewW]);
     },
     get viewHeight() {
       return viewH;
@@ -353,7 +357,7 @@ export default function ZoomPanWindow(containerDiv) {
         );
       }
       viewH = height;
-      setDivSize([view, viewH, viewW]);
+      setDivSizePx([view, viewH, viewW]);
     },
     get bounded() {
       let isBounded = bounded ? true : false;

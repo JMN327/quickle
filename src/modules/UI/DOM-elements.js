@@ -42,12 +42,11 @@ export function addSvgElement(shape, classes = [], parent = null) {
 export function addTileElement(color, shape, parent = null, top, left) {
   const svgTile = document.createElement("div");
   svgTile.classList.add("svg-tile");
-  svgTile.classList.add(reverseEnum(Shape, shape));
   svgTile.classList.add(reverseEnum(Color, color));
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.classList.add("svg-tile__svg");
   const use = document.createElementNS("http://www.w3.org/2000/svg", "use");
-  use.setAttribute("href", `#${reverseEnum(Shape, shape)}`);
+  use.setAttribute("href", `#`);
   svg.appendChild(use);
   svgTile.appendChild(svg);
   if (left && top) {
