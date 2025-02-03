@@ -29,7 +29,7 @@ export default function screenManager() {
   let boardUI = addBasicElement("div", ["board"], containerDiv); //setup board
   let zpwUI = ZoomPanWindow(containerDiv);
   zpwUI.bounded = false;
-  zpwUI.appendChild(boardUI);
+  zpwUI.appendChildToView(boardUI);
 
   // setup Game
   game.addPlayer({ PlayerType: PlayerType.HUMAN, name: "Elspeth" });
@@ -43,9 +43,6 @@ export default function screenManager() {
 
   function setupBoard() {
     boardUI.addEventListener("mouseup", (event) => {
-      console.log(zpwUI.zoomLevel);
-      console.log(zpwUI.zoomScaleFactor);
-
       let gridPos = [
         Math.floor(
           (event.clientY - boardUI.getBoundingClientRect().top) /
@@ -69,6 +66,7 @@ export default function screenManager() {
 
   function setupRackUI() {
     let rackElement = addBasicElement("div", ["rack"], containerDiv);
+    zpwUI.appendChildToPanel(rackElement);
     Add_Component_Drag_Drop_Container(rackElement, []);
     rackElement.addEventListener("dragDrop", (event) => {
       console.log(
@@ -76,9 +74,15 @@ export default function screenManager() {
       );
       rack.rearrange(event.detail.pickup, event.detail.swap);
     });
+    rackElement.addEventListener(
+      "mousedown",((event) => {
+        console.log("Rack Click");
+        event.stopImmediatePropagation()
+      })
+    );
     rackElement.addEventListener("mouseup", (event) => {
       let item = event.target.closest(".grid-item");
-      console.log(item)
+      console.log(item);
       if (!item) {
         return;
       }
@@ -109,7 +113,7 @@ export default function screenManager() {
     for (let i = 0; i < 6; i++) {
       let tileSpace = addTileElement(5, 5, rackElement);
       tileSpace.classList.add("null-tile");
-      Add_Component_Drag_Drop_Item(tileSpace)
+      Add_Component_Drag_Drop_Item(tileSpace);
     }
 
     return rackElement;

@@ -7,11 +7,11 @@ export default function ZoomPanWindow(containerDiv) {
 
   ///// set up zoom pan window /////
   let zpw = addBasicElement("div", ["zpw"], containerDiv);
-/*   let zpwH = 900;
+  /*   let zpwH = 900;
   let zpwW = 900;
   setDivSizePx([zpw, zpwH, zpwW]); */
-  zpw.style.width = "calc(100vw - 100px)" 
-  zpw.style.height = "calc(100vh - 282px)" 
+  zpw.style.width = "100vw";
+  zpw.style.height = "100vh";
 
   ///// Setup frame div /////
   const frame = addBasicElement("div", ["frame"], zpw);
@@ -197,6 +197,7 @@ export default function ZoomPanWindow(containerDiv) {
   });
 
   frame.addEventListener("mousedown", (event) => {
+    console.log("Panning")
     if (event.buttons !== 1) {
       return;
     }
@@ -287,11 +288,17 @@ export default function ZoomPanWindow(containerDiv) {
 
   ///// exposed functions /////
 
-  function appendChild(div) {
+  function appendChildToView(div) {
     if (!(div instanceof HTMLElement)) {
       throw new Error("Parameter is not an HTML Element");
     }
     view.appendChild(div);
+  }
+  function appendChildToPanel(div) {
+    if (!(div instanceof HTMLElement)) {
+      throw new Error("Parameter is not an HTML Element");
+    }
+    panel.appendChild(div);
   }
 
   return {
@@ -368,6 +375,7 @@ export default function ZoomPanWindow(containerDiv) {
         bounded = bool;
       }
     },
-    appendChild,
+    appendChildToView,
+    appendChildToPanel,
   };
 }

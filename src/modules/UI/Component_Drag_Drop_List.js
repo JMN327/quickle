@@ -41,6 +41,7 @@ export default function Add_Component_Drag_Drop_Container(
   });
 
   function pickUpGridItem(event) {
+    console.log("dragDropping")
     let earlyExitCheck = nonGrabClassArr.some((CssClass) =>
       event.target.classList.contains(CssClass)
     );
