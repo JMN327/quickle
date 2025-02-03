@@ -1,6 +1,7 @@
 import {
   addBasicElement,
   addNullRackTile,
+  addSvgElement,
   addTileElement,
   addValidSpaceElement,
   removeAllChildNodes,
@@ -119,8 +120,11 @@ export default function screenManager() {
 
     ///// buttons /////
     let buttonsDiv = addBasicElement("div", ["widget__buttons"], container);
-    let swapButton = addBasicElement("div", ["widget__button", "swap"], buttonsDiv, "swap");
-    let playButton = addBasicElement("div", ["widget__button", "play"], buttonsDiv, "play");
+    let swapButton = addBasicElement("div", ["widget__button", "swap"], buttonsDiv );
+    let swapIcon = addSvgElement("swap", ["button-icon"],swapButton)
+    let playButton = addBasicElement("div", ["widget__button", "play"], buttonsDiv);
+    let playIcon = addSvgElement("play", ["button-icon"],playButton)
+
 
 
     return { container, rackDiv };
