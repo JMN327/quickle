@@ -66,11 +66,11 @@ export default function screenManager() {
   }
 
   function setupGameWidgetUI() {
-    let container = addBasicElement("div", ["ui-container"]);
-    zpwUI.appendChildToPanel(container);
+    let widget = addBasicElement("div", ["widget"]);
+    zpwUI.appendChildToPanel(widget);
 
     ///// rack /////
-    let rackDiv = addBasicElement("div", ["rack"], container);
+    let rackDiv = addBasicElement("div", ["rack"], widget);
     Add_Component_Drag_Drop_Container(rackDiv, []);
     rackDiv.addEventListener("dragDrop", (event) => {
       console.log(
@@ -119,15 +119,25 @@ export default function screenManager() {
     }
 
     ///// buttons /////
-    let buttonsDiv = addBasicElement("div", ["widget__buttons"], container);
-    let swapButton = addBasicElement("div", ["widget__button", "swap"], buttonsDiv );
+    /* let buttonsDiv = addBasicElement("div", ["widget__buttons"], widget); */
+    let swapButton = addBasicElement("div", ["widget__button", "swap"], widget );
     let swapIcon = addSvgElement("swap", ["button-icon"],swapButton)
-    let playButton = addBasicElement("div", ["widget__button", "play"], buttonsDiv);
+    widget.insertBefore(swapButton,widget.firstChild)
+    let playButton = addBasicElement("div", ["widget__button", "play"], widget);
     let playIcon = addSvgElement("play", ["button-icon"],playButton)
 
+    swapButton.addEventListener("mousedown", (event) => {
+      console.log("swap Click");
+      event.stopImmediatePropagation();
+    });
+    playButton.addEventListener("mousedown", (event) => {
+      console.log("play Click");
+      event.stopImmediatePropagation();
+    });
 
 
-    return { container, rackDiv };
+
+    return { container: widget, rackDiv };
   }
 
   function displayRack() {
@@ -141,10 +151,12 @@ export default function screenManager() {
         reverseEnum(Color, Color.GREEN),
         reverseEnum(Color, Color.BLUE),
         reverseEnum(Color, Color.PURPLE),
-        "null-tile"
+        "null-tile",
+        "not-selected"
       );
       if (tile == null) {
         rackSpaceDivs[i].classList.add("null-tile");
+        rackSpaceDivs[i].classList.remove("selected");
       } else {
         rackSpaceDivs[i].classList.add(reverseEnum(Color, tile.color));
         rackSpaceDivs[i]
