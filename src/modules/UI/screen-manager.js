@@ -38,7 +38,7 @@ export default function screenManager() {
   game.startGame();
   setupBoard();
   let rack = game.currentPlayer.rack;
-  let rackUI = setupRackUI(); // = setup rackDivs
+  let gameWidgetUI = setupGameWidgetUI(); // = setup rackDivs
   displayRack();
 
   function setupBoard() {
@@ -64,23 +64,24 @@ export default function screenManager() {
     });
   }
 
-  function setupRackUI() {
-    let rackElement = addBasicElement("div", ["rack"], containerDiv);
-    zpwUI.appendChildToPanel(rackElement);
-    Add_Component_Drag_Drop_Container(rackElement, []);
-    rackElement.addEventListener("dragDrop", (event) => {
+  function setupGameWidgetUI() {
+    let container = addBasicElement("div", ["ui-container"]);
+    zpwUI.appendChildToPanel(container);
+
+    ///// rack /////
+    let rackDiv = addBasicElement("div", ["rack"], container);
+    Add_Component_Drag_Drop_Container(rackDiv, []);
+    rackDiv.addEventListener("dragDrop", (event) => {
       console.log(
         `Switching item: ${event.detail.pickup} with item ${event.detail.swap}`
       );
       rack.rearrange(event.detail.pickup, event.detail.swap);
     });
-    rackElement.addEventListener(
-      "mousedown",((event) => {
-        console.log("Rack Click");
-        event.stopImmediatePropagation()
-      })
-    );
-    rackElement.addEventListener("mouseup", (event) => {
+    rackDiv.addEventListener("mousedown", (event) => {
+      console.log("Rack Click");
+      event.stopImmediatePropagation();
+    });
+    rackDiv.addEventListener("mouseup", (event) => {
       let item = event.target.closest(".grid-item");
       console.log(item);
       if (!item) {
@@ -90,39 +91,45 @@ export default function screenManager() {
         console.log(`moving, no select`);
         return;
       }
-      let selectedItemIndex = [...rackElement.children].indexOf(item);
+      let selectedItemIndex = [...rackDiv.children].indexOf(item);
       if (selectedItemIndex == rack.selectionIndexes[0]) {
-        Array.from(rackElement.children).forEach((child) =>
+        Array.from(rackDiv.children).forEach((child) =>
           child.classList.remove("not-selected")
         );
-        rackElement.querySelector(".selected")?.classList.remove("selected");
+        rackDiv.querySelector(".selected")?.classList.remove("selected");
         rack.deselectSingle(selectedItemIndex);
         removeValidEmptySpacesOnBoardForSelectedTile();
         return;
       }
       rack.selectSingle(selectedItemIndex);
-      Array.from(rackElement.children).forEach((child) =>
+      Array.from(rackDiv.children).forEach((child) =>
         child.classList.add("not-selected")
       );
-      rackElement.querySelector(".selected")?.classList.remove("selected");
+      rackDiv.querySelector(".selected")?.classList.remove("selected");
       item.classList.add("selected");
       item.classList.remove("not-selected");
       displayPlayableTilesForSelection();
     });
 
     for (let i = 0; i < 6; i++) {
-      let tileSpace = addTileElement(5, 5, rackElement);
+      let tileSpace = addTileElement(5, 5, rackDiv);
       tileSpace.classList.add("null-tile");
       Add_Component_Drag_Drop_Item(tileSpace);
     }
 
-    return rackElement;
+    ///// buttons /////
+    let buttonsDiv = addBasicElement("div", ["widget__buttons"], container);
+    let swapButton = addBasicElement("div", ["widget__button", "swap"], buttonsDiv, "swap");
+    let playButton = addBasicElement("div", ["widget__button", "play"], buttonsDiv, "play");
+
+
+    return { container, rackDiv };
   }
 
   function displayRack() {
     for (let i = 0; i < 6; i++) {
       let tile = rack.tiles[i];
-      let rackSpaceDivs = Array.from(rackUI.children);
+      let rackSpaceDivs = Array.from(gameWidgetUI.rackDiv.children);
       rackSpaceDivs[i].classList.remove(
         reverseEnum(Color, Color.RED),
         reverseEnum(Color, Color.ORANGE),
