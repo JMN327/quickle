@@ -17,8 +17,8 @@ export default function Player(playerType = PlayerType.HUMAN, name = "Human") {
     turnScores: [],
     accumulatedScores: [],
     add: (newScore) => {
-      turnScores.push(newScore);
-      accumulatedScores.push(newScore + turnScores[turnScores.length - 1]);
+      score.turnScores.push(newScore);
+      score.accumulatedScores.push(newScore + score.turnScores[score.turnScores.length - 1]);
     },
     reset: () => {
       turnScores = []

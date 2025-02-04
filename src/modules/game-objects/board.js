@@ -54,7 +54,9 @@ export default function Board() {
       throw new Error("The cell is not active");
     }
     cells[row][col].addTile(tile);
-    console.log(`EDGES TO GROW ${JSON.stringify(edgeGrowDirections(row, col))}`)
+    console.log(
+      `EDGES TO GROW ${JSON.stringify(edgeGrowDirections(row, col))}`
+    );
     edgeGrowDirections(row, col).forEach((direction) => {
       AddRemoveBoardEdges(direction, AddRemove.ADD);
       col = direction == Direction.LEFT ? col + 1 : col;
@@ -193,11 +195,12 @@ export default function Board() {
       `Check tile ${reverseEnum(Color, tile.color)} ${reverseEnum(
         Shape,
         tile.shape
-      )} is valid for cell [${row},${col}]`
+      )} ${tile.color} ${tile.shape} is valid for cell [${row},${col}]`
     );
     let result = cells[row][col].checkList.validSymbols.some(
       (validTile) => validTile[0] == tile.color && validTile[1] == tile.shape
     );
+    console.log(`valid tiles are: ${JSON.stringify(cells[row][col].checkList.validSymbols)}`)
     console.log(`RESULT: ${result}`);
     return result;
   }
@@ -234,7 +237,7 @@ export default function Board() {
       let checkCells = [];
       Object.values(Direction).forEach((direction) => {
         let cell = radiate(direction, fromRow, fromCol).activeCellFound;
-        checkCells.push([cell.row,cell.col]);
+        checkCells.push([cell.row, cell.col]);
       });
       playableCells = checkCells.filter((cell) =>
         tileIsValidForCell(tile, cell[0], cell[1])
@@ -256,7 +259,7 @@ export default function Board() {
       let checkCells = [];
       directions.forEach((direction) => {
         let cell = radiate(direction, fromRow, fromCol).activeCellFound;
-        checkCells.push([cell.row,cell.col]);
+        checkCells.push([cell.row, cell.col]);
       });
       playableCells = checkCells.filter((cell) =>
         tileIsValidForCell(tile, cell[0], cell[1])
@@ -333,11 +336,11 @@ export default function Board() {
     let r = radiate(Direction.RIGHT, row, col);
     let b = radiate(Direction.BOTTOM, row, col);
     let hTilesToAddRemove = [tile];
-    hTilesToAddRemove.concat(l.tilesToAddRemoveIfUpdatingChecklists);
-    hTilesToAddRemove.concat(r.tilesToAddRemoveIfUpdatingChecklists);
+    hTilesToAddRemove = hTilesToAddRemove.concat(l.tilesToAddRemoveIfUpdatingChecklists);
+    hTilesToAddRemove = hTilesToAddRemove.concat(r.tilesToAddRemoveIfUpdatingChecklists);
     let vTilesToAddRemove = [tile];
-    vTilesToAddRemove.concat(b.tilesToAddRemoveIfUpdatingChecklists);
-    vTilesToAddRemove.concat(b.tilesToAddRemoveIfUpdatingChecklists);
+    vTilesToAddRemove = vTilesToAddRemove.concat(t.tilesToAddRemoveIfUpdatingChecklists);
+    vTilesToAddRemove = vTilesToAddRemove.concat(b.tilesToAddRemoveIfUpdatingChecklists);
     let lCell = l.activeCellFound;
     let tCell = t.activeCellFound;
     let rCell = r.activeCellFound;

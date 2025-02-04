@@ -38,12 +38,15 @@ export default function screenManager() {
   game.addPlayer({ PlayerType: PlayerType.HUMAN, name: "Rose" });
   game.startGame();
   setupBoard();
-  let rack = game.currentPlayer.rack;
+  let rack = currentRack()
   let gameWidgetUI = setupGameWidgetUI(); // = setup rackDivs
   displayRack();
 
   function setupBoard() {
     boardUI.addEventListener("mouseup", (event) => {
+      if (!event.target.closest(".valid-space")) {
+        return
+      }
       let gridPos = [
         Math.floor(
           (event.clientY - boardUI.getBoundingClientRect().top) /
@@ -120,10 +123,12 @@ export default function screenManager() {
 
     ///// buttons /////
     /* let buttonsDiv = addBasicElement("div", ["widget__buttons"], widget); */
-    let swapButton = addBasicElement("div", ["widget__button", "swap"], widget );
+    let swapButtonContainer = addBasicElement("div", ["widget__button-container", "popup-left"], widget );
+    let swapButton = addBasicElement("div", ["widget__button", "swap"], swapButtonContainer );
     let swapIcon = addSvgElement("swap", ["button-icon"],swapButton)
-    widget.insertBefore(swapButton,widget.firstChild)
-    let playButton = addBasicElement("div", ["widget__button", "play"], widget);
+    widget.insertBefore(swapButtonContainer,widget.firstChild)
+    let playButtonContainer = addBasicElement("div", ["widget__button-container", "popup-right"], widget );
+    let playButton = addBasicElement("div", ["widget__button", "play"], playButtonContainer);
     let playIcon = addSvgElement("play", ["button-icon"],playButton)
 
     swapButton.addEventListener("mousedown", (event) => {
@@ -133,14 +138,16 @@ export default function screenManager() {
     playButton.addEventListener("mousedown", (event) => {
       console.log("play Click");
       event.stopImmediatePropagation();
+      confirmTurn()
+      displayRack()
     });
-
-
 
     return { container: widget, rackDiv };
   }
 
   function displayRack() {
+    rack = currentRack()
+    console.table(rack.tiles)
     for (let i = 0; i < 6; i++) {
       let tile = rack.tiles[i];
       let rackSpaceDivs = Array.from(gameWidgetUI.rackDiv.children);
@@ -212,23 +219,18 @@ export default function screenManager() {
     removeAllChildNodesByCssClass(boardUI, "valid-space");
   }
 
-  /*   console.log(game.currentPlayer.name);
-    console.table(game.currentPlayer.rack.tiles);
-    game.selectTileOnRack(1);
-    console.table(game.playableTilesForSelection());
-    game.placeSelectedTileOnBoard(0, 0); */
+  function confirmTurn() {
+    game.confirmTurn()
+  }
+
+  function currentRack() {
+    console.log(game.currentPlayer)
+    return game.currentPlayer.rack;
+  }
 
   displayBoard();
   displayPlacedAndFixedTilesOnBoard();
 
-  function setDivSize([div, h, w]) {
-    if (h) {
-      div.style.height = h + "px";
-    }
-    if (w) {
-      div.style.width = w + "px";
-    }
-  }
 
   function reverseEnum(e, value) {
     for (let k in e) if (e[k] == value) return k;

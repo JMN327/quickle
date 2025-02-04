@@ -12,8 +12,9 @@ export default function PlayerManager() {
     players.push(Player(PlayerType, name));
   }
 
-  function nextPlayer() {
-    if (!activePlayerIndex) {
+  function changeActivePlayer() {
+    console.log(`active player index: ${activePlayerIndex}`)
+    if (activePlayerIndex =="undefined"  || activePlayerIndex == null) {
       throw new Error(
         "Turn cannot be switch as the active player has not been defined"
       );
@@ -53,7 +54,7 @@ export default function PlayerManager() {
     },
     addPlayer,
     randomizePlayerOrder,
-    nextPlayer,
+    changeActivePlayer,
     setStartPlayer,
   };
 }

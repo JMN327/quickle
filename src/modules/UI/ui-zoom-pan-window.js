@@ -78,11 +78,11 @@ export default function ZoomPanWindow(containerDiv) {
   centerView();
 
   ///// zoom /////
-  let zoomLevelMax = 10;
-  let zoomLevelMin = -10;
+  let zoomLevelMax = 7;
+  let zoomLevelMin = -7;
   let zoomLevel = 0;
   let zoomParity;
-  let zoomScaleFactor = 1.1;
+  let zoomScaleFactor = 1.18;
 
   ///// utilities /////
   function setDivSizePx([div, h, w]) {

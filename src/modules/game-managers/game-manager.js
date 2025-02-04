@@ -59,6 +59,7 @@ export default function GameManager() {
   }
 
   function placeSelectedTileOnBoard(row, col) {
+
     board.addTile(currentPlayer.rack.pickUpSelection(), row, col);
     //places the selected tile on the board
   }
@@ -68,9 +69,12 @@ export default function GameManager() {
       throw new Error("cannot confirm turn while no cells have been placed");
     }
     let score = board.score;
-    board.fixTiles;
+    board.fixTiles();
     currentPlayer.score.add(score);
-    currentPlayer = playerManager.nextPlayer;
+    currentPlayer.rack.drawTiles(bag.draw(currentPlayer.rack.spaces.count))
+    playerManager.changeActivePlayer();
+    currentPlayer = playerManager.active;
+    console.log(`CurrentPlayer ${currentPlayer}` )
   }
 
   // SWAP_MODE
@@ -87,11 +91,6 @@ export default function GameManager() {
     // swaps all the selected tiles for new ones in the bag
   }
 
-  function nextTurn() {
-    checkGameState(GameState.PLAYER_TURN);
-    playerManager.nextPlayer;
-    currentPlayer = playerManager.active;
-  }
 
   //GAME STATE
   function switchGameState(gameState) {
@@ -122,7 +121,7 @@ export default function GameManager() {
     },
     addPlayer,
     startGame,
-    nextTurn,
+    confirmTurn,
     selectTileOnRack,
     rearrangeTilesOnRack,
     playableTilesForSelection,
