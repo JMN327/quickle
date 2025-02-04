@@ -2,7 +2,7 @@
   display: grid;
   grid-template-columns: repeat(6, 1fr);
 
-  gap: 1px;
+  gap: 8px;
   padding: 8px;
   /* scroll-snap-type: y mandatory; */
 }

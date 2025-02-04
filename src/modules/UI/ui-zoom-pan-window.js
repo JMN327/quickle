@@ -78,7 +78,7 @@ export default function ZoomPanWindow(containerDiv) {
   centerView();
 
   ///// zoom /////
-  let zoomLevelMax = 7;
+  let zoomLevelMax = 3;
   let zoomLevelMin = -7;
   let zoomLevel = 0;
   let zoomParity;
