@@ -23,7 +23,7 @@ export default function screenManager() {
 
   //module scoped variables
   let game = GameManager(); // maybe player details and start game
-  let players = []; // setup players
+  let players;// setup players
   let playerUI = []; // setup player spaces
   let board = game.board;
   let boardUI = addBasicElement("div", ["board"], containerDiv); //setup board
@@ -37,9 +37,10 @@ export default function screenManager() {
   game.addPlayer({ PlayerType: PlayerType.HUMAN, name: "Rose" });
   game.startGame();
   setupBoard();
+  let scoreSheet;
+  setupScoreSheet();
   let rack = currentRack();
   let gameWidgetUI = setupGameWidgetUI(); // = setup rackDivs
-  let scoreSheetUI = setupScoreSheet();
   displayRack();
 
   function setupBoard() {
@@ -156,25 +157,39 @@ export default function screenManager() {
       event.stopImmediatePropagation();
       confirmTurn();
       displayRack();
+      displayScoreSheet()
     });
 
     return { container: widget, rackDiv };
   }
 
   function setupScoreSheet() {
-    let scoreSheet = addBasicElement("div", ["scoreSheet"]);
+    scoreSheet = addBasicElement("div", ["scoreSheet"]);
     zpwUI.appendChildToPanel(scoreSheet);
+  }
+
+  function displayScoreSheet() {
+    removeAllChildNodes(scoreSheet)
     let openCloseButton = addBasicElement(
       "div",
       ["scoreSheet__openCloseButton"],
       scoreSheet
     );
-    openCloseButton.addEventListener("mouseup", (event) => {
-      scoreSheet.classList.toggle("scoreSheet__maximized");
-    });
     let scoreTable = addBasicElement("div", ["scoreSheet__table"], scoreSheet);
+    console.log(game.playerManager.playerCount*2)
+    scoreTable.style.gridTemplateColumns = "repeat(6,1fr)" //`repeat(${players.playerCount*2}, 1fr)`
     game.scores.forEach((round) => {
-      //thing
+      for (let i = 0; i < round.length; i++) {
+        if (scoreTable,round[i] != undefined) {
+          addBasicElement("span", ["scoreSheet__cell"], scoreTable,round[i])
+        }
+      }
+    });
+    for (let i = 0; i < game.playerManager.playerCount; i++) {
+      scoreTable.children[i].classList.add("scoreSheet__header")
+    }
+    openCloseButton.addEventListener("mouseup", (event) => {
+      scoreTable.classList.toggle("scoreTable__hidden");
     });
   }
 

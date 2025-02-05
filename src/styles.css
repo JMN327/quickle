@@ -276,6 +276,23 @@
   margin-top: 16px;
 }
 
+
+.scoreSheet__table {
+  border: 2px solid green;
+  display: grid;
+}
+.scoreTable__hidden {
+  display: none;
+}
+.scoreSheet__header {
+  grid-column: span 2;
+  display: flex;
+  justify-content: center;
+}
+.scoreSheet__cell {
+padding: 4px;
+}
+
 .scoreSheet__openCloseButton {
 
   width: 40px;
