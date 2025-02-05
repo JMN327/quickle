@@ -9,6 +9,7 @@ export default function GameManager() {
   let state = GameState.PRE_GAME;
   let board = Board();
   let bag = Bag();
+  let gameCounter = _gameCounter();
   bag.fill();
   bag.shuffle();
   let playerManager = PlayerManager();
@@ -34,9 +35,11 @@ export default function GameManager() {
       startWordLengths.push(player.rack.longestWordLength());
     });
     console.log(startWordLengths.indexOf(Math.max(...startWordLengths)));
-    playerManager.setStartPlayer(startWordLengths.indexOf(Math.max(...startWordLengths)));
+    playerManager.setStartPlayer(
+      startWordLengths.indexOf(Math.max(...startWordLengths))
+    );
     currentPlayer = playerManager.active;
-    console.log(`GAME STARTED  Start player is ${currentPlayer.name}`)
+    console.log(`GAME STARTED  Start player is ${currentPlayer.name}`);
     switchGameState(GameState.PLAYING);
   }
 
@@ -50,16 +53,15 @@ export default function GameManager() {
   }
 
   function playableTilesForSelection() {
-    console.log(currentPlayer.rack.selection)
-    let tile = currentPlayer.rack.selection
+    console.log(currentPlayer.rack.selection);
+    let tile = currentPlayer.rack.selection;
     if (tile == undefined) {
-      return
+      return;
     }
-    return board.playableCells(tile) ;
+    return board.playableCells(tile);
   }
 
   function placeSelectedTileOnBoard(row, col) {
-
     board.addTile(currentPlayer.rack.pickUpSelection(), row, col);
     //places the selected tile on the board
   }
@@ -71,10 +73,12 @@ export default function GameManager() {
     let score = board.score;
     board.fixTiles();
     currentPlayer.score.add(score);
-    currentPlayer.rack.drawTiles(bag.draw(currentPlayer.rack.spaces.count))
+    currentPlayer.rack.drawTiles(bag.draw(currentPlayer.rack.spaces.count));
     playerManager.changeActivePlayer();
     currentPlayer = playerManager.active;
-    console.log(`CurrentPlayer ${currentPlayer}` )
+    console.table(scores());
+    gameCounter.incrementTurn();
+    console.log(`CurrentPlayer ${currentPlayer.name}`);
   }
 
   // SWAP_MODE
@@ -91,6 +95,58 @@ export default function GameManager() {
     // swaps all the selected tiles for new ones in the bag
   }
 
+  function _gameCounter() {
+    let turnNumber = 1;
+    function incrementTurn() {
+      turnNumber++;
+    }
+    function reset() {
+      turnNumber = 1;
+    }
+    function roundNumber() {
+      return (
+        Math.ceil(turnNumber / playerManager.playerCount)
+      );
+    }
+
+    return {
+      get turnNumber() {
+        return turnNumber;
+      },
+      get roundNumber() {
+        return roundNumber();
+      },
+      incrementTurn,
+      reset,
+    };
+  }
+
+  //score sheet
+  function scores() {
+    let names =[]
+    let headers = [];
+    let rounds = [];
+
+    playerManager.players.forEach((player) => {
+      names.push(player.name)
+      names.push(null)
+      headers.push("score");
+      headers.push("total");
+    });
+
+    rounds.push(names);
+    rounds.push(headers);
+    console.log(gameCounter.roundNumber);
+    for (let i = 0; i < gameCounter.roundNumber; i++) {
+      let round = [];
+      playerManager.players.forEach((player) => {
+        round.push(player.score.turnScores[i] || null);
+        round.push(player.score.accumulatedScores[i] || null);
+      });
+      rounds.push(round);
+    }
+    return rounds
+  }
 
   //GAME STATE
   function switchGameState(gameState) {
@@ -105,7 +161,7 @@ export default function GameManager() {
   }
   return {
     get playerManager() {
-      return playerManager
+      return playerManager;
     },
     get bag() {
       return bag;
@@ -117,7 +173,7 @@ export default function GameManager() {
       return currentPlayer;
     },
     get state() {
-      return state
+      return state;
     },
     addPlayer,
     startGame,

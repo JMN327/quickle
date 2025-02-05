@@ -116,7 +116,7 @@ export default function Board() {
         });
       }
     }
-    return score;
+    return score || 1;
 
     function stem(direction, row, col) {
       let directions;
@@ -200,7 +200,11 @@ export default function Board() {
     let result = cells[row][col].checkList.validSymbols.some(
       (validTile) => validTile[0] == tile.color && validTile[1] == tile.shape
     );
-    console.log(`valid tiles are: ${JSON.stringify(cells[row][col].checkList.validSymbols)}`)
+    console.log(
+      `valid tiles are: ${JSON.stringify(
+        cells[row][col].checkList.validSymbols
+      )}`
+    );
     console.log(`RESULT: ${result}`);
     return result;
   }
@@ -336,11 +340,19 @@ export default function Board() {
     let r = radiate(Direction.RIGHT, row, col);
     let b = radiate(Direction.BOTTOM, row, col);
     let hTilesToAddRemove = [tile];
-    hTilesToAddRemove = hTilesToAddRemove.concat(l.tilesToAddRemoveIfUpdatingChecklists);
-    hTilesToAddRemove = hTilesToAddRemove.concat(r.tilesToAddRemoveIfUpdatingChecklists);
+    hTilesToAddRemove = hTilesToAddRemove.concat(
+      l.tilesToAddRemoveIfUpdatingChecklists
+    );
+    hTilesToAddRemove = hTilesToAddRemove.concat(
+      r.tilesToAddRemoveIfUpdatingChecklists
+    );
     let vTilesToAddRemove = [tile];
-    vTilesToAddRemove = vTilesToAddRemove.concat(t.tilesToAddRemoveIfUpdatingChecklists);
-    vTilesToAddRemove = vTilesToAddRemove.concat(b.tilesToAddRemoveIfUpdatingChecklists);
+    vTilesToAddRemove = vTilesToAddRemove.concat(
+      t.tilesToAddRemoveIfUpdatingChecklists
+    );
+    vTilesToAddRemove = vTilesToAddRemove.concat(
+      b.tilesToAddRemoveIfUpdatingChecklists
+    );
     let lCell = l.activeCellFound;
     let tCell = t.activeCellFound;
     let rCell = r.activeCellFound;

@@ -14,7 +14,6 @@ import { CellState } from "../enums/cell-state.js";
 import Add_Component_Drag_Drop_Container, {
   Add_Component_Drag_Drop_Item,
 } from "./Component_Drag_Drop_List.js";
-import Rack from "../game-objects/rack.js";
 import { Color } from "../enums/color.js";
 import { Shape } from "../enums/shape.js";
 
@@ -40,6 +39,7 @@ export default function screenManager() {
   setupBoard();
   let rack = currentRack()
   let gameWidgetUI = setupGameWidgetUI(); // = setup rackDivs
+  let scoreSheetUI = setupScoreSheet()
   displayRack();
 
   function setupBoard() {
@@ -143,6 +143,13 @@ export default function screenManager() {
     });
 
     return { container: widget, rackDiv };
+  }
+
+  function setupScoreSheet() {
+    let scoreSheet = addBasicElement("div", ["scoreSheet"]);
+    zpwUI.appendChildToPanel(scoreSheet);
+    let openCloseButton = addBasicElement("div", ["scoreSheet__openCloseButton"], scoreSheet)
+    let scoreTable = addBasicElement("div", ["scoreSheet__table"], scoreSheet)
   }
 
   function displayRack() {

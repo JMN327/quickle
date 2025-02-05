@@ -18,12 +18,17 @@ export default function Player(playerType = PlayerType.HUMAN, name = "Human") {
     accumulatedScores: [],
     add: (newScore) => {
       score.turnScores.push(newScore);
-      score.accumulatedScores.push(newScore + score.turnScores[score.turnScores.length - 1]);
+      score.accumulatedScores.push(
+        newScore + (score.turnScores[score.turnScores.length - 2] || 0)
+      );
+      console.log(score.turnScores[score.turnScores.length - 2]);
+      console.table(score.turnScores);
+      console.table(score.accumulatedScores);
     },
     reset: () => {
-      turnScores = []
-      accumulatedScores = []
-    }
+      turnScores = [];
+      accumulatedScores = [];
+    },
   };
 
   if (playerType == PlayerType.BOT) {
