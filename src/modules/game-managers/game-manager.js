@@ -76,7 +76,7 @@ export default function GameManager() {
     currentPlayer.rack.drawTiles(bag.draw(currentPlayer.rack.spaces.count));
     playerManager.changeActivePlayer();
     currentPlayer = playerManager.active;
-    console.table(scores());
+    console.table(scores.rounds());
     gameCounter.incrementTurn();
     console.log(`CurrentPlayer ${currentPlayer.name}`);
   }
@@ -145,7 +145,7 @@ export default function GameManager() {
       });
       rounds.push(round);
     }
-    return rounds
+    return {rounds}
   }
 
   //GAME STATE
@@ -174,6 +174,9 @@ export default function GameManager() {
     },
     get state() {
       return state;
+    },
+    get scores() {
+      return scores()
     },
     addPlayer,
     startGame,
