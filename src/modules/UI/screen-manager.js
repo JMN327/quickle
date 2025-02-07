@@ -240,10 +240,8 @@ export default function screenManager() {
       ...board.positionsByCellState(CellState.PLACED),
       ...board.positionsByCellState(CellState.FIXED),
     ];
-    console.log(tilePositionsOnBoard);
     tilePositionsOnBoard.forEach((pos) => {
       let tile = board.cells[pos[0]][pos[1]].tile;
-      console.log(board.cells[pos[0]][pos[1]].tile);
       addTileElement(
         tile.color,
         tile.shape,

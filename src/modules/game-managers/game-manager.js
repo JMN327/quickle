@@ -140,8 +140,8 @@ export default function GameManager() {
     for (let i = 0; i < gameCounter.roundNumber; i++) {
       let round = [];
       playerManager.players.forEach((player) => {
-        round.push(player.score.turnScores[i] || null);
-        round.push(player.score.accumulatedScores[i] || null);
+        round.push(player.score.turnScores[i] || " ");
+        round.push(player.score.accumulatedScores[i] || " ");
       });
       rounds.push(round);
     }
