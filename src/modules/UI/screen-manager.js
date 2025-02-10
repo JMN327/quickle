@@ -156,10 +156,16 @@ export default function screenManager() {
     let playIcon = addSvgElement("play", ["button-icon"], playButton);
 
     swapButton.addEventListener("mousedown", (event) => {
+      if (event.buttons !== 1) {
+        return;
+      }
       console.log("swap Click");
       event.stopImmediatePropagation();
     });
     playButton.addEventListener("mousedown", (event) => {
+      if (event.buttons !== 1) {
+        return;
+      }
       console.log("play Click");
       event.stopImmediatePropagation();
       confirmTurn();

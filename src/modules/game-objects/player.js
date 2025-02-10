@@ -19,7 +19,7 @@ export default function Player(playerType = PlayerType.HUMAN, name = "Human") {
     add: (newScore) => {
       score.turnScores.push(newScore);
       score.accumulatedScores.push(
-        newScore + (score.turnScores[score.turnScores.length - 2] || 0)
+        newScore + (score.accumulatedScores[score.accumulatedScores.length - 1] || 0)
       );
       console.log(score.turnScores[score.turnScores.length - 2]);
       console.table(score.turnScores);
