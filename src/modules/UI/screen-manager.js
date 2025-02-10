@@ -124,27 +124,34 @@ export default function screenManager() {
 
     ///// buttons /////
     /* let buttonsDiv = addBasicElement("div", ["widget__buttons"], widget); */
-    let swapButtonContainer = addBasicElement(
+    let buttonContainer = addBasicElement(
       "div",
-      ["widget__button-container", "popup-left"],
+      ["widget__button-container"],
       widget
     );
+    let bagButton = addBasicElement(
+      "div",
+      ["widget__button", "bag"],
+      buttonContainer
+    );
+    let bagIcon = addSvgElement("bag", ["button-icon"], bagButton);
+    let scoreButton = addBasicElement(
+      "div",
+      ["widget__button", "score"],
+      buttonContainer
+    );
+    let scoreIcon = addSvgElement("score", ["button-icon"], scoreButton);
     let swapButton = addBasicElement(
       "div",
       ["widget__button", "swap"],
-      swapButtonContainer
+      buttonContainer
     );
     let swapIcon = addSvgElement("swap", ["button-icon"], swapButton);
-    widget.insertBefore(swapButtonContainer, widget.firstChild);
-    let playButtonContainer = addBasicElement(
-      "div",
-      ["widget__button-container", "popup-right"],
-      widget
-    );
+
     let playButton = addBasicElement(
       "div",
       ["widget__button", "play"],
-      playButtonContainer
+      buttonContainer
     );
     let playIcon = addSvgElement("play", ["button-icon"], playButton);
 
@@ -235,7 +242,7 @@ export default function screenManager() {
   }
 
   function displayPlacedAndFixedTilesOnBoard() {
-    removeAllChildNodesByCssClass(boardUI, "svg-tile");
+    removeAllChildNodesByCssClass(boardUI, "tile");
     let tilePositionsOnBoard = [
       ...board.positionsByCellState(CellState.PLACED),
       ...board.positionsByCellState(CellState.FIXED),

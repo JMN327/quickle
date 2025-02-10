@@ -41,7 +41,7 @@ export function addSvgElement(shape, classes = [], parent = null) {
 
 export function addTileElement(color, shape, parent = null, top, left) {
   const svgTile = document.createElement("div");
-  svgTile.classList.add("svg-tile");
+  svgTile.classList.add("tile");
   svgTile.classList.add(reverseEnum(Color, color));
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.classList.add("svg-tile__svg");
@@ -53,6 +53,9 @@ export function addTileElement(color, shape, parent = null, top, left) {
     svgTile.style.left = `${left}px`;
     svgTile.style.top = `${top}px`;
     svgTile.style.position = "absolute"
+    svgTile.classList.add("board-tile");
+  } else {
+    svgTile.classList.add("rack-tile");
   }
 
   if (parent) {
