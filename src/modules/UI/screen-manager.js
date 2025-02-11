@@ -186,7 +186,7 @@ export default function screenManager() {
         console.log(event.button )
         return;
       }
-      bagUI.classList.toggle("scoreTable__hidden");
+      bagUI.classList.toggle("hidden");
       displayBag();
     });
     scoreButton.addEventListener("mousedown", (event) => {
@@ -202,7 +202,7 @@ export default function screenManager() {
         console.log(event.button )
         return;
       }
-      scoreSheetUI.classList.toggle("scoreTable__hidden");
+      scoreSheetUI.classList.toggle("hidden");
       displayScoreSheet();
     });
 
@@ -232,10 +232,10 @@ export default function screenManager() {
   }
 
   function setupScoreSheet() {
-    return addBasicElement("div", ["scoreSheet"]);
+    return addBasicElement("div", ["score-sheet", "hidden"]);
   }
   function setupBag() {
-    return addBasicElement("div", ["bag-sheet"]);
+    return addBasicElement("div", ["bag-sheet", "hidden"]);
   }
 
   function displayBag() {
@@ -268,17 +268,17 @@ export default function screenManager() {
 
   function displayScoreSheet() {
     removeAllChildNodes(scoreSheetUI);
-    let scoreTableDiv = addBasicElement("div", ["scoreSheet__table"], scoreSheetUI);
+    let scoreTableDiv = addBasicElement("div", ["score-sheet__table"], scoreSheetUI);
     scoreTableDiv.style.gridTemplateColumns = "repeat(6,1fr)"; //`repeat(${players.playerCount*2}, 1fr)`
     game.scores.forEach((round) => {
       for (let i = 0; i < round.length; i++) {
         if ((scoreTableDiv, round[i] != undefined)) {
-          addBasicElement("span", ["scoreSheet__cell"], scoreTableDiv, round[i]);
+          addBasicElement("span", ["score-sheet__cell"], scoreTableDiv, round[i]);
         }
       }
     });
     for (let i = 0; i < game.playerManager.playerCount; i++) {
-      scoreTableDiv.children[i].classList.add("scoreSheet__header");
+      scoreTableDiv.children[i].classList.add("score-sheet__header");
     }
   }
 

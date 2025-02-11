@@ -197,7 +197,7 @@ export default function ZoomPanWindow(containerDiv) {
   });
 
   frame.addEventListener("mousedown", (event) => {
-    console.log("Panning")
+    console.log("Panning");
     if (event.buttons !== 1) {
       return;
     }
@@ -264,9 +264,7 @@ export default function ZoomPanWindow(containerDiv) {
   zoomInButton.addEventListener("mousedown", (event) => {
     event.stopPropagation();
   });
-  zoomInButton.addEventListener("click", (event) => {
-    zooming(event);
-  });
+  zoomInButton.addEventListener("click", (event) => zooming(event));
   let zoomOutButton = addSvgElement(
     "zoom-out",
     ["zoom-out", "controls__icon"],
