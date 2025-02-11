@@ -10,11 +10,11 @@
 .grid-item {
   user-select: none;
   position: relative;
-  border-radius: 10%
+  border-radius: 8%
 }
 
 .moving {
   transform: scale(1.075);
-  border-radius: 10%;
+  border-radius: 8%;
 
 }

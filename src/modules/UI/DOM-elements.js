@@ -12,7 +12,7 @@ export function addBasicElement(
     element.classList.add(cssClass);
   });
 
-  if (textContent) {
+  if (textContent != undefined) {
     element.textContent = textContent;
   }
   if (parent) {
@@ -39,7 +39,7 @@ export function addSvgElement(shape, classes = [], parent = null) {
   return svgElement;
 }
 
-export function addTileElement(color, shape, parent = null, top, left) {
+export function addTileElement(color, shape, parent = null, type, top, left) {
   const svgTile = document.createElement("div");
   svgTile.classList.add("tile");
   svgTile.classList.add(reverseEnum(Color, color));
@@ -53,9 +53,17 @@ export function addTileElement(color, shape, parent = null, top, left) {
     svgTile.style.left = `${left}px`;
     svgTile.style.top = `${top}px`;
     svgTile.style.position = "absolute"
-    svgTile.classList.add("board-tile");
-  } else {
-    svgTile.classList.add("rack-tile");
+  } 
+  switch (type) {
+    case "board":
+      svgTile.classList.add("board-tile");
+      break;
+      case "bag":
+        svgTile.classList.add("bag-tile");
+      break;
+      case "rack":
+        svgTile.classList.add("rack-tile");
+      break;
   }
 
   if (parent) {

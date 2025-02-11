@@ -14,6 +14,7 @@ export default function GameManager() {
   bag.shuffle();
   let playerManager = PlayerManager();
   let currentPlayer;
+  let inactivePlayers = [];
 
   //PRE_GAME
   function addPlayer({ PlayerType, name }) {
@@ -39,6 +40,7 @@ export default function GameManager() {
       startWordLengths.indexOf(Math.max(...startWordLengths))
     );
     currentPlayer = playerManager.active;
+    inactivePlayers = playerManager.inactive;
     console.log(`GAME STARTED  Start player is ${currentPlayer.name}`);
     switchGameState(GameState.PLAYING);
   }
@@ -76,6 +78,7 @@ export default function GameManager() {
     currentPlayer.rack.drawTiles(bag.draw(currentPlayer.rack.spaces.count));
     playerManager.changeActivePlayer();
     currentPlayer = playerManager.active;
+    inactivePlayers = playerManager.inactive;
     console.table(scores());
     gameCounter.incrementTurn();
     console.log(`CurrentPlayer ${currentPlayer.name}`);
@@ -104,9 +107,7 @@ export default function GameManager() {
       turnNumber = 1;
     }
     function roundNumber() {
-      return (
-        Math.ceil(turnNumber / playerManager.playerCount)
-      );
+      return Math.ceil(turnNumber / playerManager.playerCount);
     }
 
     return {
@@ -123,13 +124,13 @@ export default function GameManager() {
 
   //score sheet
   function scores() {
-    let names =[]
+    let names = [];
     let headers = [];
     let rounds = [];
 
     playerManager.players.forEach((player) => {
-      names.push(player.name)
-      names.push(null)
+      names.push(player.name);
+      names.push(null);
       headers.push("score");
       headers.push("total");
     });
@@ -145,7 +146,7 @@ export default function GameManager() {
       });
       rounds.push(round);
     }
-    return rounds
+    return rounds;
   }
 
   //GAME STATE
@@ -172,11 +173,14 @@ export default function GameManager() {
     get currentPlayer() {
       return currentPlayer;
     },
+    get inactivePlayers() {
+      return inactivePlayers;
+    },
     get state() {
       return state;
     },
     get scores() {
-      return scores()
+      return scores();
     },
     addPlayer,
     startGame,

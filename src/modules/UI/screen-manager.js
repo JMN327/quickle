@@ -18,6 +18,17 @@ import { Color } from "../enums/color.js";
 import { Shape } from "../enums/shape.js";
 
 export default function screenManager() {
+  // lock the screen from portrait orientation
+  let oppositeOrientation = "landscape";
+  screen.orientation
+    .lock(oppositeOrientation)
+    .then(() => {
+      console.log.textContent = `Locked to ${oppositeOrientation}\n`;
+    })
+    .catch((error) => {
+      console.log.textContent += `${error}\n`;
+    });
+
   let gridSizePx = 100;
   let globalContainerDiv = document.querySelector("body");
 
@@ -33,16 +44,20 @@ export default function screenManager() {
   zpwUI.appendChildToView(boardUI);
   let gameWidgetUI = setupGameWidgetUI(); // = setup rackDivs
   zpwUI.appendChildToPanel(gameWidgetUI.widgetDiv);
-
+  let scoreSheetUI = setupScoreSheet();
+  zpwUI.appendChildToPanel(scoreSheetUI);
+  let bagUI = setupBag()
+  zpwUI.appendChildToPanel(bagUI);
+  
   // setup Game
   game.addPlayer({ PlayerType: PlayerType.HUMAN, name: "Elspeth" });
   game.addPlayer({ PlayerType: PlayerType.HUMAN, name: "Jinny" });
   game.addPlayer({ PlayerType: PlayerType.HUMAN, name: "Rose" });
   game.startGame();
   displayRack();
-
-  let scoreSheet;
-  setupScoreSheet();
+  displayBag() 
+  displayBoard();
+  displayPlacedAndFixedTilesOnBoard();
 
   function setupBoard() {
     let boardDiv = addBasicElement("div", ["board"], globalContainerDiv);
@@ -74,7 +89,7 @@ export default function screenManager() {
 
   function setupGameWidgetUI() {
     let widgetDiv = addBasicElement("div", ["widget"]);
-    
+
     ///// rack /////
     let rackDiv = addBasicElement("div", ["rack"], widgetDiv);
     Add_Component_Drag_Drop_Container(rackDiv, []);
@@ -119,7 +134,7 @@ export default function screenManager() {
     });
 
     for (let i = 0; i < 6; i++) {
-      let tileSpace = addTileElement(5, 5, rackDiv);
+      let tileSpace = addTileElement(5, 5, rackDiv, "rack");
       tileSpace.classList.add("null-tile");
       Add_Component_Drag_Drop_Item(tileSpace);
     }
@@ -142,6 +157,7 @@ export default function screenManager() {
       ["widget__button", "score"],
       buttonContainer
     );
+
     let scoreIcon = addSvgElement("score", ["button-icon"], scoreButton);
     let swapButton = addBasicElement(
       "div",
@@ -157,59 +173,117 @@ export default function screenManager() {
     );
     let playIcon = addSvgElement("play", ["button-icon"], playButton);
 
+    bagButton.addEventListener("mousedown", (event) => {
+      if (event.button !== 0) {
+        console.log(event.button )
+        return;
+      }
+      console.log("bag Click");
+      event.stopImmediatePropagation();
+    });
+    bagButton.addEventListener("mouseup", (event) => {
+      if (event.button !== 0) {
+        console.log(event.button )
+        return;
+      }
+      bagUI.classList.toggle("scoreTable__hidden");
+      displayBag();
+    });
+    scoreButton.addEventListener("mousedown", (event) => {
+      if (event.button !== 0) {
+        console.log(event.button )
+        return;
+      }
+      console.log("score Click");
+      event.stopImmediatePropagation();
+    });
+    scoreButton.addEventListener("mouseup", (event) => {
+      if (event.button !== 0) {
+        console.log(event.button )
+        return;
+      }
+      scoreSheetUI.classList.toggle("scoreTable__hidden");
+      displayScoreSheet();
+    });
+
     swapButton.addEventListener("mousedown", (event) => {
-      if (event.buttons !== 1) {
+      if (event.button !== 0) {
+        console.log(event.button )
         return;
       }
       console.log("swap Click");
       event.stopImmediatePropagation();
     });
     playButton.addEventListener("mousedown", (event) => {
-      if (event.buttons !== 1) {
+      if (event.button !== 0) {
+        console.log(event.button )
         return;
       }
       console.log("play Click");
       event.stopImmediatePropagation();
+    });
+    playButton.addEventListener("mouseup", () =>{
       confirmTurn();
       displayRack();
-      displayScoreSheet();
-    });
+
+    })
 
     return { widgetDiv, rackDiv };
   }
 
   function setupScoreSheet() {
-    scoreSheet = addBasicElement("div", ["scoreSheet"]);
-    zpwUI.appendChildToPanel(scoreSheet);
+    return addBasicElement("div", ["scoreSheet"]);
+  }
+  function setupBag() {
+    return addBasicElement("div", ["bag-sheet"]);
+  }
+
+  function displayBag() {
+    removeAllChildNodes(bagUI);
+    let bagInfoDiv= addBasicElement("div", ["bag-info"], bagUI);
+    let info = new Array(6).fill().map(() => new Array(6).fill(0))
+    game.bag.tiles.forEach((tile)=>{
+      info[tile.color][tile.shape]++
+    })
+    console.log(`inactive players amount: ${game.inactivePlayers.length}`)
+    game.inactivePlayers.forEach((player)=>{
+      player.rack.tiles.forEach((tile)=>{
+        info[tile.color][tile.shape]++
+      })
+    })
+    console.table(info)
+    for (let i = 0; i < 6; i++) {
+      for (let j = 0; j < 6; j++) {
+         let tile = addTileElement(
+          i,
+          j,
+          bagInfoDiv,
+          "bag"
+        );
+       addBasicElement("div",["bag-text"],tile, info[i][j])
+      }
+      
+    }
   }
 
   function displayScoreSheet() {
-    removeAllChildNodes(scoreSheet);
-    let openCloseButton = addBasicElement(
-      "div",
-      ["scoreSheet__openCloseButton"],
-      scoreSheet
-    );
-    let scoreTable = addBasicElement("div", ["scoreSheet__table"], scoreSheet);
-    console.log(game.playerManager.playerCount * 2);
-    scoreTable.style.gridTemplateColumns = "repeat(6,1fr)"; //`repeat(${players.playerCount*2}, 1fr)`
+    removeAllChildNodes(scoreSheetUI);
+    let scoreTableDiv = addBasicElement("div", ["scoreSheet__table"], scoreSheetUI);
+    scoreTableDiv.style.gridTemplateColumns = "repeat(6,1fr)"; //`repeat(${players.playerCount*2}, 1fr)`
     game.scores.forEach((round) => {
       for (let i = 0; i < round.length; i++) {
-        if ((scoreTable, round[i] != undefined)) {
-          addBasicElement("span", ["scoreSheet__cell"], scoreTable, round[i]);
+        if ((scoreTableDiv, round[i] != undefined)) {
+          addBasicElement("span", ["scoreSheet__cell"], scoreTableDiv, round[i]);
         }
       }
     });
     for (let i = 0; i < game.playerManager.playerCount; i++) {
-      scoreTable.children[i].classList.add("scoreSheet__header");
+      scoreTableDiv.children[i].classList.add("scoreSheet__header");
     }
-    openCloseButton.addEventListener("mouseup", (event) => {
-      scoreTable.classList.toggle("scoreTable__hidden");
-    });
   }
 
   function displayRack() {
-    let rack = game.currentPlayer.rack
+    let rack = game.currentPlayer.rack;
     console.table(rack.tiles);
     for (let i = 0; i < 6; i++) {
       let tile = rack.tiles[i];
@@ -261,6 +335,7 @@ export default function screenManager() {
         tile.color,
         tile.shape,
         boardUI,
+        "board",
         pos[0] * gridSizePx,
         pos[1] * gridSizePx
       );
@@ -288,9 +363,6 @@ export default function screenManager() {
     console.log(game.currentPlayer);
     return game.currentPlayer.rack;
   }
-
-  displayBoard();
-  displayPlacedAndFixedTilesOnBoard();
 
   function reverseEnum(e, value) {
     for (let k in e) if (e[k] == value) return k;

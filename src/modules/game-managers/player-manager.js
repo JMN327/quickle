@@ -7,14 +7,13 @@ export default function PlayerManager() {
   function addPlayer({ PlayerType, name }) {
     if (players.length == 4) {
       throw new Error("There are already 4 players at this table");
-            
     }
     players.push(Player(PlayerType, name));
   }
 
   function changeActivePlayer() {
-    console.log(`active player index: ${activePlayerIndex}`)
-    if (activePlayerIndex =="undefined"  || activePlayerIndex == null) {
+    console.log(`active player index: ${activePlayerIndex}`);
+    if (activePlayerIndex == "undefined" || activePlayerIndex == null) {
       throw new Error(
         "Turn cannot be switch as the active player has not been defined"
       );
@@ -22,9 +21,8 @@ export default function PlayerManager() {
     activePlayerIndex = (activePlayerIndex + 1) % players.length;
   }
 
-  let p = Player()
-  p.rack.longestWordLength
-
+  let p = Player();
+  p.rack.longestWordLength;
 
   function randomizePlayerOrder() {
     let m = players.length;
@@ -39,18 +37,21 @@ export default function PlayerManager() {
   }
 
   function setStartPlayer(index) {
-    activePlayerIndex = index
+    activePlayerIndex = index;
   }
 
   return {
     get players() {
-      return players
+      return players;
     },
     get active() {
       return players[activePlayerIndex] || null;
     },
+    get inactive() {
+      return players.filter((player) => players.indexOf(player) != activePlayerIndex);
+    },
     get playerCount() {
-      return players.length
+      return players.length;
     },
     addPlayer,
     randomizePlayerOrder,
