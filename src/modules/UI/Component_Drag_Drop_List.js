@@ -9,6 +9,8 @@ export default function Add_Component_Drag_Drop_Container(
     gridContainerStyles.getPropertyValue("padding-left")
   );
 
+  let selectOffset = "-20%"
+
   let item = null;
   let itemToLeft = null;
   let itemToLeftLeftX = null;
@@ -138,7 +140,7 @@ export default function Add_Component_Drag_Drop_Container(
       itemLocalPosX = paddingLeft;
     }
     if (item.classList.contains("selected")) {
-      item.style.top = "-24px"
+      item.style.top = selectOffset
     }
     item.style.left = itemLocalPosX + "px";
 
@@ -197,8 +199,8 @@ export default function Add_Component_Drag_Drop_Container(
     console.log(thisItem.classList.contains("selected"))
     if (thisItem.classList.contains("selected")) {
        snap = [
-        { transform: `translate(${startPosition}px, -24px) scale(1.075)` },
-        { transform: `translate(${endPosition}px, -24px) scale(1.075)` },
+        { transform: `translate(${startPosition}px, ${selectOffset}) scale(1.075)` },
+        { transform: `translate(${endPosition}px,${selectOffset}) scale(1.075)` },
       ];
     } else {
        snap = [

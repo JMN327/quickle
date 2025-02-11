@@ -19,43 +19,45 @@ import { Shape } from "../enums/shape.js";
 
 export default function screenManager() {
   let gridSizePx = 100;
-  let containerDiv = document.querySelector("body");
+  let globalContainerDiv = document.querySelector("body");
 
   //module scoped variables
   let game = GameManager(); // maybe player details and start game
-  let players;// setup players
+  let players; // setup players
   let playerUI = []; // setup player spaces
-  let board = game.board;
-  let boardUI = addBasicElement("div", ["board"], containerDiv); //setup board
-  let zpwUI = ZoomPanWindow(containerDiv);
+
+  let zpwUI = ZoomPanWindow(globalContainerDiv);
   zpwUI.bounded = false;
+  let board = game.board;
+  let boardUI = setupBoard();
   zpwUI.appendChildToView(boardUI);
+  let gameWidgetUI = setupGameWidgetUI(); // = setup rackDivs
+  zpwUI.appendChildToPanel(gameWidgetUI.widgetDiv);
 
   // setup Game
   game.addPlayer({ PlayerType: PlayerType.HUMAN, name: "Elspeth" });
   game.addPlayer({ PlayerType: PlayerType.HUMAN, name: "Jinny" });
   game.addPlayer({ PlayerType: PlayerType.HUMAN, name: "Rose" });
   game.startGame();
-  setupBoard();
-  let scoreSheet;
-  setupScoreSheet();
-  let rack = currentRack();
-  let gameWidgetUI = setupGameWidgetUI(); // = setup rackDivs
   displayRack();
 
+  let scoreSheet;
+  setupScoreSheet();
+
   function setupBoard() {
-    boardUI.addEventListener("mouseup", (event) => {
+    let boardDiv = addBasicElement("div", ["board"], globalContainerDiv);
+    boardDiv.addEventListener("mouseup", (event) => {
       if (!event.target.closest(".valid-space")) {
         return;
       }
       let gridPos = [
         Math.floor(
-          (event.clientY - boardUI.getBoundingClientRect().top) /
+          (event.clientY - boardDiv.getBoundingClientRect().top) /
             gridSizePx /
             zpwUI.zoomScale
         ),
         Math.floor(
-          (event.clientX - boardUI.getBoundingClientRect().left) /
+          (event.clientX - boardDiv.getBoundingClientRect().left) /
             gridSizePx /
             zpwUI.zoomScale
         ),
@@ -67,14 +69,14 @@ export default function screenManager() {
       displayRack();
       displayPlayableTilesForSelection();
     });
+    return boardDiv;
   }
 
   function setupGameWidgetUI() {
-    let widget = addBasicElement("div", ["widget"]);
-    zpwUI.appendChildToPanel(widget);
-
+    let widgetDiv = addBasicElement("div", ["widget"]);
+    
     ///// rack /////
-    let rackDiv = addBasicElement("div", ["rack"], widget);
+    let rackDiv = addBasicElement("div", ["rack"], widgetDiv);
     Add_Component_Drag_Drop_Container(rackDiv, []);
     rackDiv.addEventListener("dragDrop", (event) => {
       console.log(
@@ -97,16 +99,16 @@ export default function screenManager() {
         return;
       }
       let selectedItemIndex = [...rackDiv.children].indexOf(item);
-      if (selectedItemIndex == rack.selectionIndexes[0]) {
+      if (selectedItemIndex == game.currentPlayer.rack.selectionIndexes[0]) {
         Array.from(rackDiv.children).forEach((child) =>
           child.classList.remove("not-selected")
         );
         rackDiv.querySelector(".selected")?.classList.remove("selected");
-        rack.deselectSingle(selectedItemIndex);
+        game.currentPlayer.rack.deselectSingle(selectedItemIndex);
         removeValidEmptySpacesOnBoardForSelectedTile();
         return;
       }
-      rack.selectSingle(selectedItemIndex);
+      game.currentPlayer.rack.selectSingle(selectedItemIndex);
       Array.from(rackDiv.children).forEach((child) =>
         child.classList.add("not-selected")
       );
@@ -127,7 +129,7 @@ export default function screenManager() {
     let buttonContainer = addBasicElement(
       "div",
       ["widget__button-container"],
-      widget
+      widgetDiv
     );
     let bagButton = addBasicElement(
       "div",
@@ -170,10 +172,10 @@ export default function screenManager() {
       event.stopImmediatePropagation();
       confirmTurn();
       displayRack();
-      displayScoreSheet()
+      displayScoreSheet();
     });
 
-    return { container: widget, rackDiv };
+    return { widgetDiv, rackDiv };
   }
 
   function setupScoreSheet() {
@@ -182,24 +184,24 @@ export default function screenManager() {
   }
 
   function displayScoreSheet() {
-    removeAllChildNodes(scoreSheet)
+    removeAllChildNodes(scoreSheet);
     let openCloseButton = addBasicElement(
       "div",
       ["scoreSheet__openCloseButton"],
       scoreSheet
     );
     let scoreTable = addBasicElement("div", ["scoreSheet__table"], scoreSheet);
-    console.log(game.playerManager.playerCount*2)
-    scoreTable.style.gridTemplateColumns = "repeat(6,1fr)" //`repeat(${players.playerCount*2}, 1fr)`
+    console.log(game.playerManager.playerCount * 2);
+    scoreTable.style.gridTemplateColumns = "repeat(6,1fr)"; //`repeat(${players.playerCount*2}, 1fr)`
     game.scores.forEach((round) => {
       for (let i = 0; i < round.length; i++) {
-        if (scoreTable,round[i] != undefined) {
-          addBasicElement("span", ["scoreSheet__cell"], scoreTable,round[i])
+        if ((scoreTable, round[i] != undefined)) {
+          addBasicElement("span", ["scoreSheet__cell"], scoreTable, round[i]);
         }
       }
     });
     for (let i = 0; i < game.playerManager.playerCount; i++) {
-      scoreTable.children[i].classList.add("scoreSheet__header")
+      scoreTable.children[i].classList.add("scoreSheet__header");
     }
     openCloseButton.addEventListener("mouseup", (event) => {
       scoreTable.classList.toggle("scoreTable__hidden");
@@ -207,7 +209,7 @@ export default function screenManager() {
   }
 
   function displayRack() {
-    rack = currentRack();
+    let rack = game.currentPlayer.rack
     console.table(rack.tiles);
     for (let i = 0; i < 6; i++) {
       let tile = rack.tiles[i];

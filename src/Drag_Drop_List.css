@@ -2,7 +2,7 @@
   display: grid;
   grid-template-columns: repeat(6, 1fr);
 
-  gap: 8px;
+  gap: 1.75%;
   /* padding: 10px; */
   /* scroll-snap-type: y mandatory; */
 }
@@ -10,11 +10,11 @@
 .grid-item {
   user-select: none;
   position: relative;
-  border-radius: 0.5rem;
+  border-radius: 10%
 }
 
 .moving {
   transform: scale(1.075);
-  border-radius: 0.5rem;
+  border-radius: 10%;
 
 }
