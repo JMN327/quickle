@@ -39,6 +39,7 @@ export default function screenManager() {
 
   let zpwUI = ZoomPanWindow(globalContainerDiv);
   zpwUI.bounded = false;
+  zpwUI.disp
   let board = game.board;
   let boardUI = setupBoard();
   zpwUI.appendChildToView(boardUI);
@@ -97,7 +98,7 @@ export default function screenManager() {
       console.log(
         `Switching item: ${event.detail.pickup} with item ${event.detail.swap}`
       );
-      rack.rearrange(event.detail.pickup, event.detail.swap);
+      game.currentPlayer.rack.rearrange(event.detail.pickup, event.detail.swap);
     });
     rackDiv.addEventListener("mousedown", (event) => {
       console.log("Rack Click");

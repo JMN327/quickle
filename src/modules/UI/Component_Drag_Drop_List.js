@@ -3,13 +3,11 @@ export default function Add_Component_Drag_Drop_Container(
   nonGrabClassArr
 ) {
   gridContainer.classList.add("grid-container");
-  const gridContainerStyles = getComputedStyle(gridContainer);
-  let gap = parseInt(gridContainerStyles.getPropertyValue("gap"));
-  let paddingLeft = parseInt(
-    gridContainerStyles.getPropertyValue("padding-left")
-  );
 
-  let selectOffset = "-20%"
+  let gap;
+  let paddingLeft;
+
+  let selectOffset = "-20%";
 
   let item = null;
   let itemToLeft = null;
@@ -43,7 +41,7 @@ export default function Add_Component_Drag_Drop_Container(
   });
 
   function pickUpGridItem(event) {
-    console.log("dragDropping")
+    console.log("dragDropping");
     let earlyExitCheck = nonGrabClassArr.some((CssClass) =>
       event.target.classList.contains(CssClass)
     );
@@ -60,6 +58,13 @@ export default function Add_Component_Drag_Drop_Container(
     if (!item) {
       return;
     }
+
+    paddingLeft = gridContainer.children[0].getBoundingClientRect().left - gridContainer.getBoundingClientRect().left;
+    gap =
+      gridContainer.children[1].getBoundingClientRect().left -
+      gridContainer.children[1].getBoundingClientRect().width -
+      gridContainer.children[0].getBoundingClientRect().left;
+
     pickUpItemIndex = [...gridContainer.children].indexOf(item);
 
     item.style.zIndex = 1000;
@@ -127,7 +132,6 @@ export default function Add_Component_Drag_Drop_Container(
 
     itemLocalPosX =
       event.clientX - initialItemPosX + switchOffset - pointerOffset;
-
     //set the actual position of the grid-item
     if (itemContainerRightX < item.offsetWidth) {
       /* item.parentNode.prepend(item); */
@@ -140,7 +144,7 @@ export default function Add_Component_Drag_Drop_Container(
       itemLocalPosX = paddingLeft;
     }
     if (item.classList.contains("selected")) {
-      item.style.top = selectOffset
+      item.style.top = selectOffset;
     }
     item.style.left = itemLocalPosX + "px";
 
@@ -155,8 +159,9 @@ export default function Add_Component_Drag_Drop_Container(
       return;
     }
     if (item.classList.contains("selected")) {
-      item.style.top = null
+      item.style.top = null;
     }
+
     const snapAnimation = animateSnap(item, 0, -itemLocalPosX, 150);
     snapAnimation.onfinish = () => {
       item.style.left = null;
@@ -196,14 +201,17 @@ export default function Add_Component_Drag_Drop_Container(
 
   function animateSnap(thisItem, startPosition, endPosition, durationMS) {
     let snap;
-    console.log(thisItem.classList.contains("selected"))
     if (thisItem.classList.contains("selected")) {
-       snap = [
-        { transform: `translate(${startPosition}px, ${selectOffset}) scale(1.075)` },
-        { transform: `translate(${endPosition}px,${selectOffset}) scale(1.075)` },
+      snap = [
+        {
+          transform: `translate(${startPosition}px, ${selectOffset}) scale(1.075)`,
+        },
+        {
+          transform: `translate(${endPosition}px,${selectOffset}) scale(1.075)`,
+        },
       ];
     } else {
-       snap = [
+      snap = [
         { transform: `translate(${startPosition}px, 0px) scale(1)` },
         { transform: `translate(${endPosition}px, 0px) scale(1)` },
       ];
