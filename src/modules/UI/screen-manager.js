@@ -239,6 +239,7 @@ export default function screenManager() {
     playButton.addEventListener("mouseup", () => {
       confirmTurn();
       displayRack();
+      displayPlacedAndFixedTilesOnBoard();
     });
 
     return { widgetDiv, rackDiv };
@@ -341,11 +342,8 @@ export default function screenManager() {
 
   function displayPlacedAndFixedTilesOnBoard() {
     removeAllChildNodesByCssClass(boardUI, "tile");
-    let tilePositionsOnBoard = [
-      ...board.positionsByCellState(CellState.PLACED),
-      ...board.positionsByCellState(CellState.FIXED),
-    ];
-    tilePositionsOnBoard.forEach((pos) => {
+    let fixedTilePositionsOnBoard = board.positionsByCellState(CellState.FIXED)
+    fixedTilePositionsOnBoard.forEach((pos) => {
       let tile = board.cells[pos[0]][pos[1]].tile;
       addTileElement(
         tile.color,
@@ -355,6 +353,19 @@ export default function screenManager() {
         pos[0] * gridSizePx,
         pos[1] * gridSizePx
       );
+    });
+    let placedTilePositionsOnBoard = board.positionsByCellState(CellState.PLACED);
+    placedTilePositionsOnBoard.forEach((pos) => {
+      let tile = board.cells[pos[0]][pos[1]].tile;
+      let placedTile = addTileElement(
+        tile.color,
+        tile.shape,
+        boardUI,
+        "board",
+        pos[0] * gridSizePx,
+        pos[1] * gridSizePx
+      );
+      addBasicElement("div", ["placed-tile"], placedTile)
     });
   }
 
