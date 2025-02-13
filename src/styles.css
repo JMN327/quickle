@@ -68,6 +68,7 @@
 }
 
 .board-tile {
+  position: absolute;
   width: 100px;
   height: 100px;
 }
@@ -157,12 +158,16 @@
   opacity: 0;
 }
 
-.placed-tile {
-  position: absolute;
-  width: 93%;
-  height: 93%;
-  border: 3px solid greenyellow;
+.placed-tile{
+  z-index: 9;
+}
+
+.placed-tile__glow {
+  transform: scale(94%);
+  border: 3px solid rgb(0, 208, 255);
   border-radius: 8% ;
+/*   box-shadow: inset 0 0 7px 2px rgb(0, 208, 255);
+ */  z-index: 10;
 }
 .bag-sheet {
   position: absolute;

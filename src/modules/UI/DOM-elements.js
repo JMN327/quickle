@@ -52,7 +52,6 @@ export function addTileElement(color, shape, parent = null, type, top, left) {
   if (left && top) {
     svgTile.style.left = `${left}px`;
     svgTile.style.top = `${top}px`;
-    svgTile.style.position = "absolute"
   } 
   switch (type) {
     case "board":
@@ -70,6 +69,20 @@ export function addTileElement(color, shape, parent = null, type, top, left) {
     parent.appendChild(svgTile);
   }
   return svgTile;
+}
+export function addTileGlowElement(parent = null, top, left) {
+  const glowTile = document.createElement("div");
+  glowTile.classList.add("board-tile");
+  glowTile.classList.add("placed-tile__glow");
+  if (left && top) {
+    glowTile.style.left = `${left}px`;
+    glowTile.style.top = `${top}px`;
+  } 
+
+  if (parent) {
+    parent.appendChild(glowTile);
+  }
+  return glowTile;
 }
 
 export function addNullRackTile(parent = null) {

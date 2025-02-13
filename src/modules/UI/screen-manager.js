@@ -3,6 +3,7 @@ import {
   addNullRackTile,
   addSvgElement,
   addTileElement,
+  addTileGlowElement,
   addValidSpaceElement,
   removeAllChildNodes,
   removeAllChildNodesByCssClass,
@@ -226,7 +227,7 @@ export default function screenManager() {
       game.returnLastPlacedTile();
       displayRack();
       displayBoard();
-      displayPlacedAndFixedTilesOnBoard()
+      displayPlacedAndFixedTilesOnBoard();
     });
     playButton.addEventListener("mousedown", (event) => {
       if (event.button !== 0) {
@@ -341,8 +342,8 @@ export default function screenManager() {
   }
 
   function displayPlacedAndFixedTilesOnBoard() {
-    removeAllChildNodesByCssClass(boardUI, "tile");
-    let fixedTilePositionsOnBoard = board.positionsByCellState(CellState.FIXED)
+    removeAllChildNodesByCssClass(boardUI, "board-tile");
+    let fixedTilePositionsOnBoard = board.positionsByCellState(CellState.FIXED);
     fixedTilePositionsOnBoard.forEach((pos) => {
       let tile = board.cells[pos[0]][pos[1]].tile;
       addTileElement(
@@ -354,7 +355,9 @@ export default function screenManager() {
         pos[1] * gridSizePx
       );
     });
-    let placedTilePositionsOnBoard = board.positionsByCellState(CellState.PLACED);
+    let placedTilePositionsOnBoard = board.positionsByCellState(
+      CellState.PLACED
+    );
     placedTilePositionsOnBoard.forEach((pos) => {
       let tile = board.cells[pos[0]][pos[1]].tile;
       let placedTile = addTileElement(
@@ -365,7 +368,8 @@ export default function screenManager() {
         pos[0] * gridSizePx,
         pos[1] * gridSizePx
       );
-      addBasicElement("div", ["placed-tile"], placedTile)
+      placedTile.classList.add("placed-tile");
+      addTileGlowElement(boardUI, pos[0] * gridSizePx, pos[1] * gridSizePx);
     });
   }
 
