@@ -29,7 +29,7 @@ export default function GameManager() {
     }
     playerManager.randomizePlayerOrder();
     playerManager.players.forEach((player) => {
-      player.rack.drawTiles(bag.draw(player.rack.spaces.count));
+      player.rack.addTiles(bag.draw(player.rack.spaces.count));
     });
     let startWordLengths = [];
     playerManager.players.forEach((player) => {
@@ -42,7 +42,7 @@ export default function GameManager() {
     currentPlayer = playerManager.active;
     inactivePlayers = playerManager.inactive;
     console.log(`GAME STARTED  Start player is ${currentPlayer.name}`);
-    switchGameState(GameState.PLAYING);
+    switchGameState(GameState.FULL_RACK);
   }
 
   //PLAYING
@@ -65,7 +65,12 @@ export default function GameManager() {
 
   function placeSelectedTileOnBoard(row, col) {
     board.addTile(currentPlayer.rack.pickUpSelection(), row, col);
+    console.table(board.info)
     //places the selected tile on the board
+  }
+
+  function returnLastPlacedTile() {
+    currentPlayer.rack.addTiles([board.removeLastPlacedTile()])
   }
 
   function confirmTurn() {
@@ -75,7 +80,7 @@ export default function GameManager() {
     let score = board.score;
     board.fixTiles();
     currentPlayer.score.add(score);
-    currentPlayer.rack.drawTiles(bag.draw(currentPlayer.rack.spaces.count));
+    currentPlayer.rack.addTiles(bag.draw(currentPlayer.rack.spaces.count));
     playerManager.changeActivePlayer();
     currentPlayer = playerManager.active;
     inactivePlayers = playerManager.inactive;
@@ -189,5 +194,6 @@ export default function GameManager() {
     rearrangeTilesOnRack,
     playableTilesForSelection,
     placeSelectedTileOnBoard,
+    returnLastPlacedTile,
   };
 }

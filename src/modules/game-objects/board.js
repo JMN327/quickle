@@ -12,6 +12,8 @@ export default function Board() {
   let cells = [[Cell()]];
   cells[0][0].activateFirstCell();
 
+  let placedTiles = [];
+
   let bounds = {
     left: 0,
     top: 0,
@@ -46,6 +48,7 @@ export default function Board() {
     /* let row = cellsOffsetRow(rowToOffset);
     let col = cellsOffsetCol(colToOffset); */
 
+    placedTiles.push(tile.number);
     // validity checks to be handed to player //
     if (!tileIsValidForCell(tile, row, col)) {
       throw new Error("The tile is not on the cells valid tiles list");
@@ -69,12 +72,23 @@ export default function Board() {
     console.log(`SCORE IS ${score()}`);
   }
 
-  function removeTile(rowToOffset, colToOffset) {
-    console.log(`REMOVING TILE at [${rowToOffset},${colToOffset}]`);
-    let row = cellsOffsetRow(rowToOffset);
-    let col = cellsOffsetCol(colToOffset);
+  function removeLastPlacedTile() {
+    if (placedTiles.length == 0) {
+      return;
+    }
+    let tileToRemove = placedTiles.pop();
+    let coordinates = getCoordinatesOfTileToRemove(tileToRemove);
+    let row = coordinates.i;
+    let col = coordinates.j;
+    console.log(row, col);
     let removedTile = cells[row][col].removeTile();
-    console.log(removedTile);
+    console.log(
+      `REMOVING TILE ${removedTile.number} ${reverseEnum(
+        Color,
+        tileToRemove.color
+      )} ${reverseEnum(Shape, removedTile.shape)}`
+    );
+
     updateCheckLists(AddRemove.REMOVE, row, col, removedTile);
     let edges = checkForEdgeShrink(row, col);
     edges.forEach((direction) => {
@@ -82,7 +96,11 @@ export default function Board() {
       leftOffset -= direction == Direction.LEFT ? 1 : 0;
       topOffset -= direction == Direction.TOP ? 1 : 0;
     });
+
+    console.log(removedTile);
+    console.table(info());
     console.log(`SCORE IS ${score()}`);
+    return removedTile;
   }
 
   function fixTiles() {
@@ -99,6 +117,9 @@ export default function Board() {
     console.log(
       `GETTING SCORE FOR PLACED CELLS: ${JSON.stringify(placedCells)}`
     );
+    if (placedCells.length == 0) {
+      return;
+    }
 
     if (placedCells.length == 1) {
       score += stem(Direction.LEFT, placedCells[0][0], placedCells[0][1]);
@@ -188,6 +209,16 @@ export default function Board() {
       }
     }
     return info;
+  }
+
+  function getCoordinatesOfTileToRemove(tileToRemoveByNumber) {
+    for (let i = 0; i < bounds.vSize; i++) {
+      for (let j = 0; j < bounds.hSize; j++) {
+        if (cells[i][j]?.tile?.number == tileToRemoveByNumber) {
+          return { i, j };
+        }
+      }
+    }
   }
 
   function tileIsValidForCell(tile, row, col) {
@@ -339,20 +370,31 @@ export default function Board() {
     let t = radiate(Direction.TOP, row, col);
     let r = radiate(Direction.RIGHT, row, col);
     let b = radiate(Direction.BOTTOM, row, col);
-    let hTilesToAddRemove = [tile];
-    hTilesToAddRemove = hTilesToAddRemove.concat(
-      l.tilesToAddRemoveIfUpdatingChecklists
-    );
-    hTilesToAddRemove = hTilesToAddRemove.concat(
+
+    let hTilesToAdd = [tile];
+    hTilesToAdd = hTilesToAdd.concat(l.tilesToAddRemoveIfUpdatingChecklists);
+    hTilesToAdd = hTilesToAdd.concat(r.tilesToAddRemoveIfUpdatingChecklists);
+    let vTilesToAdd = [tile];
+    vTilesToAdd = vTilesToAdd.concat(t.tilesToAddRemoveIfUpdatingChecklists);
+    vTilesToAdd = vTilesToAdd.concat(b.tilesToAddRemoveIfUpdatingChecklists);
+
+    let lTilesToRemove = [tile];
+    lTilesToRemove = lTilesToRemove.concat(
       r.tilesToAddRemoveIfUpdatingChecklists
     );
-    let vTilesToAddRemove = [tile];
-    vTilesToAddRemove = vTilesToAddRemove.concat(
-      t.tilesToAddRemoveIfUpdatingChecklists
-    );
-    vTilesToAddRemove = vTilesToAddRemove.concat(
+    let tTilesToRemove = [tile];
+    tTilesToRemove = tTilesToRemove.concat(
       b.tilesToAddRemoveIfUpdatingChecklists
     );
+    let rTilesToRemove = [tile];
+    rTilesToRemove = rTilesToRemove.concat(
+      l.tilesToAddRemoveIfUpdatingChecklists
+    );
+    let bTilesToRemove = [tile];
+    bTilesToRemove = bTilesToRemove.concat(
+      t.tilesToAddRemoveIfUpdatingChecklists
+    );
+
     let lCell = l.activeCellFound;
     let tCell = t.activeCellFound;
     let rCell = r.activeCellFound;
@@ -364,46 +406,72 @@ export default function Board() {
 
     function sendTiles(direction) {
       let uCell;
-      let tilesToAddRemove;
+      let tilesToAdd;
+      let tilesToRemove;
       switch (direction) {
         case Direction.LEFT:
-          tilesToAddRemove = hTilesToAddRemove;
+          tilesToAdd = hTilesToAdd;
+          tilesToRemove = lTilesToRemove;
           uCell = lCell;
           break;
         case Direction.TOP:
-          tilesToAddRemove = vTilesToAddRemove;
+          tilesToAdd = vTilesToAdd;
+          tilesToRemove = tTilesToRemove;
           uCell = tCell;
           break;
         case Direction.RIGHT:
-          tilesToAddRemove = hTilesToAddRemove;
+          tilesToAdd = hTilesToAdd;
+          tilesToRemove = rTilesToRemove;
           uCell = rCell;
           break;
         case Direction.BOTTOM:
-          tilesToAddRemove = vTilesToAddRemove;
+          tilesToAdd = vTilesToAdd;
+          tilesToRemove = bTilesToRemove;
           uCell = bCell;
           break;
       }
+      console.log("tiles to remove:");
+      console.table(tilesToRemove);
 
       console.log(
         `NEW CELL CHECK FROM: ${direction} updating cell [${uCell.row}][${uCell.col}] checklist matrix BEFORE update:`
       );
       console.table(cells[uCell.row][uCell.col].checkList.matrix(direction));
+      if (addRemove == AddRemove.ADD) {
+        tilesToAdd.forEach((tile) => {
+          console.log(
+            `Adding to cell [${uCell.row},${uCell.col}] with tile ${reverseEnum(
+              Color,
+              tile.color
+            )} ${reverseEnum(Shape, tile.shape)}`
+          );
 
-      tilesToAddRemove.forEach((tile) => {
-        console.log(
-          `Updating cell [${uCell.row},${uCell.col}] with tile ${reverseEnum(
-            Color,
-            tile.color
-          )} ${reverseEnum(Shape, tile.shape)}`
-        );
+          cells[uCell.row][uCell.col].checkList.addRemoveSymbol(
+            direction,
+            addRemove,
+            tile.color,
+            tile.shape
+          );
+        });
+      } else {
+        tilesToRemove.forEach((tile) => {
+          console.log(
+            `Removing from cell [${uCell.row},${
+              uCell.col
+            }] with tile ${reverseEnum(Color, tile.color)} ${reverseEnum(
+              Shape,
+              tile.shape
+            )}`
+          );
 
-        cells[uCell.row][uCell.col].checkList.addRemoveSymbol(
-          direction,
-          addRemove,
-          tile.color,
-          tile.shape
-        );
-      });
+          cells[uCell.row][uCell.col].checkList.addRemoveSymbol(
+            direction,
+            addRemove,
+            tile.color,
+            tile.shape
+          );
+        });
+      }
 
       console.log(
         `CELL CHECK OVER FROM:${direction}, updated cell [${uCell.row}][${uCell.col}] checklist matrix AFTER update:`
@@ -414,8 +482,8 @@ export default function Board() {
           cells[uCell.row][uCell.col].state
         }`
       );
-      console.log(`Valid tiles for cell after updates:`);
-      console.table(cells[uCell.row][uCell.col].checkList.validSymbolsText);
+      //console.log(`Valid tiles for cell after updates:`);
+      //console.table(cells[uCell.row][uCell.col].checkList.validSymbolsText);
     }
 
     console.log(`UPDATES FINISHED.  Board:`);
@@ -499,6 +567,7 @@ export default function Board() {
             arr.shift();
           }
         });
+        //placedTiles.forEach((pt)=>{pt.ptCol++})
         break;
       case Direction.TOP:
         if (addRemove == AddRemove.ADD) {
@@ -510,6 +579,7 @@ export default function Board() {
         } else if (addRemove == AddRemove.REMOVE) {
           cells.shift();
         }
+        //placedTiles.forEach((pt)=>{pt.ptRow++})
         break;
       case Direction.RIGHT:
         cells.forEach((arr) => {
@@ -560,11 +630,14 @@ export default function Board() {
     get score() {
       return score();
     },
+    get placedTiles() {
+      return placedTiles;
+    },
     cellsByCellState,
     positionsByCellState,
     playableCells,
     addTile,
-    removeTile,
+    removeLastPlacedTile,
     fixTiles,
   };
 }

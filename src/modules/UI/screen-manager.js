@@ -39,7 +39,6 @@ export default function screenManager() {
 
   let zpwUI = ZoomPanWindow(globalContainerDiv);
   zpwUI.bounded = false;
-  zpwUI.disp
   let board = game.board;
   let boardUI = setupBoard();
   zpwUI.appendChildToView(boardUI);
@@ -47,16 +46,16 @@ export default function screenManager() {
   zpwUI.appendChildToPanel(gameWidgetUI.widgetDiv);
   let scoreSheetUI = setupScoreSheet();
   zpwUI.appendChildToPanel(scoreSheetUI);
-  let bagUI = setupBag()
+  let bagUI = setupBag();
   zpwUI.appendChildToPanel(bagUI);
-  
+
   // setup Game
   game.addPlayer({ PlayerType: PlayerType.HUMAN, name: "Elspeth" });
   game.addPlayer({ PlayerType: PlayerType.HUMAN, name: "Jinny" });
   game.addPlayer({ PlayerType: PlayerType.HUMAN, name: "Rose" });
   game.startGame();
   displayRack();
-  displayBag() 
+  displayBag();
   displayBoard();
   displayPlacedAndFixedTilesOnBoard();
 
@@ -78,7 +77,6 @@ export default function screenManager() {
             zpwUI.zoomScale
         ),
       ];
-      console.log(gridPos);
       game.placeSelectedTileOnBoard(gridPos[0], gridPos[1]);
       displayBoard();
       displayPlacedAndFixedTilesOnBoard();
@@ -160,12 +158,21 @@ export default function screenManager() {
     );
 
     let scoreIcon = addSvgElement("score", ["button-icon"], scoreButton);
-    let swapButton = addBasicElement(
+    let swapReturnButton = addBasicElement(
       "div",
       ["widget__button", "swap"],
       buttonContainer
     );
-    let swapIcon = addSvgElement("swap", ["button-icon"], swapButton);
+    let swapIcon = addSvgElement(
+      "swap",
+      ["button-icon", "swap"],
+      swapReturnButton
+    );
+    let returnIcon = addSvgElement(
+      "return",
+      ["button-icon", "return", "hidden"],
+      swapReturnButton
+    );
 
     let playButton = addBasicElement(
       "div",
@@ -176,7 +183,7 @@ export default function screenManager() {
 
     bagButton.addEventListener("mousedown", (event) => {
       if (event.button !== 0) {
-        console.log(event.button )
+        console.log(event.button);
         return;
       }
       console.log("bag Click");
@@ -184,7 +191,7 @@ export default function screenManager() {
     });
     bagButton.addEventListener("mouseup", (event) => {
       if (event.button !== 0) {
-        console.log(event.button )
+        console.log(event.button);
         return;
       }
       bagUI.classList.toggle("hidden");
@@ -192,7 +199,7 @@ export default function screenManager() {
     });
     scoreButton.addEventListener("mousedown", (event) => {
       if (event.button !== 0) {
-        console.log(event.button )
+        console.log(event.button);
         return;
       }
       console.log("score Click");
@@ -200,34 +207,39 @@ export default function screenManager() {
     });
     scoreButton.addEventListener("mouseup", (event) => {
       if (event.button !== 0) {
-        console.log(event.button )
+        console.log(event.button);
         return;
       }
       scoreSheetUI.classList.toggle("hidden");
       displayScoreSheet();
     });
 
-    swapButton.addEventListener("mousedown", (event) => {
+    swapReturnButton.addEventListener("mousedown", (event) => {
       if (event.button !== 0) {
-        console.log(event.button )
+        console.log(event.button);
         return;
       }
       console.log("swap Click");
       event.stopImmediatePropagation();
     });
+    swapReturnButton.addEventListener("mouseup", () => {
+      game.returnLastPlacedTile();
+      displayRack();
+      displayBoard();
+      displayPlacedAndFixedTilesOnBoard()
+    });
     playButton.addEventListener("mousedown", (event) => {
       if (event.button !== 0) {
-        console.log(event.button )
+        console.log(event.button);
         return;
       }
       console.log("play Click");
       event.stopImmediatePropagation();
     });
-    playButton.addEventListener("mouseup", () =>{
+    playButton.addEventListener("mouseup", () => {
       confirmTurn();
       displayRack();
-
-    })
+    });
 
     return { widgetDiv, rackDiv };
   }
@@ -241,40 +253,43 @@ export default function screenManager() {
 
   function displayBag() {
     removeAllChildNodes(bagUI);
-    let bagInfoDiv= addBasicElement("div", ["bag-info"], bagUI);
-    let info = new Array(6).fill().map(() => new Array(6).fill(0))
-    game.bag.tiles.forEach((tile)=>{
-      info[tile.color][tile.shape]++
-    })
-    console.log(`inactive players amount: ${game.inactivePlayers.length}`)
-    game.inactivePlayers.forEach((player)=>{
-      player.rack.tiles.forEach((tile)=>{
-        info[tile.color][tile.shape]++
-      })
-    })
-    console.table(info)
+    let bagInfoDiv = addBasicElement("div", ["bag-info"], bagUI);
+    let info = new Array(6).fill().map(() => new Array(6).fill(0));
+    game.bag.tiles.forEach((tile) => {
+      info[tile.color][tile.shape]++;
+    });
+    console.log(`inactive players amount: ${game.inactivePlayers.length}`);
+    game.inactivePlayers.forEach((player) => {
+      player.rack.tiles.forEach((tile) => {
+        info[tile.color][tile.shape]++;
+      });
+    });
+    console.table(info);
     for (let i = 0; i < 6; i++) {
       for (let j = 0; j < 6; j++) {
-         let tile = addTileElement(
-          i,
-          j,
-          bagInfoDiv,
-          "bag"
-        );
-       addBasicElement("div",["bag-text"],tile, info[i][j])
+        let tile = addTileElement(i, j, bagInfoDiv, "bag");
+        addBasicElement("div", ["bag-text"], tile, info[i][j]);
       }
-      
     }
   }
 
   function displayScoreSheet() {
     removeAllChildNodes(scoreSheetUI);
-    let scoreTableDiv = addBasicElement("div", ["score-sheet__table"], scoreSheetUI);
+    let scoreTableDiv = addBasicElement(
+      "div",
+      ["score-sheet__table"],
+      scoreSheetUI
+    );
     scoreTableDiv.style.gridTemplateColumns = "repeat(6,1fr)"; //`repeat(${players.playerCount*2}, 1fr)`
     game.scores.forEach((round) => {
       for (let i = 0; i < round.length; i++) {
         if ((scoreTableDiv, round[i] != undefined)) {
-          addBasicElement("span", ["score-sheet__cell"], scoreTableDiv, round[i]);
+          addBasicElement(
+            "span",
+            ["score-sheet__cell"],
+            scoreTableDiv,
+            round[i]
+          );
         }
       }
     });

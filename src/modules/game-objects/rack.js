@@ -70,7 +70,7 @@ export default function Rack() {
     return emptySpaces;
   }
 
-  function drawTiles(arr) {
+  function addTiles(arr) {
     if (!arr) {
       throw new Error("No tiles passed for adding");
     }
@@ -139,7 +139,7 @@ export default function Rack() {
     get tiles() {
       return tiles;
     },
-    drawTiles,
+    addTiles,
     pickUpSelection,
     rearrange,
     select,
