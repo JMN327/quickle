@@ -78,8 +78,10 @@ export default function GameManager() {
     if (board.cellsByCellState(CellState.PLACED).length < 1) {
       throw new Error("cannot confirm turn while no cells have been placed");
     }
+    board.resetPlacedTiles();
     let score = board.score;
     board.fixTiles();
+    console.log(`placed tiles length ${board.placedTiles.length }`)
     currentPlayer.score.add(score);
     currentPlayer.rack.addTiles(bag.draw(currentPlayer.rack.spaces.count));
     playerManager.changeActivePlayer();

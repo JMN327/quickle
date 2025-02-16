@@ -172,10 +172,19 @@
 }
 .placed-tile__score{
   position: absolute;
-  width: 20px;
-  height: 20px;
-  background-color: var(--the-gray);
-  z-index: 10;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 35px;
+  height: 35px;
+  background-color: black;
+  color: yellowgreen;
+  font-weight: 700;
+  font-size: 1.5rem;
+  z-index: 12;
+  border: 5px solid rgb(0, 197, 197);
+  border-radius: 20% ;
 }
 .bag-sheet {
   position: absolute;

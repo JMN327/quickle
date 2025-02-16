@@ -4,6 +4,7 @@ import {
   addSvgElement,
   addTileElement,
   addTileGlowElement,
+  addTileScoreElement,
   addValidSpaceElement,
   removeAllChildNodes,
   removeAllChildNodesByCssClass,
@@ -344,6 +345,7 @@ export default function screenManager() {
 
   function displayPlacedAndFixedTilesOnBoard() {
     removeAllChildNodesByCssClass(boardUI, "board-tile");
+    removeAllNodesByCssClass(".placed-tile__score");
     let fixedTilePositionsOnBoard = board.positionsByCellState(CellState.FIXED);
     fixedTilePositionsOnBoard.forEach((pos) => {
       let tile = board.cells[pos[0]][pos[1]].tile;
@@ -372,11 +374,15 @@ export default function screenManager() {
       );
       placedTile.classList.add("placed-tile");
       addTileGlowElement(boardUI, pos[0] * gridSizePx, pos[1] * gridSizePx);
-      
-      if (!scoreDiv) {
-        //removeAllNodesByCssClass(".placed-tile__score");
-         scoreDiv = addBasicElement("div", ["placed-tile__score"], placedTile, `${game.currentWordScore}${game.currentWordScore == 1? "pt":"pts"}`);
-        
+      if (
+        tile.number == game.board.placedTiles[game.board.placedTiles.length - 1]
+      ) {
+        scoreDiv = addTileScoreElement(
+          boardUI,
+          (pos[0] + 1) * gridSizePx,
+          (pos[1] + 1) * gridSizePx
+        );
+        scoreDiv.textContent = `${game.currentWordScore}`; //${game.currentWordScore == 1 ? "pt" : "pts"
       }
     });
   }

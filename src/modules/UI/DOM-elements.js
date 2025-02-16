@@ -84,6 +84,19 @@ export function addTileGlowElement(parent = null, top, left) {
   }
   return glowTile;
 }
+export function addTileScoreElement(parent = null, top, left) {
+  const scoreDiv = document.createElement("div");
+  scoreDiv.classList.add("placed-tile__score");
+  if (parent) {
+    parent.appendChild(scoreDiv);
+  }
+  if (left && top) {
+    scoreDiv.style.left = `${left - scoreDiv.getBoundingClientRect().width / 3}px`;
+    scoreDiv.style.top = `${top - scoreDiv.getBoundingClientRect().height / 3}px`;
+  } 
+
+  return scoreDiv;
+}
 
 export function addNullRackTile(parent = null) {
   const nullTile = document.createElement("div");

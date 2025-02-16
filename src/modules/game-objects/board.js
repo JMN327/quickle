@@ -103,6 +103,12 @@ export default function Board() {
     return removedTile;
   }
 
+  function resetPlacedTiles(){
+    console.table(placedTiles)
+    placedTiles = []
+    console.table(placedTiles)
+  }
+
   function fixTiles() {
     positionsByCellState(CellState.PLACED).forEach((pos) => {
       cells[pos[0]][pos[1]].fixTile();
@@ -567,7 +573,6 @@ export default function Board() {
             arr.shift();
           }
         });
-        //placedTiles.forEach((pt)=>{pt.ptCol++})
         break;
       case Direction.TOP:
         if (addRemove == AddRemove.ADD) {
@@ -579,7 +584,6 @@ export default function Board() {
         } else if (addRemove == AddRemove.REMOVE) {
           cells.shift();
         }
-        //placedTiles.forEach((pt)=>{pt.ptRow++})
         break;
       case Direction.RIGHT:
         cells.forEach((arr) => {
@@ -633,6 +637,7 @@ export default function Board() {
     get placedTiles() {
       return placedTiles;
     },
+    resetPlacedTiles,
     cellsByCellState,
     positionsByCellState,
     playableCells,
