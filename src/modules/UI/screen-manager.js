@@ -7,6 +7,7 @@ import {
   addValidSpaceElement,
   removeAllChildNodes,
   removeAllChildNodesByCssClass,
+  removeAllNodesByCssClass,
 } from "./DOM-elements.js";
 import ZoomPanWindow from "./ui-zoom-pan-window.js";
 import GameManager from "../game-managers/game-manager.js";
@@ -358,6 +359,7 @@ export default function screenManager() {
     let placedTilePositionsOnBoard = board.positionsByCellState(
       CellState.PLACED
     );
+    let scoreDiv;
     placedTilePositionsOnBoard.forEach((pos) => {
       let tile = board.cells[pos[0]][pos[1]].tile;
       let placedTile = addTileElement(
@@ -370,6 +372,12 @@ export default function screenManager() {
       );
       placedTile.classList.add("placed-tile");
       addTileGlowElement(boardUI, pos[0] * gridSizePx, pos[1] * gridSizePx);
+      
+      if (!scoreDiv) {
+        //removeAllNodesByCssClass(".placed-tile__score");
+         scoreDiv = addBasicElement("div", ["placed-tile__score"], placedTile, `${game.currentWordScore}${game.currentWordScore == 1? "pt":"pts"}`);
+        
+      }
     });
   }
 

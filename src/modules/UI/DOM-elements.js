@@ -121,6 +121,9 @@ export function removeAllChildNodesByCssClass(parent, cssClass) {
     }
   })
 }
+export function removeAllNodesByCssClass( cssClass) {
+  document.querySelectorAll(cssClass).forEach(e => e.remove())
+}
 
 function reverseEnum(e, value) {
   for (let k in e) if (e[k] == value) return k;

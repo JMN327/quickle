@@ -66,6 +66,7 @@ export default function GameManager() {
   function placeSelectedTileOnBoard(row, col) {
     board.addTile(currentPlayer.rack.pickUpSelection(), row, col);
     console.table(board.info)
+    console.log(`current word score is: ${currentWordScore()}`)
     //places the selected tile on the board
   }
 
@@ -154,6 +155,10 @@ export default function GameManager() {
     return rounds;
   }
 
+  function currentWordScore() {
+    return board.score
+  }
+
   //GAME STATE
   function switchGameState(gameState) {
     state = gameState;
@@ -186,6 +191,9 @@ export default function GameManager() {
     },
     get scores() {
       return scores();
+    },
+    get currentWordScore() {
+      return currentWordScore()
     },
     addPlayer,
     startGame,
