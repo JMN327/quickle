@@ -53,9 +53,8 @@ export default function screenManager() {
   zpwUI.appendChildToPanel(bagUI);
 
   // setup Game
-  game.addPlayer({ PlayerType: PlayerType.HUMAN, name: "Elspeth" });
-  game.addPlayer({ PlayerType: PlayerType.HUMAN, name: "Jinny" });
-  game.addPlayer({ PlayerType: PlayerType.HUMAN, name: "Rose" });
+  game.addPlayer({ PlayerType: PlayerType.HUMAN, name: "Lisa" });
+  game.addPlayer({ PlayerType: PlayerType.HUMAN, name: "Dad" });
   game.startGame();
   displayRack();
   displayBag();
@@ -247,6 +246,7 @@ export default function screenManager() {
       displayRack();
       displayBar();
       displayPlacedAndFixedTilesOnBoard();
+      displayScoreSheet();
     });
 
     ///// bar /////

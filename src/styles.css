@@ -48,12 +48,19 @@
   position: relative;
 }
 
+body{
+
+  background-size: cover;
+/*   background-image: url("https://img.freepik.com/free-vector/gradient-winter-solstice-background_23-2149174668.jpg?t=st=1739912359~exp=1739915959~hmac=7fa3c26801bd2eb21121d9988d95f71c4dbd9c1a64075ee1d2afedbde997f4c7&w=1380");
+ */  background-image: url("https://img.freepik.com/free-vector/flat-summer-background-videocalls_23-2148958164.jpg?t=st=1739912462~exp=1739916062~hmac=9ce98a855c7b9b93ab7bc6fbb3ae8c2f4941b1d8e140e5fed41ed2c6a297ff5f&w=1380");
+}
+
 .frame {
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle, rgba(63,94,251,1) 0%, rgba(252,70,107,1) 100%);
+/*   background: linear-gradient(0deg, rgba(127,127,255,1) 0%, rgba(0,255,255,1) 34%, rgba(127,255,127,1) 50%, rgba(255,255,127,1) 66%, rgba(255,127,127,1) 100%);}
+ */
 }
-
 .view {
   position: absolute;
   
