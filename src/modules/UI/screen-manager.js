@@ -61,6 +61,7 @@ export default function screenManager() {
   displayBag();
   displayBoard();
   displayPlacedAndFixedTilesOnBoard();
+  displayBar();
 
   function setupBoard() {
     let boardDiv = addBasicElement("div", ["board"], globalContainerDiv);
@@ -91,6 +92,8 @@ export default function screenManager() {
 
   function setupGameWidgetUI() {
     let widgetDiv = addBasicElement("div", ["widget"]);
+
+    
 
     ///// rack /////
     let rackDiv = addBasicElement("div", ["rack"], widgetDiv);
@@ -242,10 +245,15 @@ export default function screenManager() {
     playButton.addEventListener("mouseup", () => {
       confirmTurn();
       displayRack();
+      displayBar();
       displayPlacedAndFixedTilesOnBoard();
     });
 
-    return { widgetDiv, rackDiv };
+    ///// bar /////
+
+    let barDiv = addBasicElement("div", ["bar"], widgetDiv, "");
+
+    return { widgetDiv, barDiv, rackDiv };
   }
 
   function setupScoreSheet() {
@@ -300,6 +308,13 @@ export default function screenManager() {
     for (let i = 0; i < game.playerManager.playerCount; i++) {
       scoreTableDiv.children[i].classList.add("score-sheet__header");
     }
+  }
+
+  function displayBar() {
+    console.log("displaying bar");
+    gameWidgetUI.barDiv.textContent = `${
+      game.currentPlayer.name
+    } ${game.currentPlayer.score.currentScore()}pts`;
   }
 
   function displayRack() {

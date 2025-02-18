@@ -29,6 +29,11 @@ export default function Player(playerType = PlayerType.HUMAN, name = "Human") {
       turnScores = [];
       accumulatedScores = [];
     },
+    currentScore: () => {
+      console.log(score.accumulatedScores[score.accumulatedScores.length - 1])
+      console.trace
+      return (score.accumulatedScores[score.accumulatedScores.length - 1] || 0)
+    }
   };
 
   if (playerType == PlayerType.BOT) {
