@@ -35,11 +35,14 @@ export default function screenManager() {
     });
 
   let gridSizePx = 100;
-  let globalContainerDiv = document.querySelector("body");
+  let body = document.querySelector("body")
+  let globalContainerDiv = addBasicElement("div",["global-container"], body)
+  let backgroundDiv = addBasicElement("div",["background"], body)
 
   let str = randomIntFromInterval(1,images.length)
   console.log(str, images[str])
-  globalContainerDiv.style.backgroundImage = `url(${images[randomIntFromInterval(1,images.length)]})`
+  backgroundDiv.style.backgroundImage = `url(${images[randomIntFromInterval(1,images.length)]})`
+  //backgroundDiv.style.filter = "blur(20px)"
 
   function randomIntFromInterval(min, max) { // min and max included 
     return Math.floor(Math.random() * (max - min + 1) + min).toLocaleString('en-US', {

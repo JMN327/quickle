@@ -43,15 +43,22 @@
 }
 
 .zpw {
-  outline: solid 0px hsl(120, 55%, 45%);
   overflow: hidden;
   position: relative;
 }
 
-body{
-
+.background{
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
   background-size: cover;
   background-position: center;
+  filter:  saturate(.7);
+  z-index: -1;
+}
+
+.global-container{
+  position: absolute;
 }
 
 .frame {
