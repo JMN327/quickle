@@ -35,7 +35,6 @@ export default function GameManager() {
     playerManager.players.forEach((player) => {
       startWordLengths.push(player.rack.longestWordLength());
     });
-    console.log(startWordLengths.indexOf(Math.max(...startWordLengths)));
     playerManager.setStartPlayer(
       startWordLengths.indexOf(Math.max(...startWordLengths))
     );
@@ -76,6 +75,7 @@ export default function GameManager() {
 
   function confirmTurn() {
     if (board.cellsByCellState(CellState.PLACED).length < 1) {
+      return
       throw new Error("cannot confirm turn while no cells have been placed");
     }
     board.resetPlacedTiles();

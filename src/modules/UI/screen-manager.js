@@ -20,6 +20,8 @@ import Add_Component_Drag_Drop_Container, {
 import { Color } from "../enums/color.js";
 import { Shape } from "../enums/shape.js";
 
+import { images} from "./images.js";
+
 export default function screenManager() {
   // lock the screen from portrait orientation
   let oppositeOrientation = "landscape";
@@ -34,6 +36,17 @@ export default function screenManager() {
 
   let gridSizePx = 100;
   let globalContainerDiv = document.querySelector("body");
+
+  let str = randomIntFromInterval(1,images.length)
+  console.log(str, images[str])
+  globalContainerDiv.style.backgroundImage = `url(${images[randomIntFromInterval(1,images.length)]})`
+
+  function randomIntFromInterval(min, max) { // min and max included 
+    return Math.floor(Math.random() * (max - min + 1) + min).toLocaleString('en-US', {
+      minimumIntegerDigits: 2,
+      useGrouping: false
+    });
+  }
 
   //module scoped variables
   let game = GameManager(); // maybe player details and start game
