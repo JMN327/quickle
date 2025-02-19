@@ -82,11 +82,6 @@
   position: absolute;
 }
 
-.board-tile {
-  position: absolute;
-  width: 100px;
-  height: 100px;
-}
 
 .tile {
   display: flex;
@@ -98,6 +93,9 @@
     0px 16px 12px -6px rgba(0, 0, 0, 0.3);
   transition-property: filter;
   transition-duration: 0.15s;
+}
+.svg-tile__svg{
+  height: 100%;
 }
 .not-selected {
   filter: brightness(0.7) saturate(0.7);
@@ -181,6 +179,24 @@
   margin-bottom: min(2%, 12px);
 }
 
+.board-tile {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+}
+
+/* .board-tile::before{
+  position: absolute;
+  width: 100px;
+  height: 100px;
+
+  border-radius: 8%;
+  content:"";
+  z-index: -1;
+  box-shadow: 0 0 20px 20px rgba(255, 255, 255, 0.75);
+} */
+
+
 .rack-tile {
   max-width: 85px;
   aspect-ratio: 1;
@@ -198,6 +214,9 @@
 }
 
 .placed-tile__glow {
+  position: absolute;
+  width: 100px;
+  height: 100px;
   transform: scale(105%);
   border: 5px solid rgb(0, 197, 197);
   border-radius: 10%;
